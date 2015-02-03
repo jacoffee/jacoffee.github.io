@@ -1,5 +1,3 @@
-@import "compass/css3/box-shadow";
-
 pre {
 	counter-reset: line-numbering;
 	border: solid 1px #d9d9d9;
