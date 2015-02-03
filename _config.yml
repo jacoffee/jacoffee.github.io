@@ -1,0 +1,12 @@
+# Build settings
+markdown: redcarpet-pygments
+lineanchors: true
+# extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink", "tables", "with_toc_data"]
+
+defaults:
+  -
+    scope:
+      path: "" # an empty string here means all files in the project
+      type: "posts"
+    values:
+      layout: "default"
