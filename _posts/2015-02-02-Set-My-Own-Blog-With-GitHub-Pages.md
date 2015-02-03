@@ -22,7 +22,7 @@ tags: [Github Pages, Jekyll, RedCarpet]
   最后的方案, Cmd Markdown(博客内容编辑，导出) --》Jekyll的内容渲染 --》 Github Pages发布页面， 至于图片的存储选择了又拍云。 
     
 # 搭建
-  整个项目的搭建主要是集中在Jekyll系统的搭建，至于在Github上新建这个博客项目按照此页面所说的即可([GitHub Pages](https://pages.github.com/) )。
+  整个项目的搭建主要是集中在Jekyll系统的搭建，至于在Github上新建这个博客项目按照此页面所说的即可([GitHub Pages](https://pages.github.com/))。
   Jekyll官网对于整个配置感觉讲的不是很清晰，下面简单回顾一下，我自己搭建过程中总结的知识点。
   
   + 项目结构  
