@@ -47,9 +47,9 @@ tags: [Github Pages, Jekyll, RedCarpet]
     ![Redcarpet高亮Ruby](http://jacoffee-blog.b0.upaiyun.com/2015-02-03/Ruby%20Highlight%20Redcarpet.png)
 
     虽然Jekyll最新版(2.0)已经支持redcarpet2了, 但是我在搭建的过程中还是需要在_config.yml中配置如下的参数，否则```式高亮无法生效
-    <pre>
+    <div class="highlight">
        markdown: redcarpet
-    </pre>
+    </div>
     不过默认的高亮的颜色不是太好看, 并且没有行号，所以参考[这篇博客](http://blog.leonardfactory.com/2013/05/05/code-fenced-blocks-pygments-and-line-numbers-with-jekyll/)解决了这个问题。
     这样一来，基本博客的书写就没有什么问题了。
 
