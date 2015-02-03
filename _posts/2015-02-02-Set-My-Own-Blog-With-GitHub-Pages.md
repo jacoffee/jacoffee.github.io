@@ -2,12 +2,12 @@
 category: posts
 date: 2015-02-02 17:15:16 UTC
 title: 使用Github Pages + Jekyll搭建个人Blog 
-labels: [Github Pages, Jekyll, RedCarpet]
+tags: [Github Pages, Jekyll, RedCarpet]
 ---
 
-# 起因
+
   正式投身于Scala的开发已有1年由余，期间一直在不断学习新的知识Lift、Git、Mongo、Maven, Lucene......但是一直没有机会将自己所学所想写下来，遗憾没能抓住写博客总结这个机会来加深对于各个知识点的理解。终于在2015年开始行动起来, 开始了这个博客系统的搭建。
-  
+
 # 选择
 #### CSDN  
   之前在CSDN上面写过一篇博客但是感觉对于代码的输出等做的不是太好，这样写的时候就会不太方便。

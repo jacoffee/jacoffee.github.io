@@ -1,3 +1,14 @@
+# Site settings
+title: Allen写字的地方
+author: Allen
+email: 361541673@163.com
+description: "编程不仅仅是代码的积累，也是思考深度和广度的积累，写博客是一种不错的途径"
+url: "http://allenchou.com"
+
+# Conversion
+# excerpt_separator: "\n\n" control where Jekyll to extract the displaying part of post in the index page
+
+
 # Build settings
 markdown: redcarpet-pygments
 lineanchors: true
