@@ -1,0 +1,87 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta content="webkit" name="renderer" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+	<!-- syntax highlighting CSS  need pygments support-->
+    <link rel="stylesheet" href="/static/css/syntax.css" type="text/css" />
+    <!-- use to display line number-->
+    <link rel="stylesheet" href="/static/css/line.css" type="text/css" />
+    <title>
+        
+            Allen写字的地方 | Test
+        
+    </title>
+</head>
+	<body>
+	<h1>Static Forwarder</h1>
+
+<p>标签（空格分隔）： FpInScala</p>
+
+<h2>Static Forwarder provides easy way for java to invoke scala object&#39;s method.</h2>
+
+<p>eg:
+```scala
+object A {
+    def foo() = 2
+}
+scala</p>
+
+<p>&amp; compiled class
+A.class
+<code class="inline-code">java
+public final class A {
+    public static int foo() {
+        return A..MODULE$.foo();
+    }
+}
+</code></p>
+
+<p>A$.class 
+This is what&#39;s object being compiled
+```java
+public final class A$ {
+    public  static final MODULE$;
+    static {
+        new ();
+    }
+    public int foo() {
+        return 2;
+    }
+    private A$() {
+       MODULE$ = this;
+    }
+}</p>
+
+<p>public class MainTest {
+    public static void main(String[] args) {
+        int r = A$.MODULE$.foo(); 
+        // 如果使用上面的方法调用，我们就需要了解A$.class bytecode过程
+        // 这样不友好，所以Scala编译器提供了A.class 以及<br>
+        // 单例对象方法的副本, like foo in A.class
+        // 所以下面这种方法就非常友好了
+        int r1 = A.foo();
+        System.out.println(r == r1);
+    }
+}
+```</p>
+
+<h2>Problem to be solved</h2>
+
+<p>trait TryCatch {}
+object TryCatch extends App {}</p>
+
+<p>Warning:(19, 8) TryCatch has a main method with parameter type Array[String], but jacoffee.scalabasic.TryCatch will not be a runnable program.
+  Reason: companion is a trait, which means no static forwarder can be generated.
+    object TryCatch extends App {
+       ^
+因为trait TryCatch不能生成静态也就是
+public static int foo() {
+    return A..MODULES$.foo()
+}</p>
+
+<p><a href="http://hongjiang.info/scala-static-forwarders/">Static Forwarder</a></p>
+
+	</body>
+</html>
