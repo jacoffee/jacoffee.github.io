@@ -28,7 +28,7 @@ tags: [Github Pages, Jekyll, RedCarpet]
 
     在Github上创建了博客项目之后，最初就只有一个index.html。
 
-    ![项目的最初结构](http://jacoffee-blog.b0.upaiyun.com/2015-02-03/Blog Directroy Structure.png)
+    
     
     其它几个文件夹(<b style="color:red">都需要你自己手动创建的</b>)
     _layouts是放你的网站的基本结构页面, 比如说header.html, footer.html, default.html等
@@ -40,11 +40,11 @@ tags: [Github Pages, Jekyll, RedCarpet]
 
     Jekyll默认采用的 Liquid templating language来处理模板，比说高亮代码语法
 
-    ![高亮Ruby](http://jacoffee-blog.b0.upaiyun.com/2015-02-03/Ruby Highlight.png)
+    
 
     但是这种写法比较繁琐，这时我们需要引入[redcarpet](https://rubygems.org/gems/redcarpet), 它支持下面的写法
 
-    ![Redcarpet高亮Ruby](http://jacoffee-blog.b0.upaiyun.com/2015-02-03/Ruby Highlight Redcarpet.png)
+    
 
     虽然Jekyll最新版(2.0)已经支持redcarpet2了, 但是我在搭建的过程中还是需要在_config.yml中配置如下的参数，否则```式高亮无法生效
     <pre>
