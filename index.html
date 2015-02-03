@@ -1,9 +1,11 @@
 ---
 layout: default
+author: Allen
 ---
 <ul>
 	{% for post in site.posts %}
 	<li>
+		{{ page.author }}
 		<a href="{{ post.url }}">{{ post.title }}</a>
 		{{ post.excerpt }}
 	</li>

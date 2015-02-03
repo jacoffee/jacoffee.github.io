@@ -1,4 +1,5 @@
 ---
+category: posts
 date: 2015-02-02 17:15:16 UTC
 title: 使用Github Pages + Jekyll搭建个人Blog 
 labels: [Github Pages, Jekyll, RedCarpet]
@@ -42,7 +43,7 @@ labels: [Github Pages, Jekyll, RedCarpet]
     ![高亮Ruby](http://jacoffee-blog.b0.upaiyun.com/2015-02-03/Ruby%20Highlight.png)
 
     但是这种写法比较繁琐，这时我们需要引入[redcarpet](https://rubygems.org/gems/redcarpet), 它支持下面的写法
-    
+
     ![Redcarpet高亮Ruby](http://jacoffee-blog.b0.upaiyun.com/2015-02-03/Ruby%20Highlight%20Redcarpet.png)
 
     虽然Jekyll最新版(2.0)已经支持redcarpet2了, 但是我在搭建的过程中还是需要在_config.yml中配置如下的参数，否则```式高亮无法生效
