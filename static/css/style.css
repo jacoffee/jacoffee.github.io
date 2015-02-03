@@ -50,6 +50,9 @@ textarea, p, blockquote, th, td, hr, button, article, aside, details, figcaption
 article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
     display: block;
 }
+article p {
+    text-indent: 2em;
+}
 audio, canvas, video {
     display: inline-block;
 }
@@ -1554,7 +1557,7 @@ h1, h2, h3, h4, h5, h6 {
     float: left;
     margin: 20px 0 12px 0px;
     position: relative;
-    width: 200px;
+    width: 240px;
     color: #525252;
 }
 .violet-site h1, .violet-site h1 a {
@@ -1659,7 +1662,7 @@ h1, h2, h3, h4, h5, h6 {
         width: 1024px;
     }
     .lotus-post {
-        -moz-column-count: 2;
+/*        -moz-column-count: 2;
         -moz-column-gap: 3em;
         -moz-column-rule: #c8c8c8 1px dotted;
         -webkit-column-count: 2;
@@ -1668,7 +1671,7 @@ h1, h2, h3, h4, h5, h6 {
         column-count: 2;
         column-gap: 3em;
         column-rule: #c8c8c8 1px dotted;
-    }
+*/    }
 }
 /*************************
  * iPad
