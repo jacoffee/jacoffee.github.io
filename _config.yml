@@ -10,7 +10,7 @@ description: "编程不仅仅是代码的积累，也是思考深度和广度的
 
 
 # Build settings
-markdown: redcarpet-pygments
+markdown: redcarpet
 lineanchors: true
 extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink", "tables", "with_toc_data"]
 
