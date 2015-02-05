@@ -13,13 +13,13 @@
     <meta name="description" content="编程不仅仅是代码的积累，也是思考深度和广度的积累，写博客是一种不错的途径" />
     <meta name="keywords" content="" /><!-- For SEO-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" media="all" href="/static/css/style.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="http://roadtopro.me/static/css/style.css" />
     <!-- syntax highlighting CSS  need pygments support-->
     <link rel="stylesheet" href="/static/css/syntax.css" type="text/css" />
     <!-- use to display line number-->
     <!--<link rel="stylesheet" href="/static/css/line.css" type="text/css" />-->
     <!--[if lt IE 9]>
-    <script src="/static/js/html5.js" type="text/javascript"></script>
+    <script src="http://roadtopro.me/static/js/html5.js" type="text/javascript"></script>
     <![endif]-->
 </head>
 
@@ -77,9 +77,9 @@
     </nav>
 
     <p class="lotus-breadcrub">
-    <a href="/" rel="nofollow" rel="nofollow" title="首页">Home</a>
+    <a href="http://roadtopro.me/" rel="nofollow" rel="nofollow" title="首页">Home</a>
     <span> &gt; </span>
-    <a href="/archives/" rel="nofollow" >Archives</a>
+    <a href="http://roadtopro.me/archives/" rel="nofollow" >Archives</a>
     <span> &gt; </span>
     Scala基础之try...catch...finally
 </p>
@@ -122,17 +122,23 @@
 所以此时的控制流程又回到了try表达式中，因为此时<b style="color:red">只有try{}才可以返回满足方法签名类型的返回值</b>,也就是Int。
 同时会将finally中的&#39;返回值&#39;作为最终的值返回。</p>
 
-<p>下面针对不同情况下，try...catch...finally的处理进行解释:
-<1> 计算b的过程中没有异常
-    如果在计算表达式e的过程中又抛出异常，那么整个表达式会中止，并且抛出异常(e表达式中包含的异常)
-    如果在计算表达式的e的过程中没有抛出异常，那么b就是整个表达式的返回值
-<2> 计算b的过程中有异常(e中的表达式仍然会被计算)
-    如果e的计算过程也抛出异常，那么表达式会中止并且e过程中的异常被抛出
-    如果e的计算过程中没有抛出异常，那么原来b中的异常会再e计算完成之后再次抛出</p>
+<p>下面针对不同情况下，try...catch...finally的处理进行解释:</p>
+
+<p><1> 计算b的过程中没有异常</p>
+
+<p>如果在计算表达式e的过程中又抛出异常，那么整个表达式会中止，并且抛出异常(e表达式中包含的异常)</p>
+
+<p>如果在计算表达式的e的过程中没有抛出异常，那么b就是整个表达式的返回值</p>
+
+<p><2> 计算b的过程中有异常(e中的表达式仍然会被计算)</p>
+
+<p>如果e的计算过程也抛出异常，那么表达式会中止并且e过程中的异常被抛出</p>
+
+<p>如果e的计算过程中没有抛出异常，那么原来b中的异常会再e计算完成之后再次抛出</p>
 
 <h1>结语</h1>
 
-<p>我们最开始学习Java时候，各种教材都会讲到在定义Java变量名我们尽量不要采用生僻的命名，这条规则同样适用于这里。我们尽量不要使用各种语法比较妖孽的地方，就比如说finally本来就不该出现return，它通常会用于处理异常抛出之后的收尾工作，比如说关闭流等</p>
+<p>我们最开始学习Java时候，各种教材都会讲到在定义Java变量名我们尽量不要采用生僻的命名，这条规则同样适用于这里。我们尽量不要使用各种语法比较妖孽的地方，就比如说finally本来就不该出现return，它通常会用于处理异常抛出之后的收尾工作，比如说关闭流等。</p>
 
 </article>
 
@@ -148,9 +154,9 @@
     <footer class="lotus-footer">
         <p>Copyright © 2010–2015 iLotus All rights reserved.</p>
     </footer>
-    <script src="/static/js/jquery.js" type="text/javascript"></script>
-    <script src="/static/js/jquery.scrollTo.js" type="text/javascript"></script>
-    <script src="/static/js/iLotus.js" type="text/javascript"></script>
+    <script src="http://roadtopro.me/static/js/jquery.js" type="text/javascript"></script>
+    <script src="http://roadtopro.me/static/js/jquery.scrollTo.js" type="text/javascript"></script>
+    <script src="http://roadtopro.me/static/js/iLotus.js" type="text/javascript"></script>
 </body>
 
 </html>
