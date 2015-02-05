@@ -3,7 +3,7 @@ title: Allen写字的地方
 author: Allen
 email: 361541673@163.com
 description: "编程不仅仅是代码的积累，也是思考深度和广度的积累，写博客是一种不错的途径"
-url: "http://roadtopro.me"
+#url: "http://roadtopro.me"
 static_url: "http://jacoffee-blog.b0.upaiyun.com"
 
 # Conversion
@@ -17,14 +17,6 @@ extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink", "tables", "w
 
 #Outputting
 permalink: none # url will be like /:categories/:title.html  category attribute is defined on the top of post
-
-defaults:
-  -
-    scope:
-      path: "" # an empty string here means all files in the project
-      type: "posts"
-    values:
-      layout: "default"
 
 
 #菜单配置
