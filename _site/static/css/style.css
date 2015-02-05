@@ -152,6 +152,7 @@ p img {
 }
 div.highlight {
   max-width: 600px;
+  margin-left: 25px
 }
 pre, code {
     font-family: "Courier New", Courier, monospace;
