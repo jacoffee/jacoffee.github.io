@@ -1908,3 +1908,7 @@ pre.prettyprint {
     border-radius: 0 2px 2px 0;
     box-shadow: 0px 4px 4px #e8e8e8;
 }
+
+.ds-thread {
+    margin-top: 25px;
+}
