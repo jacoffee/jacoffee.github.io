@@ -41,14 +41,3 @@ nav:
     url: https://github.com/jacoffee/jacoffee.github.io
     icon: icon-github
     class: none
-
-page:
-  - text: 文章分类
-    url: /archives/
-    last: true
-  - text: 友情链接
-    url: /links.html
-    last: true
-  - text: 关于我
-    url: /contact/
-    last: false
