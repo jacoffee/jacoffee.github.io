@@ -6,6 +6,8 @@ title: 使用Github Pages + Jekyll搭建个人Blog
 tags: [Github Pages, Jekyll, RedCarpet]
 permalink: /build/blog-setup/
 key: ff3b41bb5af001886973ce3d607136ae # for duoshuo data-data-thread-key
+description: ""
+keywords: [Github Pages, Jekyll, RedCarpet]
 ---
 
   正式投身于Scala的开发已有1年有余，期间一直在不断学习新的知识Lift、Git、Mongo、Maven、Lucene......但是遗憾没能抓住写博客总结这个机会来加深对于各个知识点的理解。终于在2015年行动起来了, 开始了这个博客系统的搭建。
