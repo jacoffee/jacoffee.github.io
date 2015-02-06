@@ -156,7 +156,7 @@ mark {
     background: #FFFB99;
 }
 p img {
-  max-width: 600px;
+  max-width: 100%;
 }
 div.highlight {
   max-width: 600px;
