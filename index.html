@@ -15,24 +15,13 @@ keywords: GitHub, Jekyll, iLotus, Upyun, Scala, Lift, Python, Mongo, Lucene, Git
 </article>
 <section class="lotus-double fn-clear">
     <article class="article article-first">
-    <h3>最新文章</h3>
+        <h3>最新文章</h3>
         <ul>
-            {% for npost in site.posts limit:3 offset:2   %}
-            <li><a href="{{ npost.url }}" pubdate="{{ npost.date | date_to_utc | date: '%Y-%m-%d' }}" title="{{ npost.title }}" rel="bookmark">{{ npost.title }}</a></li>
+            {% for npost in site.posts limit:3 offset:1 %}
+                <li>
+                    <a href="{{ npost.url }}" pubdate="{{ npost.date | date_to_utc | date: '%Y-%m-%d' }}" title="{{ npost.title }}" rel="bookmark">{{ npost.title }}</a>
+                </li>
             {% endfor %}
         </ul>
-    </article>
-    <!-- <article class="article article-last">
-    <h3>相关页面</h3>
-    <ul>
-        <li>
-            {% for page in site.page %}
-            <a href="{{ page.url }}" rel="bookmark" title="{{page.text}}">{{ page.text }}</a>
-            {% if !page.last %}
-                <span class="lotus-squ">|</span>
-            {% endif %}
-            {% endfor %}
-        </li>
-    </ul> -->
     </article>
 </section>
