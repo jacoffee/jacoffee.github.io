@@ -527,7 +527,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .lotus-double .article-first {
     width: 54%;
-    border-right: 1px dotted #C8C8C8;
+    /*border-right: 1px dotted #C8C8C8;*/
 }
 .lotus-double .article-last {
     width: 42%;
