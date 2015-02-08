@@ -1,8 +1,9 @@
 @charset "utf-8";
 /*************************
-Theme Name:         iLotus
-Author:             Origial Style by 展新(pizner@gmail.com)
+Theme Name: iLotus
+Author: original Style by 展新(pizner@gmail.com) and modified by Allen(361541673@163.com) 
 *************************/
+
 /*************************
  * style font
 *************************/
@@ -169,7 +170,7 @@ pre, code {
 }
 /* pre { font-size: 12px; border: 1px solid #d8d8d8; border-left-width: 0.4em;  background: rgba(214, 214, 214, 0.5); padding: 10px; } */
 code {
-    color: #4d4d4d;
+    /* color: #4d4d4d; */
     background: rgba(214, 214, 214, 0.5);
     padding: 0 0.2em;
     border: 1px solid #bdbdbd;

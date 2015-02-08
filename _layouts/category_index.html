@@ -22,7 +22,7 @@ layout: default
                                     <h3><a href="{{ post.url }}">{{ post.title }}</a></h3>
                                 </div>
                                 <div class="ui-grid-11 v-archive-det">
-                                    <p>{{ post.excerpt }}<a href="{{ post.url }}">阅读更多</a></p>
+                                    <p>{{ post.excerpt | truncate: 60 }}<a href="{{ post.url }}">阅读更多</a></p>
                                 </div>
                             </article><!-- //archive -->
                     	</div>
