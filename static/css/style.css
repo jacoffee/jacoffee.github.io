@@ -79,13 +79,14 @@ iframe {
 }
 blockquote {
     padding: 0.5em 1em 0.1em 1em;
-    margin-bottom: 1em;
+    margin: 0 0 10px 25px;
     background: rgba(214, 214, 214, 0.5);
     border-width: 1px 1px 1px 0.4em;
     border-color: #d8d8d8 #d8d8d8 #d8d8d8 #d0d0d0;
     border-style: solid;
     vertical-align: middle;
     border-radius: 0px 2px 2px 0;
+    max-width: 650px;
 }
 blockquote blockquote {
     padding: 0 1em 0 1em;
@@ -160,8 +161,10 @@ p img {
   max-width: 90%;
 }
 div.highlight {
-  max-width: 600px;
-  margin-left: 25px
+    padding: 0.5em 1em 0.1em 1em;
+    margin: 0 0 10px 25px;
+    border-radius: 0px 2px 2px 0;
+    max-width: 650px;
 }
 pre, code {
     font-family: "Courier New", Courier, monospace;
