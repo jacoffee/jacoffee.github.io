@@ -13,24 +13,25 @@ keywords: [GitHub, Jekyll, Category, Archives]
 
 <h1 class="lotus-pagetit">Archives</h1>
 
-
-<article id="archives" class="clearfix">
- <div class="cateogry-list left">
-      <h4>文章分类</h4>
-        <ul>
-           {% for category in site.categories %}
-            <li>
-                <a href="/categories/{{ category | first }}/" title="view all posts">{{ category | first }}</a><span>({{ category | last | size }})</span>
-            </li>
-            {% endfor %}
-        </ul>
+  <div class="cateogry-list left">
+  <h4>文章分类</h4>
+    <ul>
+       {% for category in site.categories %}
+        <li>
+            <a href="/categories/{{ category | first }}/" title="view all posts">{{ category | first }}</a>
+            <span>({{ category | last | size }})</span>
+        </li>
+        {% endfor %}
+    </ul>
   </div>
-  
-  <div class="post-list right">
+
+<article id="archives">
+  <div class="post-list">
     <ul>
         {% for post in site.posts  %}
         <li>
-          <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a></span>{{ post.date | date: '%Y-%m-%d' }}</span>
+          <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+          <span>{{ post.date | date: '%Y-%m-%d' }}</span>
          </li>
         {% endfor %}
   </ul>

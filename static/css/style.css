@@ -378,10 +378,10 @@ h1, h2, h3, h4, h5, h6 {
 .lotus .lotus-tagline .lotus-tagline-catg {
     margin-left: 1em;
 }
-.lotus ul, .lotus-ul {
+/*.lotus ul, .lotus-ul {
     margin-left: 1.3em;
     list-style: disc;
-}
+}*/
 .lotus ol, .lotus-ol {
     list-style: decimal;
     margin-left: 1.9em;
@@ -919,4 +919,32 @@ pre.prettyprint {
 }
 .right {
     float: right;
+}
+
+/* for Archive index page */
+.cateogry-list {
+    padding: 5px;
+    margin: 0 0 0 -130px;
+}
+#archives .post-list {
+    max-width: 600px;
+    height: auto;
+    margin: 35px 0 0 10px;
+}
+#archives .post-list ul li {
+    margin: 0 0 5px 0;
+}
+#archives .post-list ul li a {
+    display: inline-block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 200px;
+}
+#archives .post-list ul li span {
+    float: right;
+    margin-left: 20px;
+    font-size: 0.8em;
+    color: #c8c8c8;
+    padding-top: 4px;
 }
