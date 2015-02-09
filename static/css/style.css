@@ -939,7 +939,7 @@ pre.prettyprint {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    max-width: 200px;
+    max-width: 300px;
 }
 #archives .post-list ul li span {
     float: right;
