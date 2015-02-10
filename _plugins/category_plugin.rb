@@ -6,7 +6,7 @@ module Jekyll
       @base = base
       @dir = dir
       @name = 'index.html'
- 
+  
       self.process(@name)
       self.read_yaml(File.join(base, '_layouts'), 'category_index.html')
       self.data['category'] = category
@@ -15,7 +15,7 @@ module Jekyll
       self.data['title'] = "#{category_title_prefix}#{category}"
     end
   end
- 
+  
   class CategoryGenerator < Generator
     safe true
     

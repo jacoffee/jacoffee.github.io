@@ -922,10 +922,10 @@ pre.prettyprint {
 }
 
 /* for Archive index page */
-.cateogry-list {
+/*.cateogry-list {
     padding: 5px;
     margin: 0 0 0 -130px;
-}
+}*/
 #archives .post-list {
     max-width: 600px;
     height: auto;
