@@ -19,6 +19,7 @@ extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink", "tables", "w
 permalink: none # url will be like /:categories/:title.html  category attribute is defined on the top of post
 
 # Plugins
+safe: false
 # whitelist: []
 # gems: [redcarpet_pygments]
 
