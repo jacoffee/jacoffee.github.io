@@ -26,11 +26,11 @@ safe: false
 #菜单配置
 nav:
   - text: 首页
-    url: /index.html
+    url: /
     icon: icon-home
     class: home
   - text: 文章归档
-    url: /archives/index.html
+    url: /archives/
     icon: icon-reorder
     class: none
   # - text: 关于我
