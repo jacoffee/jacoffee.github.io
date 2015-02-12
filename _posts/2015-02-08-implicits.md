@@ -2,7 +2,7 @@
 layout: post
 category: scala
 date: 2015-02-08 14:51:31 UTC
-title: Scala基础之隐式转换(implicit-conversion)
+title: Scala基础之隐式转换(implicit conversion)
 tags: [隐式转换, 隐式参数, 隐式方法, 隐式类]
 permalink: /scala/implicits/
 key: dde9e45d61a77e15ceb5bbf9cfa1e6ac

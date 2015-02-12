@@ -2,7 +2,7 @@
 layout: post
 category: scala
 date: 2015-02-06 14:59:49 UTC
-title: Scala基础之静态代理(static-forwarder)
+title: Scala基础之静态代理(static forwarder)
 tags: [静态代理, 单例对象]
 permalink: /scala/static-forwarder/
 key: ae1c4aa3fc3d7ec318c814a4093d0e29
