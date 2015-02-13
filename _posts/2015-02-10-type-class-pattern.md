@@ -2,7 +2,7 @@
 layout: post
 category: scala
 date: 2015-02-10 21:03:04 UTC
-title: Scala基础之类型类(Type class pattern)
+title: Scala基础之类型类(type class pattern)
 tags: [Haskell, 类型类]
 permalink: /scala/type-class/
 key: 45e8dc0d31da82335dc1f50ae63c3f33
