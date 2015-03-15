@@ -29,8 +29,6 @@ keywords: [文档，Document，数组，Array，WriteResult，回调，钩子，
 
 
 ```json
-"collection_name": "date_serializers"
-
 {
 	"_id" : ObjectId("54f6e3e1d4c678d4a1f7b8c9"),
 	"created_at" : ISODate("2015-03-04T10:52:17.762Z"),
@@ -53,7 +51,7 @@ keywords: [文档，Document，数组，Array，WriteResult，回调，钩子，
 Model层: MongoModel，MongoModelMeta分别是对于MongoRecord, MongoMetaRecord的封装。
 created_at和updated_at来源于MongoModel。
 
-````scala
+```scala
 class DateSerializer extends MongoModel[DateSerializer] {
  def meta = DateSerializer
 
@@ -80,13 +78,18 @@ object DateSerializer extends DateSerializer with MongoModelMeta[DateSerializer]
 
 	/*
 		("_id" -> id) ~ ("d_student.name" -> name)
-		注意这个查询的条件的level会决定后面的WriteResult中n的结果的"准确性"，如果("_id" -> id)能够匹配到文档，那么n永远是1，updatedExisting永远是true。这样就无法根据n来判断操作是否成功，<b style="color:red">因为我们操作不是top_level文档</b>。
+		注意这个查询的条件的level会决定后面的WriteResult中n的结果的"准确性"，
+		如果("_id" -> id)能够匹配到文档，
+		那么n永远是1，updatedExisting永远是true。这样就无法根据n来判断操作是否成功，
+		<b style="color:red">因为我们操作不是top_level文档</b>。
 
-		加大查询条件的力度("_id" -> id) ~ ("d_student.name" -> name), 使它到Array的element级别，这样n加上updatedExisting以及err就能判断是否成功操作了。
+		加大查询条件的力度("_id" -> id) ~ ("d_student.name" -> name), 使它到Array的element级别，
+			这样n加上updatedExisting以及err就能判断是否成功操作了。
 	*/
 
 	def updateSegmentById(id: ObjectId, name: String, newOne: JValue) = {
-		updateWithResult(("_id" -> id) ~ ("d_student.name" -> name), ("$set" -> ("d_student.$" -> newOne)))
+		updateWithResult(("_id" -> id) ~ ("d_student.name" -> name), 
+		("$set" -> ("d_student.$" -> newOne)))
 	}
 
 	def addSegmentById(id: ObjectId, newOne: JValue) = {
@@ -126,7 +129,8 @@ public WriteResult update(
 
 ```json
 { 
-  "serverUsed" : "/127.0.0.1:27017" , "connectionId" : 38 , "updatedExisting" :   true , "n" : 1 , "syncMillis" : 0 , "writtenTo" :  null  , "err" :  null  , "ok" : 1.0 
+  "serverUsed" : "/127.0.0.1:27017" , "connectionId" : 38 , "updatedExisting" : true , 
+  "n" : 1 , "syncMillis" : 0 , "writtenTo" :  null , "err" :  null  , "ok" : 1.0 
 }
 ```
 
@@ -147,8 +151,9 @@ n表示的是如果当前操作是更新或者删除时，被更新或者是删�
    { <update operator>: { "<array>.$" : value } }
 )
 
-```shell
-db.date_serializers.update({"_id": ObjectId("54f6e3e1d4c678d4a1f7b8c9"), "d_student.name": "zml"}, {<b style="color:red">"$set"</b>: {"d_student.$": {"name": "zml_new", "startYear":"2018"}}})
+```json
+db.date_serializers.update({"_id": ObjectId("54f6e3e1d4c678d4a1f7b8c9"), 
+"d_student.name": "zml"}, {"$set": {"d_student.$": {"name": "zml_new", "startYear":"2018"}}})
 ```
 
 如果更新成功，mongo shell会提示如下:
@@ -166,7 +171,8 @@ WriteResult({
 	"nModified" : 0,
 	"writeError" : {
 		"code" : 16836,
-		"errmsg" : "The positional operator did not find the match needed from the query. Unexpanded update: d_student.$"
+		"errmsg" : "The positional operator did not find the match needed from the query. " +
+		"Unexpanded update: d_student.$"
 	}
 })
 ```
@@ -176,16 +182,18 @@ WriteResult({
 $addSet operator能向Array添加不重复的元素，实际上会遍历Array的element，如果都不相等的话，就插入。否则，什么都不做。所以，这种操作适合<b style="color:red">Array中element不太多且结构不会太复杂的</b>，否则就会有性能问题
 。
 
-```shell
-db.date_serializers.update({"_id": ObjectId("54f6e3e1d4c678d4a1f7b8c9")}, {"$addToSet": {"d_student": {"name": "tuniu", "startYear":"2020"}}})
+```json
+db.date_serializers.update({"_id": ObjectId("54f6e3e1d4c678d4a1f7b8c9")}, 
+{"$addToSet": {"d_student": {"name": "tuniu", "startYear":"2020"}}})
 
 WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 ```
 
 注意$addToSet的后面key的结构。另外我们知道MongoDB的数据结构修改起来是非常容易的
 
-```shell
-db.date_serializers.update({"_id": ObjectId("54f6e3e1d4c678d4a1f7b8c9")}, {"$addToSet": {"d_student": {"name": "tuniu"}}})
+```json
+db.date_serializers.update({"_id": ObjectId("54f6e3e1d4c678d4a1f7b8c9")}, 
+{"$addToSet": {"d_student": {"name": "tuniu"}}})
 ```
 
 上面这种操作也是Okay的，对于数据库层面没有问题但是对于业务逻辑和代码层面就有问题，所以在实际开发中我们要确保"d_student"的Json格式的数据满足我们定义的数据结构，如上面的graduate的结构，即序列化和反序列化的时候要保证数据结构的统一。
@@ -194,10 +202,12 @@ db.date_serializers.update({"_id": ObjectId("54f6e3e1d4c678d4a1f7b8c9")}, {"$add
 
 $pull操作符可以用于删除Array中符合条件的element，如果没有匹配的什么都不做。
 
-```shell
-db.date_serializers.update({"_id": ObjectId("54f6e3e1d4c678d4a1f7b8c9"), "d_student.name": "zml"}, {"$pull": {"d_student": {"name": "xxl"}}})
+```json
+db.date_serializers.update({"_id": ObjectId("54f6e3e1d4c678d4a1f7b8c9"), 
+"d_student.name": "zml"}, {"$pull": {"d_student": {"name": "xxl"}}})
 
-db.date_serializers.update({"_id": ObjectId("54f6e3e1d4c678d4a1f7b8c9")}, {"$pull": {"d_student": {"name": "xxl"}}})
+db.date_serializers.update({"_id": ObjectId("54f6e3e1d4c678d4a1f7b8c9")}, 
+{"$pull": {"d_student": {"name": "xxl"}}})
 
 WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 ```
