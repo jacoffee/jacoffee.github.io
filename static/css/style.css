@@ -948,3 +948,16 @@ pre.prettyprint {
     color: #c8c8c8;
     padding-top: 4px;
 }
+#archives .pagination {
+    width: 600px;
+    padding: .3em;
+    margin: 20px 0;
+    font-size: 16px;
+    text-align: center;
+}
+#archives .pagination .page_number {
+    margin: 0 10px;
+}
+#archives .pagination .current_page {
+    color: #FC7D43;
+}

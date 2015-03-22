@@ -28,12 +28,33 @@ keywords: [GitHub, Jekyll, Category, Archives]
 <article id="archives">
   <div class="post-list">
     <ul>
-        {% for post in site.posts  %}
+        {% for post in paginator.posts  %}
         <li>
           <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
           <span>{{ post.date | date: '%Y-%m-%d' }}</span>
          </li>
         {% endfor %}
-  </ul>
+    </ul>
   </div>
+
+<!-- Pagination links -->
+<div class="pagination">
+  {% if paginator.previous_page %}
+    <a href="{{ paginator.previous_page_path }}" class="previous">上一页</a>
+  {% else %}
+    <span class="previous">上一页</span>
+  {% endif %}
+
+  {% if paginator.total_pages >= 1 %}
+  <span class="page_number">
+      <span class="current_page">{{ paginator.page }}</span> / {{ paginator.total_pages }}
+  </span>
+  {% endif %}
+
+  {% if paginator.next_page %}
+    <a href="{{ paginator.next_page_path }}" class="next">下一页</a>
+  {% else %}
+    <span class="next ">下一页</span>
+  {% endif %}
+</div>
 </article>
