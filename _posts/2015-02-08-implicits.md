@@ -122,6 +122,7 @@ Greeter.greet("allen")
 > Thus the style rule: use at least one role-determining name within the type of an implicit parameter(这句话告诉我们隐式参数的类型命名应该是达意的，让人一下就看出来它是干什么的).
 
 Scala的CanBuildFrom就是一个不错的例子
+
 ```scala
 trait CanBuildFrom[-From, -Elem, +To] {}
 
