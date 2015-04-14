@@ -107,7 +107,8 @@ My Process ID 910
 # 结语
 在验证trap signal的时候，我碰到了一个问题:
 
-如果使用source kill.sh 或者是. kill.sh的方式启动的话，Ctrl+C是无法触发trap的第二个参数对应的handler。我知道source 或者.启动script的话是在当前的process中的，而sh或者是bash启动script则会新启动一个进程并且将执行结果返回到当前的process中。目前还没有得到解决，如果解决了，会回来补充的。
+如果使用source kill.sh 或者是. kill.sh的方式启动的话，Ctrl+C是无法触发trap的第二个参数对应的handler。我知道source 或者.启动script的话是在当前的process中的，而sh或者是bash启动script则会新启动一个进程并且将执行结果返回到当前的process中。
+后来在StackOveflow找到一个问题，不过他的解释我并没有完全理解，个人对于Linux系统的了解还是比较浅，所以等Process了解有一定程度之后再回来解决。
 
 # 参考
 <1> [Kill Process](http://www.cyberciti.biz/faq/kill-process-in-linux-or-terminate-a-process-in-unix-or-linux-systems/)
@@ -117,3 +118,5 @@ My Process ID 910
 <3> [Kill -9原理](http://unix.stackexchange.com/questions/5642/what-if-kill-9-does-not-work)
 
 <4> [source, sh, bash, . 运行Script的不同](http://superuser.com/questions/176783/what-is-the-difference-between-executing-a-bash-script-and-sourcing-a-bash-scrip)
+
+<5> [以source或.运行script的时候，Trap会出现问题](http://stackoverflow.com/questions/10630059/why-is-this-simple-bash-trap-failing)
