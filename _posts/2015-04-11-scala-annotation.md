@@ -47,7 +47,8 @@ def meth[A: ju.TypeTag](xs: List[A]) = xs match {
 我们知道List[T]在运行时会被类型擦除，相当于变成List。@unchecked 告诉compiler不要去检查这个，否则就会报下面的warning。
 
 ```scala
-non-variable type argument String in type pattern List[String] is unchecked since it is eliminated by erasure
+non-variable type argument String in type pattern List[String] is unchecked 
+since it is eliminated by erasure
 ```
 
 另外, 注解实际上也是普通的类只不过Compiler对其进行特殊的支持，所以我们才能那样书写。比如说，我们常见的序列号的注解。
@@ -153,7 +154,9 @@ try especially hard to inline the annotated method.
 
 文档中的解释跟没有一样，在StackOverflow上找到几个问题，其中参考<5>中的有一段解释，个人觉得比较能说明作用。
 
->  Instead of a function call resulting in parameters being placed on the stack and an invoke operation occurring, the definition of the function is copied at compile time to where the invocation was made, saving the invocation overhead at runtime.
+>  Instead of a function call resulting in parameters being placed on the stack and an invoke operation occurring, 
+the definition of the function is copied at compile time to where the invocation was made, 
+saving the invocation overhead at runtime.
 
 大致的意思就是@inline能够避免方法的参数被放到栈上，以及"显示的调用"，因为编译器在编译的时候会将整个方法copy到它被调用的地方。
 
