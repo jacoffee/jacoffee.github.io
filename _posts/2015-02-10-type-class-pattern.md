@@ -103,7 +103,7 @@ def f[A: B](a: A) = g(a)
 eg: scala.math.Ordered就是一个比较典型的例子
 
 ```scala
-def simpleF[A: Ordering](x: A, y: A) = implicitly[Ordered[A]].compare(x, y)
+def simpleF[A: Ordering](x: A, y: A) = implicitly[Ordering[A]].compare(x, y)
 
 simpleF(3, 4) // -1 即 3 < 4   
 ```
