@@ -63,8 +63,12 @@ class StringImprovement(s: String) {
 }
 implicit def stringIncrement(s: String) = new StringImprovement(s)
 
-"abc".increment
+
 // "abc"默认的是没有increment方法，这次隐式转换就会去搜索哪个类有这个方法然后，将string转换成StringImprovement
+// 还有一点需要注意的，Scala编译器对于隐式方法的寻找， 似乎有点类似于“变量的先定义后使用的原则"
+// 如果上面的隐转方法在下面的调用之后被定义， Scala编译器就会寻找失败
+"abc".increment
+
 
 //还有一个更为常见的就是
 Map(1 -> "one", 2 -> "two") 
@@ -196,6 +200,7 @@ with IndexedSeq[Char] with StringLike[WrappedString] {
 
 ### 隐式类型的规则
 <1> 只有使用implicit标记的定义(val, def, class)才会被编译器当作隐式类型去使用
+
 <2> 插入的隐式转换必须以单一标识符的形式存在于作用域中，或是与源类型或目标类型相关联。
 
 前半句的意思就是x + y可以被转换成 convert(x) + y, 但是不会被转换成SomeVariable.convert(x) + y。如果非要使用后一种必须要显示的引入进来。
@@ -246,15 +251,14 @@ env.apply("USER")
 eg1: Scala类库中的sorted
 
 ```scala
-class B(n: Int) {}
-object B {
-    implicit val ord: Ordering[Int] = new Ordering[Int] {
-        def compare(x: A, y: A): Int = x.n - y.n
+class A(val n: Int) {}
+object A {
+    implicit val ord: Ordering[A] = new Ordering[A] {
+        override def compare(x: A, y: A): Int = x.n - y.n
     }
 }
 
 List(new A(3), new A(5)).sorted
-// def sorted[B >: A](implicit ord: Ordering[B]): Repr...
 ```
 很明显上面的sorted方法需要传入一个隐式的ord参数，但是Ordering[A]根本没有这样的转换，这时候Scala编译器就会去类型参数A中去寻找即A的<b style="color:red">伴生对象</b>中定义的ord。
  	                                  
