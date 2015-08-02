@@ -158,7 +158,7 @@ jacoffee.scalabasic.SingleType
     with jacoffee.scalabasic.Type2
 ```
 
-<b style="color:red">关于(1)</b>， 上面那种singleType就被称之为结构化的。如果定义中覆盖了T1..Tn中的方法
+<b style="color:red">(1)</b>， 上面那种singleType就被称之为结构化的。如果定义中覆盖了T1..Tn中的方法
 
 ```scala
 // 注意定义的时候初始化的方向 SingleType -> type1 -> type2
@@ -173,7 +173,7 @@ val unStructuralSingleType = new SingleType with type1 with type2 {
 
 引用结构化定义的成员(方法调用，访问变量)会导致生成的二进制码比非结构化的效率低(<b style="color:red">目前的水平还无法解释</b>)
 
-<b style="color:red">关于(2)</b>，如果修改SingleType的定义如下:
+<b style="color:red">(2)</b>，如果修改SingleType的定义如下:
 
 ```scala
 class SingleType[A] { self: type1 with type2 { 
@@ -185,7 +185,7 @@ class SingleType[A] { self: type1 with type2 {
   在结构化的Refinement中不能引用它之外的类型参数。
   
 
-<b style="color:red">关于(3)</b>，下面的定义也是可以的。
+<b style="color:red">(3)</b>，下面的定义也是可以的。
 
 ```scala
 class SingleType { self: AnyRef { def structual(s: String) } }
@@ -245,7 +245,7 @@ def apply[T: ClassTag](xs: T*): Array[T] = { ... }
 // T* 表示传递多个T类型的参数
 val newArr = Array(1,2,3) 
 
-// 关于:, 最典型的当然是scala.collection.immutable.List
+// :, 最典型的当然是scala.collection.immutable.List
 //的构造啦，运算是从右往左的
 val newList = 1 :: 2 :: Nil
 ```
@@ -298,14 +298,52 @@ trait Functionn[-T1,..., -Tn, +R] {
 }
 ```
 
+### 2015-08-02 更新
+<9> **Existential Types**
+
+对于什么是Existential Types，在Scala In Depth这本书中有段解释还是比较易懂的。
+
+> Existential types are a means of constructing types where portions of the type signature are existential, where existential means that although some real type meets that portion of a type signature, we don’t care about the specific type. Existential types were introduced into Scala as a means to interoperate with Java’s generic types
+
+Existential Types主要是用于类型构造的，只不过定义的时候只留下了部分的定义，因为Scala Compiler不在意具体的类型，只要求到时候传递的类型满足部分的定义即可。
+
+基本格式: T forSome { ‘type’ TypeDcl | ‘val’ ValDcl }
+
+```scala
+// 在实际使用中，我们一般是 _ 来表示
+def foo(x: List[_]) = x
+// 完整形式
+def foo(x: List[T forSome { type T }]) = x
+```
+
+从完整版的定义中，我们可以看出 T实际上是有可以Upper Bound 和 Lower Bound的，默认情况下 type T => type T >: scala.Nothing <: scala.AnyRef
+
+```scala
+// Scala compiler不在意传入什么类型，只要该类型是Int或者是Int的超类即可
+def foo(x: List[T forSome { type T >: Int}]) = x
+
+foo(List("hello")) // 因为String与Int的共同父类是Any, 所以上例的T的类型是Any
+```
+
+另外forSome block中定义的类型在T中都是可以被引用的。
+
+```scala
+trait Outer {
+    type AbsT
+
+    def handle(proc: this.type => Unit)
+}
+
+type Ref = x.AbsT forSome { val x: Outer }
+```
+
+
+
 # 结语
-我自己感觉对于Type Designators和Existential Types的理解还不够，所以到了合适的时候会补上的。
 
 虽然，讲的类型比较杂但是个人感觉<b style="color:red">中置类型</b>和<b style="color:red">复合类型</b>是需要特别理解的。前者我们可以使用它定义自己的一些操作符，使程序更加的优雅和达意，就像 ==>之于Converter。
 
 复合类型就更不用说了，在实际的项目中它是无处不在的，理解它的含义有助于我们解读程序中一些类型的意义因为大多数的时候，我们可能会依赖编译器的类型推断。
-
-当然，仅仅简单的翻译是不能彻底提升我对于Scala值类型的理解的。以后，每每有对Scala值类型有新的理解的时候，我都会来更新这篇博客的。也希望这篇文章能够对于看到的人理解值类型有一定帮助。
 
 
 
