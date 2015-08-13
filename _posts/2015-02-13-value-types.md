@@ -5,12 +5,12 @@ date: 2015-02-13 15:29:03 UTC
 title: Scala基础之值类型(value types)
 tags: [值类型，类型投影]
 permalink: /scala/value-types/
-key:
+key: 0e78a72174e18bd5eb0b22b1dfc6f75a
 description: "本文研究了Scala值类型及基本的运用"
-keywords: [值类型，类型投影，类型指示器，参数类型，元祖类型，带注解的类型，复合类型，中置类型，函数类型]
+keywords: [值类型，类型投影，类型指示器，参数类型，元祖类型，带注解的类型，复合类型，中置类型，函数类型，存在类型]
 ---
 
-今天定义一个函数的时候，突然发现需要使用一个类型里面的成员，于是想到类型投影(type projection)。在查阅Scala Reference的时候，发现类型投影只是Scala值类型中的一种，于是决定将Scala值类型研究一下，基本上就是对于英文版的Scala Reference的值类型章节进行了翻译，并使用一些案例说明。
+今天定义一个函数的时候，突然发现需要使用一个类型里面的成员，于是想到类型投影(type projection)。在查阅Scala Reference的时候，发现类型投影只是Scala值类型中的一种，于是决定将Scala值类型研究一下。
 
 # 问题
 Scala的值类型有哪几种，每一种如何去使用？
@@ -198,10 +198,10 @@ class SingleType { self: type1 with type2 {} }
 
 ```scala
 class Bird(val name: String) extends Object {
-	def fly(height: Int) = println("鸟的飞行高度: " + height)
+  def fly(height: Int) = println("鸟的飞行高度: " + height)
 }
 class Plane(val code: String) extends Object {
-	def fly(height: Int) = println("代号:  " +
+  def fly(height: Int) = println("代号:  " +
      code + "的飞机的飞行高度: " + height)
 }
 
@@ -210,20 +210,20 @@ object HeightTest extends App {
     通过定义复合类型的参数r， takeOff的第二个参数
     可以接受任何定义了code属性和fly方法的对象
   */
-	def takeOff(
-		location: String,
-		r: { val code: String; def fly(height: Int) }
-	) = {
-		println(" 起飞点 " + location)
-		r.fly(300)
-	}
+  def takeOff(
+    location: String,
+    r: { val code: String; def fly(height: Int) }
+  ) = {
+    println(" 起飞点 " + location)
+    r.fly(300)
+  }
 
-	val bird = new Bird("wudi") {
-		val code = "flappy bird"
-	}
-	val plane = new Plane("Boeing")
-	takeOff("terminal1", plane)
-	takeOff("tree", bird)
+  val bird = new Bird("wudi") {
+    val code = "flappy bird"
+  }
+  val plane = new Plane("Boeing")
+  takeOff("terminal1", plane)
+  takeOff("tree", bird)
 }
 
 ```
@@ -245,8 +245,8 @@ def apply[T: ClassTag](xs: T*): Array[T] = { ... }
 // T* 表示传递多个T类型的参数
 val newArr = Array(1,2,3) 
 
-// :, 最典型的当然是scala.collection.immutable.List
-//的构造啦，运算是从右往左的
+// 关于:, 最典型的当然是scala.collection.immutable.List
+// 运算是从右往左的
 val newList = 1 :: 2 :: Nil
 ```
 
@@ -254,33 +254,31 @@ val newList = 1 :: 2 :: Nil
 
 ```scala
 abstract class Converter[T, R] extends (T => R) {
-	def apply(v1: T): R
+  def apply(v1: T): R
 }
 
 class StringConverter[T] extends Converter[T, String] {
-	def apply(v1: T): String = v1.toString
+  def apply(v1: T): String = v1.toString
 }
 
 object InfixTest extends App {
-	type ==>[T, R] = Converter[T, R]
+  type ==>[T, R] = Converter[T, R]
 
     val infixType: ==>[Int, String] = 
         new ==>[Int, String] {
          def apply(v1: Int) = v1.toString
         }
 
-	val infixTypeComplex: Int => String = 
-	    new ==>[Int, String] {
-		  def apply(v1: Int) = v1.toString
-	    }
+  val infixTypeComplex: Int => String = 
+      new ==>[Int, String] {
+      def apply(v1: Int) = v1.toString
+      }
 }
 ```
 
 <8> **Function Types(函数类型)**
 
 基本格式: FunctionArgs => Type
-
-说明: 这个相对来说就比较好理解了，不过有几点需要额外说明。
 
 & (T1, ..., Tn) => U 表示的是一个函数接受n个参数，并且返回类型U
 
@@ -291,7 +289,7 @@ object InfixTest extends App {
 ```scala
 package scala
 
-// 另外Scala函数的参数是逆变的，返回值是协变的(TODO: 以后会用专门的一篇博客来说明这个问题的)。
+// 另外Scala函数的参数是逆变的，返回值是协变的
 trait Functionn[-T1,..., -Tn, +R] {
     def apply(x1: T1,...,xn: Tn): R
     override def toString = "<function>" 
@@ -301,25 +299,40 @@ trait Functionn[-T1,..., -Tn, +R] {
 ### 2015-08-02 更新
 <9> **Existential Types**
 
-对于什么是Existential Types，在Scala In Depth这本书中有段解释还是比较易懂的。
+对于什么是Existential Types，在《Scala In Depth》这本书中有段解释还是比较易懂的。
 
-> Existential types are a means of constructing types where portions of the type signature are existential, where existential means that although some real type meets that portion of a type signature, we don’t care about the specific type. Existential types were introduced into Scala as a means to interoperate with Java’s generic types
+> Existential types are a means of constructing types where portions of the type signature are existential, where existential means that although some real type meets that portion of a type signature, we don’t care about the specific type. Existential types were introduced into Scala as a means to interoperate with Java’s generic types, such as Iterator<?> or Iterator<? extends Component>
 
-Existential Types主要是用于类型构造的，只不过定义的时候只留下了部分的定义，因为Scala Compiler不在意具体的类型，只要求到时候传递的类型满足部分的定义即可。
+Existential Types用于构造类型的时候，有一部分已经是确定的类型(library中的各种yi'zhi)已知的数据类型， 自己定义的类型class, trait)。
 
-基本格式: T forSome { ‘type’ TypeDcl | ‘val’ ValDcl }
+基本格式: T forSome { ‘type’ TypeDcl | ‘val’ ValDcl } 
 
 ```scala
 // 在实际使用中，我们一般是 _ 来表示
-def foo(x: List[_]) = x
+def foo(x: List[_]) = x 
 // 完整形式
 def foo(x: List[T forSome { type T }]) = x
 ```
 
-从完整版的定义中，我们可以看出 T实际上是有可以Upper Bound 和 Lower Bound的，默认情况下 type T => type T >: scala.Nothing <: scala.AnyRef
+```scala
+/* 
+下例中的List并不是scala.collection.immutable, 而是一个高阶类型。AA || List 
+都不是real type, 因为编译器在编译的时候对它们的了解仅限于它们是一个高阶类型参数。
+但是在方法参数的地方，AA已经是一个定义的高阶类型了，满足real type所以是一个Existential Type。
+*/
+def foo[List[_]](x: List[_]) = x
+def foo[AA[_]](x: AA[_]) = x
+def foo[AA[_]](x: AA[t forSome { type t}]) = x
+
+// 因为方法类型参数的地方， AA刚被定义所以并不满足real type的定义。有点类似于变量先定义后使用的味道。因此下面的用法是不对的。
+def foo[AA[t forSome { type t}]](x: AA[t forSome { type t}]) = x
+```
+
+从完整版的定义中，T实际上是有可以Upper Bound 和 Lower Bound的，默认情况下
+ type T => type T >: scala.Nothing <: scala.AnyRef
 
 ```scala
-// Scala compiler不在意传入什么类型，只要该类型是Int或者是Int的超类即可
+// Scala compiler 不在意传入什么类型，只要该类型是Int或者是Int的超类即可
 def foo(x: List[T forSome { type T >: Int}]) = x
 
 foo(List("hello")) // 因为String与Int的共同父类是Any, 所以上例的T的类型是Any
@@ -330,32 +343,18 @@ foo(List("hello")) // 因为String与Int的共同父类是Any, 所以上例的T�
 ```scala
 trait Outer {
     type AbsT
-
-    def handle(proc: this.type => Unit)
+    
+    def handle(proc: this.type => Unit) 
 }
 
 type Ref = x.AbsT forSome { val x: Outer }
 ```
-
-
-
-# 结语
-
-虽然，讲的类型比较杂但是个人感觉<b style="color:red">中置类型</b>和<b style="color:red">复合类型</b>是需要特别理解的。前者我们可以使用它定义自己的一些操作符，使程序更加的优雅和达意，就像 ==>之于Converter。
-
-复合类型就更不用说了，在实际的项目中它是无处不在的，理解它的含义有助于我们解读程序中一些类型的意义因为大多数的时候，我们可能会依赖编译器的类型推断。
-
-
 
 # 参考
 <1> Scala Reference 3.2
 
 <2> [scala-type-infix-operators](http://jim-mcbeath.blogspot.com/2008/11/scala-type-infix-operators.html)
 
-<3> [typeoperators.scala](https://github.com/milessabin/shapeless/blob/master/core/src/main/scala/shapeless/typeoperators.scala)
+<3> [type-operators.scala](https://github.com/milessabin/shapeless/blob/master/core/src/main/scala/shapeless/typeoperators.scala)
 
-<4> [Existential Type ](http://stackoverflow.com/questions/292274/what-is-an-existential-type)
-
-
-
-
+<4> [scala-method-type-parameter-can-not-accept-existential-type-in-forsome-form](http://stackoverflow.com/questions/31937965/scala-method-type-parameter-can-not-accept-existential-type-in-forsome-form/31978204#31978204)
