@@ -2,7 +2,7 @@
 layout: post
 category: scala
 date: 2015-02-08 14:51:31 UTC
-title: Scala基础之隐式转换(implicit conversion)
+title: Scala基础之隐式转换(implicit-conversion)
 tags: [隐式转换, 隐式参数, 隐式方法, 隐式类]
 permalink: /scala/implicits/
 key: dde9e45d61a77e15ceb5bbf9cfa1e6ac
@@ -25,10 +25,10 @@ keywords: [隐式转换, 隐式方法, 隐式类, 视界, 类型参数]
 ```java
 JButton button = new JButton("press me");
 button.addActionListener(new ActionListener() {
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		System.out.println("Click");
-	}
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        System.out.println("Click");
+    }
 });
 ```
 
@@ -36,19 +36,19 @@ button.addActionListener(new ActionListener() {
 
 ```scala
     button.addActionListener({
-		(_: ActionEvent) => println("I am pressed")
-	})
-	// 但是这种写法会报编译类型错误的
-	
-	// 增加隐式方法为我们完成这次转换
+        (_: ActionEvent) => println("I am pressed")
+    })
+    // 但是这种写法会报编译类型错误的
+    
+    // 增加隐式方法为我们完成这次转换
     implicit def actionEventFuncToActionListener(f: ActionEvent => Unit) =
-		new ActionListener {
-			override def actionPerformed(e: ActionEvent): Unit = f(e)
-		}
-	// 那么当编译器去编译上面的代码，开始不通过然后去搜索隐式转换，编译通过
-	// 特别注意隐式方法有点先定义后使用的感觉，
+        new ActionListener {
+            override def actionPerformed(e: ActionEvent): Unit = f(e)
+        }
+    // 那么当编译器去编译上面的代码，开始不通过然后去搜索隐式转换，编译通过
+    // 特别注意隐式方法有点先定义后使用的感觉，
     // 就是actionEventFuncToActionListener一定要定义
-	// 在button.addActionListener之前，当然这个之前不仅仅指的是代码的位置。
+    // 在button.addActionListener之前，当然这个之前不仅仅指的是代码的位置。
 ```
 所以隐式转换很好的避免了，每次注册监听事件都要重复书写ActionListener的实现。
 
@@ -59,16 +59,12 @@ button.addActionListener(new ActionListener() {
 ```scala
 // 给String添加新方法
 class StringImprovement(s: String) {
-	def increment = s.map(one => (one + 1).toChar)
+    def increment = s.map(one => (one + 1).toChar)
 }
 implicit def stringIncrement(s: String) = new StringImprovement(s)
 
-
-// "abc"默认的是没有increment方法，这次隐式转换就会去搜索哪个类有这个方法然后，将string转换成StringImprovement
-// 还有一点需要注意的，Scala编译器对于隐式方法的寻找， 似乎有点类似于“变量的先定义后使用的原则"
-// 如果上面的隐转方法在下面的调用之后被定义， Scala编译器就会寻找失败
 "abc".increment
-
+// "abc"默认的是没有increment方法，这次隐式转换就会去搜索哪个类有这个方法然后，将string转换成StringImprovement
 
 //还有一个更为常见的就是
 Map(1 -> "one", 2 -> "two") 
@@ -126,7 +122,6 @@ Greeter.greet("allen")
 > Thus the style rule: use at least one role-determining name within the type of an implicit parameter(这句话告诉我们隐式参数的类型命名应该是达意的，让人一下就看出来它是干什么的).
 
 Scala的CanBuildFrom就是一个不错的例子
-
 ```scala
 trait CanBuildFrom[-From, -Elem, +To] {}
 
@@ -169,7 +164,7 @@ def maxList[T <% Ordered[T]](elements: List[T]): T = {
 
 // 运用: 找出年龄最大的女生
 class Girl(val name: String, val age: Int) extends Ordered[Girl] {
-	override def compare(that: Girl): Int = age - that.age
+    override def compare(that: Girl): Int = age - that.age
 }
 val girls = Girl("zml", 27) ::  Girl("allen", 25) :: Nil
 maxList(girls)
@@ -198,6 +193,65 @@ with IndexedSeq[Char] with StringLike[WrappedString] {
 // "abc" ->  wrapString("abc")
 ```
 
+<3> Type class with implicits
+
+> One thing that you can achieve with type classes and not with implicit conversions is adding properties to a type, rather than to an instance of a type. You can then access these properties even when you do not have an instance of the type available.
+
+Normally, in order to add properties with implicit conversion we have to **```create a instance of that type with the property on the fly```**, i.e, instance of that type is a must.
+
+```scala
+
+trait FKTC[T] {
+    def value: T
+}
+
+// companion here is for Scala Compiler to find 
+object FKTC {
+  implicit val defaultInt = new FKTC[Int] {
+    def value = 5
+  }
+  
+  implicit def listInt[T: FKTC] = new FKTC[List[T]] {
+     def value = implicitly[FKTC[T]].value :: Nil
+  }
+}
+
+object FKTCTest {
+
+    // This is to verify the rules of implicit look up
+    implicit val defaultInt = new FKTC[Int] {
+        def value = 43
+    }
+    
+    def default[T: FKTC] = implicitly[FKTC[T]].value
+}
+
+```
+
+```scala
+// Attention, if we don't explicitly import defaultInt in FKTCTest, Scala compiler will still try to find implicit in FKTC's companion object
+
+// Then we can add value property to a type T
+// List(5)
+FKTCTest.default[List[Int]] 
+
+// See, we can even add property for higher-kinded type
+// List(List(5))
+FKTCTest.default[List[List[Int]]] 
+
+/*
+    List[List[Int]] => 
+    implicitly[FKTC[List[  List[Int] ]]] =>
+
+    // T => List[Int]
+    listInt[T: FKTC] => new FKTC[List[ List[Int] ]] {
+        def value = FKTCTest.default[List[Int]] :: Nil
+    }
+*/
+
+```
+
+
 ### 隐式类型的规则
 <1> 只有使用implicit标记的定义(val, def, class)才会被编译器当作隐式类型去使用
 
@@ -209,10 +263,10 @@ with IndexedSeq[Char] with StringLike[WrappedString] {
 
 ```scala
 object Dollar {
-	implicit def dollarToEuro(dollar: Dollar): Euro...
+    implicit def dollarToEuro(dollar: Dollar): Euro...
 }
 object Euro {
-	implicit def dollarToEuro(dollar: Dollar): Euro...
+    implicit def dollarToEuro(dollar: Dollar): Euro...
 }
 class Dollar {}
 
@@ -251,24 +305,28 @@ env.apply("USER")
 eg1: Scala类库中的sorted
 
 ```scala
-class A(val n: Int) {}
-object A {
-    implicit val ord: Ordering[A] = new Ordering[A] {
-        override def compare(x: A, y: A): Int = x.n - y.n
+class B(n: Int) {}
+object B {
+    implicit val ord: Ordering[Int] = new Ordering[Int] {
+        def compare(x: A, y: A): Int = x.n - y.n
     }
 }
 
 List(new A(3), new A(5)).sorted
+// def sorted[B >: A](implicit ord: Ordering[B]): Repr...
 ```
 很明显上面的sorted方法需要传入一个隐式的ord参数，但是Ordering[A]根本没有这样的转换，这时候Scala编译器就会去类型参数A中去寻找即A的<b style="color:red">伴生对象</b>中定义的ord。
- 	                                  
+                                      
 # 结语
 Scala的隐式类型还是比较复杂的并且涉及到很多类型方面的知识。尽管它为我们提供了很多编程方面的便利，但是在使用时还是需要谨慎，注意作用域否则就可能带来意想不到的"转换"
 
 # 参考
-<1> [finding implicits](http://docs.scala-lang.org/tutorials/FAQ/finding-implicits.html)
+<1> [Finding Implicits](http://docs.scala-lang.org/tutorials/FAQ/finding-implicits.html)
 
 <2> Programming In Scala - Implicit Conversions and Parameters(Chapter 21)
+
+<3> [Implicit Conversion VS Type Class](http://stackoverflow.com/questions/8524878/implicit-conversion-vs-type-class)
+
 
 
 
