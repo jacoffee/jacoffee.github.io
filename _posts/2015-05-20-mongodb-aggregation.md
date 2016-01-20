@@ -5,24 +5,24 @@ date: 2015-05-20 09:51:22 UTC
 title: MongoDB基础之聚合(aggregation)
 tags: [聚合，aggregation，管道，pipeline, 降维]
 permalink: /mongodb/aggregation/
-key: f2c79124fd492226e8102043e7f30a6c 
+key: 7b60b33c122bd6b3f2462615e6424199 
 description: "本文简单地介绍了MongoDB的聚合的相关使用"
 keywords: [聚合，aggregation，管道，pipeline, 降维]
 ---
 
 MongoDB中聚合可以分为很多种，目前我接触的比较多就是pipeline, 它实际上就是将一堆collection扔进去然后按照特定条件分组并且提供一定的筛选条件，最后获取你想要的结果。
 
-# 问题
+#问题
 在MongoDB中，如何使用pipeline?
 
-# 解决
+#解决
 pipeline顾名思义就是管道，以大量的documents作为输入，每一阶段都会对文档进行处理，直到产生最终的结果，当然在此过程也可能产生新的文档。在MongoDB中，pipeline的基本语法如下:
 
 ```bash
 collection.aggregate
 ```
 
-## 常见的Stage
+##常见的Stage
 
 几个在MongoDB基本查询中也会经常用到的$limit, $sort, $skip,
 两个在Aggregation中经常使用的$match, $group。第一个实际上就是普通查询的查询条件，第二个类似于MySQL中的分组。
@@ -155,7 +155,7 @@ db.sales.aggregate([
 这个modifier可以理解为是在降维， 如果对q2使用unwind操作，则原对象会被拆成三个对象，每一个对象的q2分别是10, 5, 3。这个操作即使针对重复值也会被当做单独的值处理。
 
 
-## Pipeline中的性能优化
+##Pipeline中的性能优化
 
 + 当$sort和$match在一起的时候，不论顺序是怎样的，$match都会被移到$sort之前，这样通过$match可以大大减小需要排序的documents。
 
@@ -168,9 +168,9 @@ db.sales.aggregate([
 + 当$match和$match在一起的时候，最终的结果就是两个查询条件的并集。
 
 
-# 参考
+##参考
 
-<1> MongoDB Aggregation and Data Processing
+<1> [MongoDB Aggregation and Data Processing](https://docs.mongodb.org/manual/aggregation/)
 
 <2> [Paging](http://stackoverflow.com/questions/7228169/slow-pagination-over-tons-of-records-in-mongo#)
 
