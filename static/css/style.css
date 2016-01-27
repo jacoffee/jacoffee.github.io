@@ -58,7 +58,7 @@ audio, canvas, video {
     display: inline-block;
 }
 body, button, input, select, textarea {
-    font: 500 14px/1.8 'PT Serif', 'Hiragino Sans GB', sans-serif;
+    font: 500 14px/1.8 'Georgia, serif', 'Hiragino Sans GB', sans-serif;
 }
 table {
     border-collapse: collapse;

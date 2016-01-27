@@ -16,7 +16,7 @@ lineanchors: true
 extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink", "tables", "with_toc_data"]
 
 #Outputting
-# permalink: none # url will be like /:categories/:title.html  category attribute is defined on the top of post
+# permalink: none url will be like /:categories/:title.html category attribute is defined on the top of post
 paginate: 8
 paginate_path: "/archives/page:num/"
 
