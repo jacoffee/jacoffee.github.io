@@ -35,14 +35,6 @@ nav:
     url: /archives/
     icon: icon-reorder
     class: none
-  # - text: 关于我
-  #   url: /contact/
-  #   icon: icon-envelope-alt
-  #   class: none
-#  - text: 联系我
-#    url: http://www.zhanxin.info/contact.html
-#    icon: icon-heart
-#    class: none
   - text: 博客源代码
     url: https://github.com/jacoffee/jacoffee.github.io
     icon: icon-github
