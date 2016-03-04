@@ -18,8 +18,9 @@ extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink", "tables", "w
 #Outputting
 # permalink: none url will be like /:categories/:title.html category attribute is defined on the top of post
 gems: [jekyll-paginate]
-paginate: 8
+paginate: 66
 paginate_path: "/archives/page:num/"
+
 
 # Plugins
 safe: false

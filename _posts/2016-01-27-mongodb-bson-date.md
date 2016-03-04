@@ -5,7 +5,7 @@ date: 2016-01-27 10:12:25 UTC
 title: MongoDB基础之BSON Date
 tags: []
 permalink: /mongodb/bson-date/
-key: 
+key: cf1bc6b91fd0a95fece8eb7beaeaa341
 description: "本文简单地介绍了MongoDB的日期类型以及在文档中的表示"
 keywords: [BSON Date，UTC，ISO 8601，Decimal fraction of second]
 ---
