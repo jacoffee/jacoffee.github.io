@@ -11,6 +11,7 @@ keywords: [延迟加载，双重检验锁]
 ---
 
 # 问题
+
 在Scala中lazy关键字还是使用的比较多的, lazy变量是在调用的时候初始化一次的。 当多个线程同时访问该变量的时候，这就不可避免的要涉及到**变量共享**， 我们需要确保当该变量在一个线程中初始化之后，另一个线程访问的时候不再初始化。那么Scala到底是如何实现lazy变量的？
 
 
@@ -119,4 +120,5 @@ public class LazyVar {
 ```  
 
 ##参考
-\> [Double-checked lock](https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java)
+
+<1> [Double-checked lock](https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java)
