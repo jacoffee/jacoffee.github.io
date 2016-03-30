@@ -56,13 +56,3 @@ Jekyll默认采用的 Liquid templating language来处理模板，比如说高�
 
 不过默认的高亮的颜色不是太好看, 并且没有行号，我参考[这篇博客](http://blog.leonardfactory.com/2013/05/05/code-fenced-blocks-pygments-and-line-numbers-with-jekyll/)解决了这个问题。
 这样一来，基本博客的书写就没有什么问题了。
-
-# 计划
-  <1> 完善网站的基本结构，包括网站域名的优化，顶部导航，底部的网站声明以及侧边栏的一些功能
-
-  <2> 添加基本元素的样式，包括"p"元素的缩进，一些特殊字符的高亮
-
-  <3> 增加博客文章评论框，目前考虑用多说
-
-  <4> 逐步最好网站的SEO
-  
