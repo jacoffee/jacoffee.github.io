@@ -229,8 +229,8 @@ object FKTCTest {
 ```
 
 ```scala
-// Attention, if we don't explicitly import defaultInt in FKTCTest, Scala compiler will still try to find implicit in FKTC's companion object
-
+// Attention, if we don't explicitly import defaultInt in FKTCTest,
+// Scala compiler will still try to find implicit in FKTC's companion object
 // Then we can add value property to a type T
 // List(5)
 FKTCTest.default[List[Int]] 
@@ -253,6 +253,7 @@ FKTCTest.default[List[List[Int]]]
 
 
 ### 隐式类型的规则
+
 <1> 只有使用implicit标记的定义(val, def, class)才会被编译器当作隐式类型去使用
 
 <2> 插入的隐式转换必须以单一标识符的形式存在于作用域中，或是与源类型或目标类型相关联。
@@ -316,7 +317,7 @@ List(new A(3), new A(5)).sorted
 // def sorted[B >: A](implicit ord: Ordering[B]): Repr...
 ```
 很明显上面的sorted方法需要传入一个隐式的ord参数，但是Ordering[A]根本没有这样的转换，这时候Scala编译器就会去类型参数A中去寻找即A的<b style="color:red">伴生对象</b>中定义的ord。
-                                      
+
 # 结语
 Scala的隐式类型还是比较复杂的并且涉及到很多类型方面的知识。尽管它为我们提供了很多编程方面的便利，但是在使用时还是需要谨慎，注意作用域否则就可能带来意想不到的"转换"
 
