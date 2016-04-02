@@ -5,7 +5,7 @@ date: 2015-11-10 11:51:22 UTC
 title: 从前到后看跨域访问
 tags: [跨域访问，同源策略，Cookie共享]
 permalink: /http/cross-origin/
-key: 
+key: 89b2e67da05a561abc1a12317ba4dd25
 description: "本文对浏览器跨域访问进行了研究"
 keywords: [跨域访问，同源策略，Cookie共享]
 ---
