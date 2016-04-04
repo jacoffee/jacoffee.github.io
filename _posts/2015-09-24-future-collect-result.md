@@ -5,7 +5,7 @@ date: 2015-09-24 09:51:22 UTC
 title: 从Future产生到结果收集
 tags: [异步计算，共享变量，链向根Promise，回调]
 permalink: /concurrency/future/result-collect/
-key: 
+key: 488b299b8446fc87aa490a28629fcd61
 description: "本文就Future的初始化以及结果收集的过程进行了研究"
 keywords: [异步计算，共享变量，链向根Promise，回调]
 ---
