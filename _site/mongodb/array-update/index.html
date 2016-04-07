@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html id="J-html" class="">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="generator" content="Jekyll" />
+    <title>MongoDB基础之数组类型元素的基本操作</title>
+    <meta name="description" content="本文研究了mongodb中对于数组类型元素的相关操作: 增加，删除以及修改" />
+    <meta name="keywords" content="文档，Document，数组，Array，WriteResult，回调，钩子，Callback" /><!-- For SEO-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="stylesheet" type="text/css" media="all" href="/static/css/style.css" />
+    <!-- syntax highlighting CSS  need pygments support-->
+    <link rel="stylesheet" href="/static/css/syntax.css" type="text/css" />
+    <!-- use to display line number-->
+    <!--<link rel="stylesheet" href="/static/css/line.css" type="text/css" />-->
+    <!--[if lt IE 9]>
+    <script src="/static/js/html5.js" type="text/javascript"></script>
+    <![endif]-->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="home blog lotus index">
+    <nav class="lotus-nav">
+        <ul>
+             
+                 
+                 
+                 
+                
+            <li class="home ">
+                <a href="/" rel="bookmark" title="首页">
+                    <i class="icon-home"></i>
+                </a>
+                
+            </li>
+             
+                 
+                 
+                 
+                
+            <li class="">
+                <a href="/archives/" rel="bookmark" title="文章归档">
+                    <i class="icon-reorder"></i>
+                </a>
+                
+            </li>
+             
+                 
+                 
+                 
+                
+            <li class="">
+                <a href="https://github.com/jacoffee/jacoffee.github.io" rel="bookmark" title="博客源代码">
+                    <i class="icon-github"></i>
+                </a>
+                
+            </li>
+            
+        </ul>
+    </nav>
+
+    <p class="lotus-breadcrub">
+    <a href="/" rel="nofollow" rel="nofollow" title="首页">Home</a>
+    <span> &gt; </span>
+    <a href="/archives/" rel="nofollow" >Archives</a>
+    <span> &gt; </span>
+    MongoDB基础之数组类型元素的基本操作
+</p>
+
+<h1 class="lotus-pagetit">MongoDB基础之数组类型元素的基本操作</h1>
+
+<p class="lotus-meta">Published on <time class="date" pubdate="2015-03-12">2015-03-12</time></p>
+
+<article  itemscope itemtype="http://schema.org/Article" class="lotus-post">
+<p>今天，在开发一个产品功能的时候。需要对MongoDB中数组类型的元素进行相关操作，于是简单研究了一下。发现这种level的操作在某些情况下还是有些帮助的。</p>
+
+<h1>说明</h1>
+
+<p>本文使用的相关工具以及主要依赖的jar包：</p>
+
+<p><1> Lift框架</p>
+
+<p><2> MongoDB</p>
+
+<p><3> mongo-java-driver-2.10.1.jar</p>
+
+<p><4> lift-mongo_2.10-2.5.1.jar</p>
+
+<h1>解决</h1>
+
+<h3 style="text-indent: 25px;">MongoDB代码</h3>
+<div class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">{</span><span class="w">
+    </span><span class="nt">"_id"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="err">ObjectId(</span><span class="s2">"54f6e3e1d4c678d4a1f7b8c9"</span><span class="err">)</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"created_at"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="err">ISODate(</span><span class="s2">"2015-03-04T10:52:17.762Z"</span><span class="err">)</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"updated_at"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="err">ISODate(</span><span class="s2">"2015-03-04T10:52:17.649Z"</span><span class="err">)</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"d_student"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nt">"name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"zml"</span><span class="p">,</span><span class="w">
+            </span><span class="nt">"startYear"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"2008"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nt">"name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"xxl"</span><span class="p">,</span><span class="w">
+            </span><span class="nt">"startYear"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"2010"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<h3 style="text-indent: 25px;">Scala代码</h3>
+
+<p>Model层: MongoModel，MongoModelMeta分别是对于MongoRecord, MongoMetaRecord的封装。
+created<em>at和updated</em>at来源于MongoModel。</p>
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">class</span> <span class="nc">DateSerializer</span> <span class="k">extends</span> <span class="nc">MongoModel</span><span class="o">[</span><span class="kt">DateSerializer</span><span class="o">]</span> <span class="o">{</span>
+ <span class="k">def</span> <span class="n">meta</span> <span class="k">=</span> <span class="nc">DateSerializer</span>
+
+ <span class="k">object</span> <span class="nc">d_student</span> <span class="k">extends</span> 
+<span class="nc">MongoJsonObjectListField</span><span class="o">[</span><span class="kt">DateSerializer</span>, <span class="kt">Graduate</span><span class="o">](</span><span class="k">this</span><span class="o">,</span> <span class="nc">Graduate</span><span class="o">)</span>
+<span class="o">}</span>
+
+<span class="k">object</span> <span class="nc">DateSerializer</span> <span class="k">extends</span> <span class="nc">DateSerializer</span> <span class="k">with</span> <span class="nc">MongoModelMeta</span><span class="o">[</span><span class="kt">DateSerializer</span><span class="o">]</span> <span class="o">{</span>
+    <span class="k">override</span> <span class="k">val</span> <span class="n">collectionName</span> <span class="k">=</span> <span class="s">"date_serializers"</span>
+
+    <span class="cm">/*
+     def updateWithResult(qry: JObject, newobj: JObject, opts: UpdateOption*) = {
+        useDb { db =&gt;
+            val dboOpts = opts.toList
+            db.getCollection(collectionName).update(
+                qry,
+                newobj,
+                dboOpts.find(_ == Upsert).map(x =&gt; true).getOrElse(false),
+                dboOpts.find(_ == Multi).map(x =&gt; true).getOrElse(false)
+            )
+        }
+    }
+    */</span>
+
+    <span class="cm">/*
+        ("_id" -&gt; id) ~ ("d_student.name" -&gt; name)
+        注意这个查询的条件的level会决定后面的WriteResult中n的结果的"准确性"，
+        如果("_id" -&gt; id)能够匹配到文档，
+        那么n永远是1，updatedExisting永远是true。这样就无法根据n来判断操作是否成功，
+        &lt;b style="color:red"&gt;因为我们操作不是top_level文档&lt;/b&gt;。
+
+        加大查询条件的力度("_id" -&gt; id) ~ ("d_student.name" -&gt; name), 使它到Array的element级别，
+            这样n加上updatedExisting以及err就能判断是否成功操作了。
+    */</span>
+
+    <span class="k">def</span> <span class="n">updateSegmentById</span><span class="o">(</span><span class="n">id</span><span class="k">:</span> <span class="kt">ObjectId</span><span class="o">,</span> <span class="n">name</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">newOne</span><span class="k">:</span> <span class="kt">JValue</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+        <span class="n">updateWithResult</span><span class="o">((</span><span class="s">"_id"</span> <span class="o">-&gt;</span> <span class="n">id</span><span class="o">)</span> <span class="o">~</span> <span class="o">(</span><span class="s">"d_student.name"</span> <span class="o">-&gt;</span> <span class="n">name</span><span class="o">),</span> 
+        <span class="o">(</span><span class="s">"$set"</span> <span class="o">-&gt;</span> <span class="o">(</span><span class="s">"d_student.$"</span> <span class="o">-&gt;</span> <span class="n">newOne</span><span class="o">)))</span>
+    <span class="o">}</span>
+
+    <span class="k">def</span> <span class="n">addSegmentById</span><span class="o">(</span><span class="n">id</span><span class="k">:</span> <span class="kt">ObjectId</span><span class="o">,</span> <span class="n">newOne</span><span class="k">:</span> <span class="kt">JValue</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+        <span class="n">updateWithResult</span><span class="o">((</span><span class="s">"_id"</span> <span class="o">-&gt;</span> <span class="n">id</span><span class="o">),</span> <span class="o">(</span><span class="s">"$addToSet"</span> <span class="o">-&gt;</span> <span class="o">(</span><span class="s">"d_student"</span> <span class="o">-&gt;</span> <span class="n">newOne</span><span class="o">)))</span>
+    <span class="o">}</span>
+
+
+    <span class="k">def</span> <span class="n">deleteSegmentById</span><span class="o">(</span><span class="n">id</span><span class="k">:</span> <span class="kt">ObjectId</span><span class="o">,</span> <span class="n">name</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+        <span class="k">val</span> <span class="n">matchedToDelete</span><span class="k">:</span> <span class="kt">JObject</span> <span class="o">=</span> <span class="s">"d_student"</span> <span class="o">-&gt;</span> <span class="o">(</span><span class="s">"name"</span> <span class="o">-&gt;</span> <span class="nc">List</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span><span class="mi">3</span><span class="o">))</span>
+        <span class="n">updateWithResult</span><span class="o">(</span>
+            <span class="o">(</span><span class="s">"_id"</span> <span class="o">-&gt;</span> <span class="n">id</span><span class="o">)</span> <span class="o">~</span> <span class="o">(</span><span class="s">"d_student.name"</span> <span class="o">-&gt;</span> <span class="n">name</span><span class="o">),</span> <span class="s">"$pull"</span> <span class="o">-&gt;</span> <span class="n">matchedToDelete</span>
+        <span class="o">)</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="k">object</span> <span class="nc">Graduate</span> <span class="k">extends</span> <span class="nc">JsonObjectMeta</span><span class="o">[</span><span class="kt">Graduate</span><span class="o">]</span>
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Graduate</span><span class="o">(</span><span class="n">name</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">startYear</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">JsonObject</span><span class="o">[</span><span class="kt">Graduate</span><span class="o">]</span> <span class="o">{</span>
+    <span class="k">def</span> <span class="n">meta</span> <span class="k">=</span> <span class="nc">Graduate</span>
+<span class="o">}</span>
+</code></pre></div>
+<p>几点说明:</p>
+
+<p><1> 代码中updateWithResult实际上是对于mongo-java-driver-2.10.1.jar中DBCollection方法的封装。</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="n">WriteResult</span> <span class="nf">update</span><span class="p">(</span> 
+    <span class="n">DBObject</span> <span class="n">q</span> <span class="o">,</span> <span class="n">DBObject</span> <span class="n">o</span> <span class="o">,</span> 
+    <span class="kt">boolean</span> <span class="n">upsert</span> <span class="o">,</span> <span class="kt">boolean</span> <span class="n">multi</span> <span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">update</span><span class="o">(</span> <span class="n">q</span> <span class="o">,</span> <span class="n">o</span> <span class="o">,</span> <span class="n">upsert</span> <span class="o">,</span> <span class="n">multi</span> <span class="o">,</span> <span class="n">getWriteConcern</span><span class="o">()</span> <span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div>
+<p>所以updateWithResult实际上是对于数据库底层的操作，并没有经过Lift的封装。另外当我们需要知道<b style="color:red">Update操作的返回值的时候，我们需要使用WriteResult这个类的相关方法</b>。</p>
+
+<p><2> WriteResult的getLastError会返回一个stringify的Json格式的字符串，格式如下:</p>
+<div class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">{</span><span class="w"> 
+  </span><span class="nt">"serverUsed"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"/127.0.0.1:27017"</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="nt">"connectionId"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">38</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="nt">"updatedExisting"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">,</span><span class="w"> 
+  </span><span class="nt">"n"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="nt">"syncMillis"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="nt">"writtenTo"</span><span class="w"> </span><span class="p">:</span><span class="w">  </span><span class="kc">null</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="nt">"err"</span><span class="w"> </span><span class="p">:</span><span class="w">  </span><span class="kc">null</span><span class="w">  </span><span class="p">,</span><span class="w"> </span><span class="nt">"ok"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> 
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>n表示的是如果当前操作是更新或者删除时，被更新或者是删除的文档(top-level)数，这里面实际上隐藏了一层意思，n是建立在匹配到文档之上的。然后结合updatedExisting和err我们可以判断，上面的操作是否成功。</p>
+
+<p><3> 前面提到了updateWithResult直接走的底层数据库，所以我们在框架层面定义的<b style="color:red">callback，俗称钩子(afterSave, afterUpdate...)</b>。所以需要手动去触发框架层面的保存以保证updated_at字段的更新。</p>
+
+<p><4> 由于前面的Model层代码已经说明了三种操作的代码，因此下面着重讲MongoDB中三种操作的使用，Scala代码层面的调用就不提了。</p>
+
+<h3 style="text-indent: 25px;">更新操作</h3>
+
+<p>对于上述这个简单的Document，如果我们要更新数组中name为zml的元素，就必须首先对该元素在数组中的位置进行<b style="color:red">定位</b>这样我们才能对它进行操作。</p>
+
+<p>它的核心是用到的了MongoDB的Update Operator以及Operato $。基本语法:</p>
+
+<blockquote>
+<p>db.collection.update(
+   { <array>: value ... },
+   { <update operator>: { &quot;<array>.$&quot; : value } }
+)</p>
+</blockquote>
+<div class="highlight"><pre><code class="language-json" data-lang="json"><span class="err">db.date_serializers.update(</span><span class="p">{</span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="err">ObjectId(</span><span class="s2">"54f6e3e1d4c678d4a1f7b8c9"</span><span class="err">)</span><span class="p">,</span><span class="w"> 
+</span><span class="nt">"d_student.name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"zml"</span><span class="p">}</span><span class="err">,</span><span class="w"> </span><span class="p">{</span><span class="nt">"$set"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"d_student.$"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"zml_new"</span><span class="p">,</span><span class="w"> </span><span class="nt">"startYear"</span><span class="p">:</span><span class="s2">"2018"</span><span class="p">}}}</span><span class="err">)</span><span class="w">
+</span></code></pre></div>
+<p>如果更新成功，mongo shell会提示如下:</p>
+
+<p>WriteResult({ &quot;nMatched&quot; : 1, &quot;nUpserted&quot; : 0, &quot;nModified&quot; : 1 })</p>
+
+<p>匹配一个文档(top-level), 修改一个文档(top-level), 没有文档被Upserted。</p>
+
+<p>&quot;d_student.\$&quot;用于定位匹配到的Array里面的element。这种用法有一个限制，如果update第一个参数的查询条件没有找到匹配的文档，那么会报$定位错误，如下：</p>
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nc">WriteResult</span><span class="o">({</span>
+    <span class="s">"nMatched"</span> <span class="k">:</span> <span class="err">0</span><span class="o">,</span>
+    <span class="s">"nUpserted"</span> <span class="k">:</span> <span class="err">0</span><span class="o">,</span>
+    <span class="s">"nModified"</span> <span class="k">:</span> <span class="err">0</span><span class="o">,</span>
+    <span class="s">"writeError"</span> <span class="k">:</span> <span class="o">{</span>
+        <span class="err">"</span><span class="kt">code</span><span class="err">"</span> <span class="kt">:</span> <span class="err">16836</span><span class="o">,</span>
+        <span class="err">"</span><span class="kt">errmsg</span><span class="err">"</span> <span class="kt">:</span> <span class="err">"</span><span class="kt">The</span> <span class="kt">positional</span> <span class="kt">operator</span> <span class="kt">did</span> <span class="kt">not</span> <span class="kt">find</span> <span class="kt">the</span> <span class="kt">match</span> <span class="kt">needed</span> <span class="kt">from</span> <span class="kt">the</span> <span class="kt">query.</span> <span class="err">"</span> <span class="kt">+</span>
+        <span class="err">"</span><span class="kt">Unexpanded</span> <span class="kt">update:</span> <span class="kt">d_student.$</span><span class="err">"</span>
+    <span class="o">}</span>
+<span class="o">})</span>
+</code></pre></div>
+<h3 style="text-indent: 25px;">新增操作</h3>
+
+<p>$addSet operator能向Array添加不重复的元素，实际上会遍历Array的element，如果都不相等的话，就插入。否则，什么都不做。所以，这种操作适合<b style="color:red">Array中element不太多且结构不会太复杂的</b>，否则就会有性能问题
+。</p>
+<div class="highlight"><pre><code class="language-json" data-lang="json"><span class="err">db.date_serializers.update(</span><span class="p">{</span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="err">ObjectId(</span><span class="s2">"54f6e3e1d4c678d4a1f7b8c9"</span><span class="err">)</span><span class="p">}</span><span class="err">,</span><span class="w"> 
+</span><span class="p">{</span><span class="nt">"$addToSet"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"d_student"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tuniu"</span><span class="p">,</span><span class="w"> </span><span class="nt">"startYear"</span><span class="p">:</span><span class="s2">"2020"</span><span class="p">}}}</span><span class="err">)</span><span class="w">
+
+</span><span class="err">WriteResult(</span><span class="p">{</span><span class="w"> </span><span class="nt">"nMatched"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">"nUpserted"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nt">"nModified"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">}</span><span class="err">)</span><span class="w">
+</span></code></pre></div>
+<p>注意$addToSet的后面key的结构。另外我们知道MongoDB的数据结构修改起来是非常容易的</p>
+<div class="highlight"><pre><code class="language-json" data-lang="json"><span class="err">db.date_serializers.update(</span><span class="p">{</span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="err">ObjectId(</span><span class="s2">"54f6e3e1d4c678d4a1f7b8c9"</span><span class="err">)</span><span class="p">}</span><span class="err">,</span><span class="w"> 
+</span><span class="p">{</span><span class="nt">"$addToSet"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"d_student"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tuniu"</span><span class="p">}}}</span><span class="err">)</span><span class="w">
+</span></code></pre></div>
+<p>上面这种操作也是Okay的，对于数据库层面没有问题但是对于业务逻辑和代码层面就有问题，所以在实际开发中我们要确保&quot;d_student&quot;的Json格式的数据满足我们定义的数据结构，如上面的graduate的结构，即序列化和反序列化的时候要保证数据结构的统一。</p>
+
+<h3 style="text-indent: 25px;">删除操作</h3>
+
+<p>$pull操作符可以用于删除Array中符合条件的element，如果没有匹配的什么都不做。</p>
+<div class="highlight"><pre><code class="language-json" data-lang="json"><span class="err">db.date_serializers.update(</span><span class="p">{</span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="err">ObjectId(</span><span class="s2">"54f6e3e1d4c678d4a1f7b8c9"</span><span class="err">)</span><span class="p">,</span><span class="w"> 
+</span><span class="nt">"d_student.name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"zml"</span><span class="p">}</span><span class="err">,</span><span class="w"> </span><span class="p">{</span><span class="nt">"$pull"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"d_student"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxl"</span><span class="p">}}}</span><span class="err">)</span><span class="w">
+
+</span><span class="err">db.date_serializers.update(</span><span class="p">{</span><span class="nt">"_id"</span><span class="p">:</span><span class="w"> </span><span class="err">ObjectId(</span><span class="s2">"54f6e3e1d4c678d4a1f7b8c9"</span><span class="err">)</span><span class="p">}</span><span class="err">,</span><span class="w"> 
+</span><span class="p">{</span><span class="nt">"$pull"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"d_student"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xxl"</span><span class="p">}}}</span><span class="err">)</span><span class="w">
+
+</span><span class="err">WriteResult(</span><span class="p">{</span><span class="w"> </span><span class="nt">"nMatched"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">"nUpserted"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nt">"nModified"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">}</span><span class="err">)</span><span class="w">
+</span></code></pre></div>
+<p>对于第二个查询条件&quot;d_student.name&quot;: &quot;zml&quot;在MongoDB中实际上可以省略，因为凭借WriteResult的提示，你可以看出实际操作有没有成功。加上只是为了代码层面能够很好的辨识。</p>
+
+<p>上面的操作在没有数据库异常的情况下，有可能出现nModified &lt; nMatched。</p>
+
+<p>如果我选取第二种查询方式，顺利匹配到top-level document，&quot;nMatched&quot; : 1。但是后面的&quot;name&quot;: &quot;value&quot;没有匹配到值，&quot;nModified&quot; : 0。因为找不到要删除的Array的element。</p>
+
+<h1>结语</h1>
+
+<p>MongoDB Array的element operation还有很多，本文只简单的介绍了一部分。其它的有兴趣的可以参阅官方文档，
+<a href="http://docs.mongodb.org/manual/reference/operator/update/positional/">Array Operation</a></p>
+
+</article>
+
+
+<p class="lotus-anno">声明: 本文采用 <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/" rel="nofollow" target="_blank" title="自由转载-非商用-非衍生-保持署名">BY-NC-SA</a> 授权。转载请注明转自: 
+<a href="/mongodb/array-update/" rel="nofollow">Allen</a></p>
+
+<section class="lotus-nextpage fn-clear">
+    
+    <div class="lotus-nextpage-left"><a class="prev" href="/scala/for-expression/" rel="prev">&laquo;&nbsp;Scala基础之For表达式</a></div>
+    
+    
+    <div class="lotus-nextpage-right"><a class="next" href="/scala/variance/" rel="next">Scala基础之类型变化(variance)&nbsp;&raquo;</a></div>
+    
+</section>
+
+
+<!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="484fcc7242ca50685c5fea00eb7394af" data-title="MongoDB基础之数组类型元素的基本操作" data-url="/mongodb/array-update/"></div>
+<!-- 多说评论框 end -->
+
+
+
+    <footer class="lotus-footer">
+        <p>©2016 allen with website template from <a href="https://github.com/pizn/iLotus" target="_blank">iLotus</a> </p>
+    </footer>
+    <script src="/static/js/jquery.js" type="text/javascript"></script>
+    <script src="/static/js/jquery.scrollTo.js" type="text/javascript"></script>
+    <script src="/static/js/iLotus.js" type="text/javascript"></script>
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+        var duoshuoQuery = {
+            short_name: "roadtopro"
+        };
+        (function() {
+            var ds = document.createElement('script');
+            ds.type = 'text/javascript';
+            ds.async = true;
+            ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+            ds.charset = 'UTF-8';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+        })();
+    </script>
+    <!-- 多说公共JS代码 end -->
+</body>
+
+</html>

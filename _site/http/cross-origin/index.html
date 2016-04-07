@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html id="J-html" class="">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="generator" content="Jekyll" />
+    <title>从前到后看跨域访问</title>
+    <meta name="description" content="本文对浏览器跨域访问进行了研究" />
+    <meta name="keywords" content="跨域访问，同源策略，Cookie共享" /><!-- For SEO-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="stylesheet" type="text/css" media="all" href="/static/css/style.css" />
+    <!-- syntax highlighting CSS  need pygments support-->
+    <link rel="stylesheet" href="/static/css/syntax.css" type="text/css" />
+    <!-- use to display line number-->
+    <!--<link rel="stylesheet" href="/static/css/line.css" type="text/css" />-->
+    <!--[if lt IE 9]>
+    <script src="/static/js/html5.js" type="text/javascript"></script>
+    <![endif]-->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="home blog lotus index">
+    <nav class="lotus-nav">
+        <ul>
+             
+                 
+                 
+                 
+                
+            <li class="home ">
+                <a href="/" rel="bookmark" title="首页">
+                    <i class="icon-home"></i>
+                </a>
+                
+            </li>
+             
+                 
+                 
+                 
+                
+            <li class="">
+                <a href="/archives/" rel="bookmark" title="文章归档">
+                    <i class="icon-reorder"></i>
+                </a>
+                
+            </li>
+             
+                 
+                 
+                 
+                
+            <li class="">
+                <a href="https://github.com/jacoffee/jacoffee.github.io" rel="bookmark" title="博客源代码">
+                    <i class="icon-github"></i>
+                </a>
+                
+            </li>
+            
+        </ul>
+    </nav>
+
+    <p class="lotus-breadcrub">
+    <a href="/" rel="nofollow" rel="nofollow" title="首页">Home</a>
+    <span> &gt; </span>
+    <a href="/archives/" rel="nofollow" >Archives</a>
+    <span> &gt; </span>
+    从前到后看跨域访问
+</p>
+
+<h1 class="lotus-pagetit">从前到后看跨域访问</h1>
+
+<p class="lotus-meta">Published on <time class="date" pubdate="2015-11-10">2015-11-10</time></p>
+
+<article  itemscope itemtype="http://schema.org/Article" class="lotus-post">
+<p>当一个项目逐渐演化成SOA之后，必然要涉及到不同服务之间提供服务。出于安全考虑，<strong>浏览器</strong>会限制从脚本中发起的跨域请求。
+XMLHttpRequest遵循同源策略(决定了一个域的文档和脚本能否与另外一个域的资源进行交互），也就是默认情况下XMLHttpRequest只能请求自己域名的东西。</p>
+
+<blockquote>
+<p>For security reasons, browsers restrict cross-origin HTTP requests initiated from within <strong>scripts</strong></p>
+</blockquote>
+
+<h3><1> 怎样才叫同源</h3>
+
+<blockquote>
+<p>Two pages have the same origin if the protocol, port (if one is specified), and host are the same for both page</p>
+</blockquote>
+
+<p>如果两个页面的<strong>协议</strong>，<strong>服务器域名</strong>，<strong>端口</strong>都相同的话，那么他们就是同源的。前面两个区分的标准应该没有什么问题，所以需要着重注意一下端口。</p>
+
+<p>如果一个网站的资源地址是<code>http://store.company.com/dir/page.html</code>，那么下面哪些网址指向的资源与它同源: </p>
+
+<table class="standard-table">
+ <tbody>
+  <tr>
+   <th>URL</th>
+   <th>Outcome</th>
+   <th>Reason</th>
+  </tr>
+  <tr>
+   <td><code>http://store.company.com/dir2/other.html</code></td>
+   <td>同源</td>
+   <td>&nbsp;</td>
+  </tr>
+  <tr>
+   <td><code>http://store.company.com/dir/inner/another.html</code></td>
+   <td>同源</td>
+   <td>&nbsp;</td>
+  </tr>
+  <tr>
+   <td><code>https://store.company.com/secure.html</code></td>
+   <td>不同源</td>
+   <td>协议不同</td>
+  </tr>
+  <tr>
+   <td><code>http://store.company.com:81/dir/etc.html</code></td>
+   <td>不同源</td>
+   <td>端口不同</td>
+  </tr>
+  <tr>
+   <td><code>http://news.company.com/dir/other.html</code></td>
+   <td>不同源</td>
+   <td>域名不同</td>
+  </tr>
+ </tbody>
+</table>
+
+<p>而对于Cookie，如果设置了Domain为<strong><code>xxx.com</code></strong>, 则该域名和子域名<strong><code>yyy.xxx.com</code></strong>都可以进行Cookie共享。</p>
+
+<h3><2> 如何跨域访问</h3>
+
+<p>跨越访问实际上指的就是跨域资源共享(i.e CORS)，
+默认情况下，使用XmlHttpRequest请求某网站的数据是禁止的(比如说开发时，在一个域下面向另外一个域发送Ajax请求)。</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">$</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'http://xxx.com/api/xxx.json'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"xx"</span><span class="p">)</span> <span class="p">})</span>
+</code></pre></div><div class="highlight"><pre><code class="language-console" data-lang="console">XMLHttpRequest cannot load http://xxx.com/api/xxx.json. 
+No 'Access-Control-Allow-Origin' header is present on the requested resource. 
+Origin 'http://localhost:8080' is therefore not allowed access.
+</code></pre></div>
+<p>如果需要进行跨域访问，涉及到三个方面的工作:</p>
+
+<ol>
+<li>基于Java EE的后端框架的配置</li>
+</ol>
+
+<p>一般的Java Web框架中，都有一个web.xml(一般是webapp/WEB-INF/web.xml)。它支持我们配置<strong>Filter</strong>元素(关于这部分的操作，相关的帖子有很多，由于不是本文的重点，所以便不再赘述)    </p>
+
+<ul>
+<li><strong>定义CrossOriginFilter</strong></li>
+</ul>
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">class</span> <span class="nc">CrossOriginFilter</span> <span class="k">extends</span> <span class="nc">Filter</span> <span class="o">{</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="n">destroy</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{}</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="n">init</span><span class="o">(</span><span class="n">filterConfig</span><span class="k">:</span> <span class="kt">FilterConfig</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{}</span>
+
+  <span class="k">override</span> <span class="k">def</span> <span class="n">doFilter</span><span class="o">(</span><span class="n">request</span><span class="k">:</span> <span class="kt">ServletRequest</span><span class="o">,</span> <span class="n">response</span><span class="k">:</span> <span class="kt">ServletResponse</span><span class="o">,</span>
+    <span class="n">chain</span><span class="k">:</span> <span class="kt">FilterChain</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="n">response</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+      <span class="k">case</span> <span class="o">(</span><span class="n">req</span><span class="k">:</span> <span class="kt">HttpServletRequest</span><span class="o">,</span> <span class="n">resp</span><span class="k">:</span> <span class="kt">HttpServletResponse</span><span class="o">)</span> <span class="k">=&gt;</span>
+          <span class="nc">Option</span><span class="o">(</span><span class="n">req</span><span class="o">.</span><span class="n">getHeader</span><span class="o">(</span><span class="s">"Origin"</span><span class="o">)).</span><span class="n">filter</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">trim</span><span class="o">.</span><span class="n">nonEmpty</span><span class="o">).</span><span class="n">foreach</span> <span class="o">{</span> <span class="n">origin</span> <span class="k">=&gt;</span>
+             <span class="nc">Option</span><span class="o">(</span> <span class="o">(</span><span class="k">new</span> <span class="nc">URI</span><span class="o">(</span><span class="n">origin</span><span class="o">)).</span><span class="n">getHost</span> <span class="o">).</span><span class="n">find</span> <span class="o">{</span> <span class="n">host</span> <span class="k">=&gt;</span> <span class="c1">// host假设是www.google.com
+</span>                 <span class="c1">// 域名白名单
+</span>                <span class="k">val</span> <span class="n">whiteDomainList</span> <span class="k">=</span> <span class="s">"google.com"</span>
+                <span class="n">host</span><span class="o">.</span><span class="n">endsWith</span><span class="o">(</span><span class="n">whiteDomainList</span><span class="o">)</span>
+             <span class="o">}.</span><span class="n">foreach</span> <span class="o">{</span> <span class="n">trustedOrigin</span> <span class="k">=&gt;</span>
+                <span class="n">resp</span><span class="o">.</span><span class="n">setHeader</span><span class="o">(</span><span class="s">"Access-Control-Allow-Origin"</span><span class="o">,</span> <span class="n">origin</span><span class="o">)</span>
+                <span class="n">resp</span><span class="o">.</span><span class="n">setHeader</span><span class="o">(</span><span class="s">"Access-Control-Allow-Credentials"</span><span class="o">,</span> <span class="s">"true"</span><span class="o">)</span> 
+                <span class="n">resp</span><span class="o">.</span><span class="n">setHeader</span><span class="o">(</span><span class="s">"Access-Control-Allow-Headers"</span><span class="o">,</span> <span class="s">"Content-Type"</span><span class="o">)</span>
+             <span class="o">}</span>
+          <span class="o">}</span>
+      <span class="k">case</span> <span class="k">_</span>  <span class="k">=&gt;</span>
+    <span class="o">}</span>
+    <span class="c1">// continue the chain flow
+</span>    <span class="n">chain</span><span class="o">.</span><span class="n">doFilter</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="n">response</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+<ul>
+<li><strong>Web.xml</strong></li>
+</ul>
+<div class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="nt">&lt;filter&gt;</span>
+    <span class="nt">&lt;filter-name&gt;</span>CrossOriginFilter<span class="nt">&lt;/filter-name&gt;</span>
+    <span class="nt">&lt;filter-class&gt;</span>xxx.CrossOriginFilter<span class="nt">&lt;/filter-class&gt;</span>
+    <span class="nt">&lt;async-supported&gt;</span>true<span class="nt">&lt;/async-supported&gt;</span><span class="c">&lt;!-- 异步支持 --&gt;</span>
+<span class="nt">&lt;/filter&gt;</span>
+</code></pre></div>
+<ol>
+<li>前端发送请求时添加相应的参数</li>
+</ol>
+
+<p>关于上面的请求头参数，<strong><code>Access-Control-Allow-Headers</code></strong>指定发起异步请求的域能自主设置的请求头。<strong><code>Access-Control-Allow-Credentials</code></strong>指定发起异步请求的域在发送请求的时候能否携带Cookie； <b style="color:red">浏览器在检测到是跨域请求时，会默认添加一个请求头Origin: domain</b>。</p>
+
+<p>针对请求头，比如说我们上面设置的是允许添加<strong><code>Content-Type</code></strong>。如果我们发送Ajax请求的时候，设置了请求头。</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// jQuery</span>
+<span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span>
+    <span class="p">...</span>
+    <span class="nl">xhrFields</span><span class="p">:</span> <span class="p">{</span>
+      <span class="c1">// 默认值为false</span>
+      <span class="nl">withCredentials</span><span class="p">:</span> <span class="kc">true</span>
+    <span class="p">},</span>
+    <span class="s2">"headers"</span><span class="err">:</span> <span class="p">{</span>
+      <span class="s2">"Content-Type"</span><span class="err">:</span><span class="s2">"text/plain; charset=utf-8"</span>
+    <span class="p">},</span>
+    <span class="p">...</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>这时候浏览器会首先发送一个<strong><code>OPTION</code></strong>请求，以确定被请求的域是否允许请求域添加请求头以及请求头的内容是否正确(如果你发送的是普通文本数据，但Content-Type设置成了application/json)。如果出错，则会看到如下信息:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">OPTIONS http://xxxx.com?param<span class="o">=</span>value
+
+XMLHttpRequest cannot load http://xxxx.com?param<span class="o">=</span>value. 
+Response <span class="k">for </span>preflight has invalid HTTP status code 404
+</code></pre></div>
+<p>针对Allow-Credential，首先我们要明确的一点就是，虽然我们可以通过设置某些属性来发送跨域请求，但是Cookie还是遵从浏览器的同源策略的，也是就同源的资源才能写和读取Cookie。
+设置成<code>withCredentials: true</code>，是为了让<strong>被请求的域名</strong>设置的Cookie能够在<strong>当前域</strong>发送请求的时候带回给被<strong>请求的域名</strong>；另外就是响应头中必须携带<code>Access-Control-Allow-Credentials: True</code>并且<code>Access-Control-Allow-Credentials</code>不能被设置成通配符<code>Access-Control-Allow-Credentials: *</code>。</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// A: xx.roadtopro.me</span>
+<span class="c1">// B: yy.roadtopro.me</span>
+
+    <span class="nx">cross</span><span class="o">-</span><span class="nx">domain</span>
+ <span class="nx">A</span> <span class="o">==============&gt;</span> <span class="nx">B</span>
+</code></pre></div>
+<p>假设A和B共享Cookie，在B中登录之后会设置相关的Cookie。A跨域请求B的某些资源，如果设置了<code>withCredentials: false</code>，则相应的Cookie在发送请求的时候将会被忽略。这样请求B的资源((需要从Cookie中获取某些信息)时就会因信息丢失而失败。</p>
+
+<h2>参考</h2>
+
+<p>&gt; <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS">Mozilla官方文档中对于跨越的详细介绍</a></p>
+
+<p>&gt; <a href="https://imququ.com/post/cross-origin-resource-sharing.html">也谈跨域数据交互解决方案</a></p>
+
+<p>&gt; <a href="http://stackoverflow.com/questions/11423682/cross-domain-form-posting">跨越表单提交</a></p>
+
+</article>
+
+
+<p class="lotus-anno">声明: 本文采用 <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/" rel="nofollow" target="_blank" title="自由转载-非商用-非衍生-保持署名">BY-NC-SA</a> 授权。转载请注明转自: 
+<a href="/http/cross-origin/" rel="nofollow">Allen</a></p>
+
+<section class="lotus-nextpage fn-clear">
+    
+    <div class="lotus-nextpage-left"><a class="prev" href="/concurrency/future/result-collect/" rel="prev">&laquo;&nbsp;从Future产生到结果收集</a></div>
+    
+    
+    <div class="lotus-nextpage-right"><a class="next" href="/mongodb/bson-date/" rel="next">MongoDB基础之BSON Date&nbsp;&raquo;</a></div>
+    
+</section>
+
+
+<!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="89b2e67da05a561abc1a12317ba4dd25" data-title="从前到后看跨域访问" data-url="/http/cross-origin/"></div>
+<!-- 多说评论框 end -->
+
+
+
+    <footer class="lotus-footer">
+        <p>©2016 allen with website template from <a href="https://github.com/pizn/iLotus" target="_blank">iLotus</a> </p>
+    </footer>
+    <script src="/static/js/jquery.js" type="text/javascript"></script>
+    <script src="/static/js/jquery.scrollTo.js" type="text/javascript"></script>
+    <script src="/static/js/iLotus.js" type="text/javascript"></script>
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+        var duoshuoQuery = {
+            short_name: "roadtopro"
+        };
+        (function() {
+            var ds = document.createElement('script');
+            ds.type = 'text/javascript';
+            ds.async = true;
+            ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+            ds.charset = 'UTF-8';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+        })();
+    </script>
+    <!-- 多说公共JS代码 end -->
+</body>
+
+</html>

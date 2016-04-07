@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html id="J-html" class="">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="generator" content="Jekyll" />
+    <title>Linux基础之杀死进程(kill processes)</title>
+    <meta name="description" content="本文罗列了Linux/Unix中常见的杀死进程的方法" />
+    <meta name="keywords" content="进程,PID,信号补货,Trap,Trap Signal" /><!-- For SEO-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="stylesheet" type="text/css" media="all" href="/static/css/style.css" />
+    <!-- syntax highlighting CSS  need pygments support-->
+    <link rel="stylesheet" href="/static/css/syntax.css" type="text/css" />
+    <!-- use to display line number-->
+    <!--<link rel="stylesheet" href="/static/css/line.css" type="text/css" />-->
+    <!--[if lt IE 9]>
+    <script src="/static/js/html5.js" type="text/javascript"></script>
+    <![endif]-->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="home blog lotus index">
+    <nav class="lotus-nav">
+        <ul>
+             
+                 
+                 
+                 
+                
+            <li class="home ">
+                <a href="/" rel="bookmark" title="首页">
+                    <i class="icon-home"></i>
+                </a>
+                
+            </li>
+             
+                 
+                 
+                 
+                
+            <li class="">
+                <a href="/archives/" rel="bookmark" title="文章归档">
+                    <i class="icon-reorder"></i>
+                </a>
+                
+            </li>
+             
+                 
+                 
+                 
+                
+            <li class="">
+                <a href="https://github.com/jacoffee/jacoffee.github.io" rel="bookmark" title="博客源代码">
+                    <i class="icon-github"></i>
+                </a>
+                
+            </li>
+            
+        </ul>
+    </nav>
+
+    <p class="lotus-breadcrub">
+    <a href="/" rel="nofollow" rel="nofollow" title="首页">Home</a>
+    <span> &gt; </span>
+    <a href="/archives/" rel="nofollow" >Archives</a>
+    <span> &gt; </span>
+    Linux基础之杀死进程(kill processes)
+</p>
+
+<h1 class="lotus-pagetit">Linux基础之杀死进程(kill processes)</h1>
+
+<p class="lotus-meta">Published on <time class="date" pubdate="2015-04-12">2015-04-12</time></p>
+
+<article  itemscope itemtype="http://schema.org/Article" class="lotus-post">
+<p>接触Ubuntu的时候就一直被杀死进程的各种方法困扰，后来转到Mac的时候感觉还是没有掌握那几种杀死进程的命令，所以决定系统的整理一下。</p>
+
+<h1>问题</h1>
+
+<p>Linux/Unix下有哪几种杀死进程的方法？</p>
+
+<h1>解决</h1>
+
+<p><1> 进程号</p>
+
+<p>每一个进程，简单的理解就是某个运行着的程序实例。比如说我们启动Chrome，系统就会自动分配一个unique process identification number(PID)，不过Chrome好像每开一个窗口就会启动一个进程。以Chrome为例，我们可以运行下面的命令找出当前进程所对应的进程号。</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">pidof Chrome <span class="c"># for linux </span>
+
+pgrep Skim <span class="c"># for linux/Unix</span>
+ps aux | grep Chrome <span class="c"># for Unix(mac 不支持pidof)</span>
+allen  2586   0.0  0.0  2432772    636 s003  S+    5:42PM   0:00.00 grep chrome
+</code></pre></div>
+<p>上面的2586就是Chrome的进程号。</p>
+
+<p><2> 杀死进程</p>
+
+<p>(1) 哪些进程你能够杀死</p>
+
+<p>&amp; 杀死所有你拥有权限的进程</p>
+
+<p>&amp; 只有root用户才能杀死系统级别的进程</p>
+
+<p>&amp; 由其它用户启动的进程只能由root用户杀死</p>
+
+<p>(2) 基本语法:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nb">kill</span> <span class="o">[</span>signal] PID
+killall process_name
+pkill process_name
+killall -u USERNAME process_name
+</code></pre></div>
+<p>我们在terminal中输入 </p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nb">kill</span> -l
+</code></pre></div>
+<p>会获取所有的Signal, 不过一般常用的是如下几个:</p>
+
+<p>&amp; SIGINT(2): 相当于我们按Ctrl+C时向进程发出的指令</p>
+
+<p>&amp; SIGKILL(9): 强制杀死进程</p>
+
+<p>&amp; SIGTERM(15): 默认杀死进程的方式</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">pgrep Skim <span class="c"># 2672</span>
+<span class="nb">kill</span> -9 2672
+
+killall Skim
+
+pkill Skim
+</code></pre></div>
+<p><3> 捕获Signal并给出回应</p>
+
+<p>实际上kill -l列出的所有的Singal都会有相应的Handler，当系统接受到这些Signal之后，会对进程做相应的处理。但是，我们也可以自己给Signal绑定相应的Handler。</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c">#!/bin/bash</span>
+
+<span class="k">function </span>handler<span class="o">()</span> <span class="o">{</span>
+    <span class="nb">echo </span>Hey, received signal name: SIGINT
+<span class="o">}</span>
+
+<span class="nb">echo </span>My Process ID <span class="nv">$$</span> <span class="c"># $$ is used to obtain the current process name</span>
+
+<span class="nb">trap</span> <span class="s1">'handler'</span> SIGINT
+
+<span class="k">while </span><span class="nb">true</span>;
+<span class="k">do 
+    </span>sleep 1;
+<span class="k">done</span>
+</code></pre></div>
+<p>运行如下命令:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">allen:Script allen<span class="nv">$ </span>bash kill.sh 
+My Process ID 910
+^CHey, received signal name: SIGINT
+</code></pre></div>
+<p>其实上面的trap的第二个参数也可以是直接的命令，如trap &#39;echo Signal trapped&#39; SIGINT。</p>
+
+<h1>结语</h1>
+
+<p>在验证trap signal的时候，我碰到了一个问题:</p>
+
+<p>如果使用source kill.sh 或者是. kill.sh的方式启动的话，Ctrl+C是无法触发trap的第二个参数对应的handler。我知道source 或者.启动script的话是在当前的process中的，而sh或者是bash启动script则会新启动一个进程并且将执行结果返回到当前的process中。
+后来在StackOveflow找到一个问题，不过他的解释我并没有完全理解，个人对于Linux系统的了解还是比较浅，所以等Process了解有一定程度之后再回来解决。</p>
+
+<h1>参考</h1>
+
+<p><1> <a href="http://www.cyberciti.biz/faq/kill-process-in-linux-or-terminate-a-process-in-unix-or-linux-systems/">Kill Process</a></p>
+
+<p><2> Linux Shell Scripting CookBook</p>
+
+<p><3> <a href="http://unix.stackexchange.com/questions/5642/what-if-kill-9-does-not-work">Kill -9原理</a></p>
+
+<p><4> <a href="http://superuser.com/questions/176783/what-is-the-difference-between-executing-a-bash-script-and-sourcing-a-bash-scrip">source, sh, bash, . 运行Script的不同</a></p>
+
+<p><5> <a href="http://stackoverflow.com/questions/10630059/why-is-this-simple-bash-trap-failing">以source或.运行script的时候，Trap会出现问题</a></p>
+
+</article>
+
+
+<p class="lotus-anno">声明: 本文采用 <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/" rel="nofollow" target="_blank" title="自由转载-非商用-非衍生-保持署名">BY-NC-SA</a> 授权。转载请注明转自: 
+<a href="/linux/kill-processes/" rel="nofollow">Allen</a></p>
+
+<section class="lotus-nextpage fn-clear">
+    
+    <div class="lotus-nextpage-left"><a class="prev" href="/scala/annotation/" rel="prev">&laquo;&nbsp;Scala基础之注解(annotation)</a></div>
+    
+    
+    <div class="lotus-nextpage-right"><a class="next" href="/mongodb/aggregation/" rel="next">MongoDB基础之聚合(aggregation)&nbsp;&raquo;</a></div>
+    
+</section>
+
+
+<!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="c4d6d33810e11258a1d8586ce1008b27" data-title="Linux基础之杀死进程(kill processes)" data-url="/linux/kill-processes/"></div>
+<!-- 多说评论框 end -->
+
+
+
+    <footer class="lotus-footer">
+        <p>©2016 allen with website template from <a href="https://github.com/pizn/iLotus" target="_blank">iLotus</a> </p>
+    </footer>
+    <script src="/static/js/jquery.js" type="text/javascript"></script>
+    <script src="/static/js/jquery.scrollTo.js" type="text/javascript"></script>
+    <script src="/static/js/iLotus.js" type="text/javascript"></script>
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+        var duoshuoQuery = {
+            short_name: "roadtopro"
+        };
+        (function() {
+            var ds = document.createElement('script');
+            ds.type = 'text/javascript';
+            ds.async = true;
+            ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+            ds.charset = 'UTF-8';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+        })();
+    </script>
+    <!-- 多说公共JS代码 end -->
+</body>
+
+</html>
