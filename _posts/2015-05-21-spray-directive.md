@@ -147,7 +147,7 @@ object ApplyConverter extends ApplyConverterInstances {
 最终Get的类型为**```Route => Route```**，而complete("")类型是**```StandardRoute```**，函数调用的结果是**```Route```**，正好是**```runRoute```**方法所需要的。
 
 
-#### <2> 涉及到Directive组合操作的Route实现
+#### <2> 使用Directive组合操作来实现Route
 
 ```scala
 path("xx") & authorize(true)
@@ -186,7 +186,7 @@ object ConjunctionMagnet {
 }
 ```
 
-#### <3> 涉及到Future Directive组合操作的Route实现
+#### <3> 使用Future Directive来实现Route
 
 ```scala
   
