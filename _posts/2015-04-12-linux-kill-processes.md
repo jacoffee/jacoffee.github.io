@@ -1,6 +1,6 @@
 ---
 layout: post
-category: scala
+category: linux
 date: 2015-04-12 09:51:22 UTC
 title: Linux基础之杀死进程(kill processes)
 tags: [进程, PID, 信号补货, Trap, Trap Signal]
