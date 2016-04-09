@@ -23,7 +23,7 @@ class Foo {
 }
 ```
 
-访问权限层面，前者仅限当前类中访问，后者稍微宽松一点能在类伴生对象。两者都不能在新生成的类实例中访问。
+访问权限层面，前者仅限当前类实例中访问，后者稍微宽松一点能在类伴生对象。两者都不能在新生成的类实例中访问。
 
 ```scala
 object Foo {
@@ -42,6 +42,29 @@ object Bar {
 // 部分反编译的代码
 public int iThing() { return i() * i(); } 
 public int jThing() { return this.j * this.j; }
+```
+
+(2) **case object与object的区别**
+
+```scala
+case object Message
+object Message1
+```
+
+前者之于后者，可以用于模式匹配的Pattern，这一点在Akka Actor中作为消息使用的特别多;
+继承了**Serializable**，在网络通讯中可以被序列化，这一点同样在Actor的消息传递时体现的非常明显，特别是当Actor位于不同的机器上的时候;
+类似于case class提供了**toString**的默认实现。在实际编程中，由于经常会接触到Actor，所以第二点体现的更明显。
+
+通过反编译的代码，能更清楚的看到区别:
+
+```scala
+// Message$
+public final class Message$ implements Product, Serializable {
+  public static final MODULE$;
+  ...
+  public String toString() { return "Message"; } 
+  ...
+}
 ```
 
 

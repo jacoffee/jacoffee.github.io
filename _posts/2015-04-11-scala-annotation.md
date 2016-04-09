@@ -90,7 +90,7 @@ class Person(@volatile var name: String) {
 
 (2) @tailrec 
 
-这个注解是与尾递归优化有关的，在Scala中如果写了一个需要递归的方法，这样我们就能够在方法的签名处添加@tailrec告诉Scala Compiler进行尾递归优化(有兴趣可以去Programming In Scala第8章看看)。
+这个注解是与[尾递归优化](/scala/tail-recurison/)有关的，在Scala中如果写了一个需要递归的方法，这样我们就能够在方法的签名处添加@tailrec告诉Scala Compiler进行尾递归优化(有兴趣可以去Programming In Scala第8章看看)。
 
 ```scala
 // 阶乘
