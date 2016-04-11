@@ -5,7 +5,7 @@ date: 2016-02-23 09:51:22 UTC
 title: Scala基础之尾递归
 tags: [尾递归，栈，指针，寄存器]
 permalink: /scala/tail-recurison/
-key: 
+key: 8d731d06ea462edfac8a7b879801af58
 description: "Scala中的尾递归实现以及背后的优化机制"
 keywords: [尾递归，栈，指针，寄存器]
 ---

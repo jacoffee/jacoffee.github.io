@@ -297,7 +297,10 @@ li[class^="icon-"].icon-large:before, li[class*=" icon-"].icon-large:before {
 }
 .icon-github:before {
     content: "\f09b";
-}    
+}   
+.icon-stack-overflow:before {
+    content: "\f16c";
+}  
 /*************************
  * lotus design
 *************************/

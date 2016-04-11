@@ -41,3 +41,7 @@ nav:
     url: https://github.com/jacoffee/jacoffee.github.io
     icon: icon-github
     class: none
+  - text: Stackoverflow
+    url: http://stackoverflow.com/users/1723227/allen-chou
+    icon: icon-stack-overflow
+    class: none  

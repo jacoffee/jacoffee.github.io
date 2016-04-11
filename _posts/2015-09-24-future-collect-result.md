@@ -159,7 +159,8 @@ class PromiseCompletingRunnable[T](body: => T) {
 ```scala
 // 如果该Promise已经完成则报错，否则就返回DefaultPromise的当前实例
 def complete(result: Try[T]): this.type = 
-  if (tryComplete(result)) this else throw IllegalStateException("Promise already completed.") 
+  if (tryComplete(result)) this 
+  else throw IllegalStateException("Promise already completed.") 
 ```
 
 #### 2. DefaultPromise.tryComplete
@@ -179,7 +180,8 @@ def tryComplete(result: Try[T]) = {
 
 ```scala
 @tailrec
-private def tryCompleteAndGetListeners(v: Try[T]): List[CallbackRunnable[T]] = {
+private def tryCompleteAndGetListeners(v: Try[T]): 
+  List[CallbackRunnable[T]] = {
   getState match {
     case raw: List[_] =>
       val cur = raw.asInstanceOf[List[CallbackRunnable[T]]]
@@ -219,7 +221,8 @@ sumResult onComplete {
 #### 1. DefaultPromise.onComplete
 
 ```scala
-def onComplete[U](func: Try[T] => U)(implicit executor: ExecutionContext): Unit = {
+def onComplete[U](func: Try[T] => U)
+    (implicit executor: ExecutionContext): Unit = {
     ...
     val runnable = new CallbackRunnable(executor, func) // 1.1
     dispatchOrAddCallback(runnable) // 1.2
@@ -231,7 +234,8 @@ def onComplete[U](func: Try[T] => U)(implicit executor: ExecutionContext): Unit 
 因为Java中Runnable的实现(run方法)默认是返回空的，所以此处基于Runnable再实现了一个，主要的目的是为了注入回调，让Future完成之后执行该回调。
 
 ```scala
-class CallBackRunnable(val executor: ExecutionContext, val onComplete: Try[T] => Any) 
+class CallBackRunnable(
+      val executor: ExecutionContext, val onComplete: Try[T] => Any) 
      extends Runnable with OnCompleteRunnable {
      var value: Try[T] = null
      
@@ -267,12 +271,14 @@ class CallBackRunnable(val executor: ExecutionContext, val onComplete: Try[T] =>
     
 这个方法的主要目的是获取Future的状态，从而决定是执行回调还是将回调转移给根Promise。注意这个过程中**```Future```**的执行会导致**```Promise```**的状态发生变化，也就是前面提到的**```PromiseCompletingRunnable中的run方法```**。 以sumFuture为例，
 
-```
+```scala
 private def dispatchOrAddCallback(runnable: Runnable): Unit = {
     getState match {
-      case r: Try[_]          => runnable.executeWithValue(r.asInstanceOf[Try[T]])
+      case r: Try[_] => 
+         runnable.executeWithValue(r.asInstanceOf[Try[T]])
       
-      case _: DefaultPromise[_] => compressRoot().dispatchOrAddCallback(runnable)
+      case _: DefaultPromise[_] => 
+         compressRoot().dispatchOrAddCallback(runnable)
       
       case listeners: List[_] => 
          if (updateState(listeners, runnable :: listeners)) () 
