@@ -2,7 +2,7 @@
 layout: post
 category: cache
 date: 2016-03-27 15:29:03 UTC
-title: 基于Memcached Java客户端Xmemcached的一致性哈希研究
+title: 基于Xmemcached的一致性哈希研究
 tags: [一致性哈希，取余，Memcache集群，"客户端分布式"，Xmemcached]
 permalink: /cache/memcache/cluster/
 key: 5308562e914c171fbd76970d1dbe71db
