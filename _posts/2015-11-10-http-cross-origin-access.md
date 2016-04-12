@@ -78,13 +78,12 @@ Origin 'http://localhost:8080' is therefore not allowed access.
 
 如果需要进行跨域访问，涉及到三个方面的工作:
 
-1. 基于Java EE的后端框架的配置
+**(1) 基于Java EE的后端框架的配置**
 
 一般的Java Web框架中，都有一个web.xml(一般是webapp/WEB-INF/web.xml)。它支持我们配置**Filter**元素(关于这部分的操作，相关的帖子有很多，由于不是本文的重点，所以便不再赘述)    
 
-+ **定义CrossOriginFilter**
+**定义CrossOriginFilter**
 
-   
 ```scala
 class CrossOriginFilter extends Filter {
   override def destroy(): Unit = {}
@@ -112,8 +111,7 @@ class CrossOriginFilter extends Filter {
   }
 }
 ```
-
-+ **Web.xml**
+**Web.xml**
 
 ```xml
 <filter>
@@ -123,7 +121,7 @@ class CrossOriginFilter extends Filter {
 </filter>
 ```
 
-2. 前端发送请求时添加相应的参数
+**(2) 前端发送请求时添加相应的参数**
 
 关于上面的请求头参数，**```Access-Control-Allow-Headers```**指定发起异步请求的域能自主设置的请求头。**```Access-Control-Allow-Credentials```**指定发起异步请求的域在发送请求的时候能否携带Cookie； <b style="color:red">浏览器在检测到是跨域请求时，会默认添加一个请求头Origin: domain</b>。
    
