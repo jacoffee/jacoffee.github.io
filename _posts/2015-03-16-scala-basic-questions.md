@@ -57,7 +57,7 @@ object Message1
 
 通过反编译的代码，能更清楚的看到区别:
 
-```scala
+```java
 // Message$
 public final class Message$ implements Product, Serializable {
   public static final MODULE$;
@@ -67,8 +67,96 @@ public final class Message$ implements Product, Serializable {
 }
 ```
 
+### <2> 命令行技巧
+
+(1) `:paste`, `:kind`, `:type`, `:settings`, `:javap`等命令使用
+
+`:paste`用于输出多行代码，可以简写成`:pa`
+
+```bash
+scala> :pa
+// Entering paste mode (ctrl-D to finish)
+
+   val seriesX: RDD[Double] = sc.parallelize(List[Double](2, 4, 5))
+   val seriesY: RDD[Double] = sc.parallelize(List[Double](5, 10, 12))
+
+   val correlation: Double = Statistics.corr(seriesX, seriesY)
+
+// Exiting paste mode, now interpreting.
+```
+
+`:kind`用于打印类型的信息
+
+```scala
+scala> :kind -v Int
+scala.Int's kind is A
+*
+This is a proper type.
+
+scala> :kind -v Either
+scala.util.Either's kind is F[+A1,+A2]
+* -(+)-> * -(+)-> *
+This is a type constructor: a 1st-order-kinded type
+
+scala> class Ref[M[_]]
+warning: there was one feature warning; re-run with -feature for details
+defined class Ref
+
+scala> :kind -v Ref[List]
+Ref's kind is X[F[A]]
+(* -> *) -> *
+This is a type constructor that takes type constructor(s): a higher-kinded type
+```
+
+上面的打印出的信息告诉我们`Int`的类型是A, 并且是一个特定类型(参见[Scala基础之一阶类型 vs 高阶类型](http://localhost:4000/scala/first-order-higher-types/))。
+`Either`是类型构造器并且是一阶类型, `Ref`是类型构造器并且是高阶类型。
+
+`:settings`用于查看警告详情，上面代码有一行提示: 加上**-feature**重新运行一下然后查看详情。
+
+```scala
+scala> :settings -feature
+
+scala> class Ref[M[_]]
+<console>:7: warning: higher-kinded type should be enabled
+by making the implicit value scala.language.higherKinds visible.
+This can be achieved by adding the import clause 'import scala.language.higherKinds'
+or by setting the compiler option -language:higherKinds.
+See the Scala docs for value scala.language.higherKinds for a discussion
+why the feature should be explicitly enabled.
+       class Ref[M[_]]
+                 ^
+defined class Ref
+```
+
+上面的信息告诉我们应该显示的引入高阶类型
+
+`:javap`可以用于获取字节码的相关信息
+
+
+```scala
+scala> object Foo { def apply = 10; def bar = 5 }
+defined object Foo
+
+scala> :javap Foo#apply
+  public int apply();
+    descriptor: ()I
+    flags: ACC_PUBLIC
+    Code:
+      stack=1, locals=1, args_size=1
+         0: bipush        10
+         2: ireturn
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+            0       3     0  this   LFoo$;
+      LineNumberTable:
+        line 7: 0
+
+```
+
 
 ##参考
 
 \> [private[this] vs private的字节码区别](https://gist.github.com/twolfe18/5767545)
+
+\> [实用的Console命令](http://docs.scala-lang.org/scala/2.11/)
 

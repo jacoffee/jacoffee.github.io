@@ -305,7 +305,7 @@ trait Functionn[-T1,..., -Tn, +R] {
 
 Existential Types用于构造类型的时候，有一部分已经是确定的类型(library中的各种yi'zhi)已知的数据类型， 自己定义的类型class, trait)。
 
-基本格式: T forSome { ‘type’ TypeDcl | ‘val’ ValDcl } 
+基本格式: `T forSome { ‘type’ TypeDcl | ‘val’ ValDcl }`
 
 ```scala
 // 在实际使用中，我们一般是 _ 来表示
@@ -324,12 +324,15 @@ def foo[List[_]](x: List[_]) = x
 def foo[AA[_]](x: AA[_]) = x
 def foo[AA[_]](x: AA[t forSome { type t}]) = x
 
-// 因为方法类型参数的地方， AA刚被定义所以并不满足real type的定义。有点类似于变量先定义后使用的味道。因此下面的用法是不对的。
+/*
+在方法类型参数的地方， AA刚被定义所以并不满足real type的定义。
+有点类似于变量先定义后使用的味道。因此下面的用法是不对的。
+*/
 def foo[AA[t forSome { type t}]](x: AA[t forSome { type t}]) = x
 ```
 
-从完整版的定义中，T实际上是有可以Upper Bound 和 Lower Bound的，默认情况下
- type T => type T >: scala.Nothing <: scala.AnyRef
+从完整版的定义中，T实际上是有可以**Upper Bound**和**Lower Bound的**，默认情况下
+`type T => type T >: scala.Nothing <: scala.AnyRef`
 
 ```scala
 // Scala compiler 不在意传入什么类型，只要该类型是Int或者是Int的超类即可
@@ -350,11 +353,12 @@ trait Outer {
 type Ref = x.AbsT forSome { val x: Outer }
 ```
 
-# 参考
-<1> Scala Reference 3.2
+## 参考
 
-<2> [scala-type-infix-operators](http://jim-mcbeath.blogspot.com/2008/11/scala-type-infix-operators.html)
+\> Scala Reference 3.2
 
-<3> [type-operators.scala](https://github.com/milessabin/shapeless/blob/master/core/src/main/scala/shapeless/typeoperators.scala)
+\> [scala-type-infix-operators](http://jim-mcbeath.blogspot.com/2008/11/scala-type-infix-operators.html)
 
-<4> [scala-method-type-parameter-can-not-accept-existential-type-in-forsome-form](http://stackoverflow.com/questions/31937965/scala-method-type-parameter-can-not-accept-existential-type-in-forsome-form/31978204#31978204)
+\> [type-operators.scala](https://github.com/milessabin/shapeless/blob/master/core/src/main/scala/shapeless/typeoperators.scala)
+
+\> [scala-method-type-parameter-can-not-accept-existential-type-in-forsome-form](http://stackoverflow.com/questions/31937965/scala-method-type-parameter-can-not-accept-existential-type-in-forsome-form/31978204#31978204)

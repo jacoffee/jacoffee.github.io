@@ -86,7 +86,6 @@ blockquote {
     border-style: solid;
     vertical-align: middle;
     border-radius: 0px 2px 2px 0;
-    max-width: 650px;
 }
 blockquote blockquote {
     padding: 0 1em 0 1em;
@@ -164,7 +163,6 @@ div.highlight {
     padding: 0.5em 1em 0.1em 1em;
     margin: 0 0 10px 25px;
     border-radius: 0px 2px 2px 0;
-    max-width: 850px;
 }
 pre, code {
     font-family: "Courier New", Courier, monospace;
@@ -173,12 +171,12 @@ pre, code {
 }
 /* pre { font-size: 12px; border: 1px solid #d8d8d8; border-left-width: 0.4em;  background: rgba(214, 214, 214, 0.5); padding: 10px; } */
 code {
-    /* color: #4d4d4d; */
+    color: #4d4d4d;
     background: rgba(214, 214, 214, 0.5);
     padding: 0 0.2em;
     border: 1px solid #bdbdbd;
-    border-radius: 2px 2px;
     vertical-align: top;
+    font-weight: bold;
 }
 small {
     font-size: 12px;
@@ -311,6 +309,7 @@ li[class^="icon-"].icon-large:before, li[class*=" icon-"].icon-large:before {
 }
 .lotus blockquote p {
     margin-bottom: 0.4em;
+    text-indent: -1em;
 }
 .lotus blockquote p:before {
     content: "“";
@@ -702,7 +701,6 @@ h1, h2, h3, h4, h5, h6 {
     float: left;
     margin: 20px 0 12px 0px;
     position: relative;
-    width: 240px;
     color: #525252;
 }
 .violet-site h1, .violet-site h1 a {
