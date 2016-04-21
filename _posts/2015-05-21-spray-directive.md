@@ -2,7 +2,7 @@
 layout: post
 category: spray
 date: 2015-05-21 19:51:22 UTC
-title: Spray基础之Directive(路由)
+title: Spray基础之路由(Directive)
 tags: [路由，指令，管道，Shapeless，响应式编程]
 permalink: /spray/directive/
 key: 648a1d4bee718608389fbafe9c484311
@@ -11,11 +11,15 @@ keywords: [路由，指令，管道，Shapeless，响应式编程]
 ---
 
 在谈论Directive之前，我们先要简单的解释一下[Routes(路由)](http://spray.io/documentation/1.2.2/spray-routing/key-concepts/routes/), 它的类型是**```RequestContext => Unit```**，在英文中Route是路径，路线的意思。所以在Spray中可以理解为
+
 <b style="color:red">
  Route承担了如何处理请求的任务，将请求指派到什么流程；一般来说，它有三种方式处理请求：
- + 顺利完成请求 requestContext.complete(...)
- + 因为某种原因拒绝请求 requestContext.reject(...)
- + 因为某些异常而导致 500 Server Error
+ 
+ 顺利完成请求 requestContext.complete(...)
+ 
+ 因为某种原因拒绝请求 requestContext.reject(...)
+ 
+ 因为某些异常而导致 500 Server Error
 </b>
 
 在最开始接触Routes的时候的一个疑惑，Route函数(**```RequestContext => Unit```**)的返回值类型为什么是**```Unit```**。

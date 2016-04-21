@@ -65,8 +65,11 @@ table {
     border-spacing: 0;
     width: 100%;
 }
+table.standard-table {
+   margin-left: 25px;
+}
 th {
-    text-align: inherit;
+   text-align: inherit;
 }
 fieldset, img {
     border: 0;

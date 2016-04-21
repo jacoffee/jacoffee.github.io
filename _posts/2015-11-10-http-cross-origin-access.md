@@ -12,10 +12,10 @@ keywords: [跨域访问，同源策略，Cookie共享]
 
 当一个项目逐渐演化成SOA之后，必然要涉及到不同服务之间提供服务。出于安全考虑，**浏览器**会限制从脚本中发起的跨域请求。
 XMLHttpRequest遵循同源策略(决定了一个域的文档和脚本能否与另外一个域的资源进行交互），也就是默认情况下XMLHttpRequest只能请求自己域名的东西。
+**这里要注意一点，服务器还是会正常响应请求，只不过浏览器检测到没有相应的东西会不进行渲染(For security reasons, browsers restrict cross-origin HTTP requests initiated from within scripts)。**
 
-> For security reasons, browsers restrict cross-origin HTTP requests initiated from within **scripts**
 
-### <1> 怎样才叫同源
+**(1) 怎样才叫同源**
 
 > Two pages have the same origin if the protocol, port (if one is specified), and host are the same for both page
 
@@ -61,7 +61,7 @@ XMLHttpRequest遵循同源策略(决定了一个域的文档和脚本能否与�
 而对于Cookie，如果设置了Domain为**```xxx.com```**, 则该域名和子域名**```yyy.xxx.com```**都可以进行Cookie共享。
 
 
-### <2> 如何跨域访问
+**(2) 如何跨域访问**
 
 跨越访问实际上指的就是跨域资源共享(i.e CORS)，
 默认情况下，使用XmlHttpRequest请求某网站的数据是禁止的(比如说开发时，在一个域下面向另外一个域发送Ajax请求)。
@@ -78,9 +78,9 @@ Origin 'http://localhost:8080' is therefore not allowed access.
 
 如果需要进行跨域访问，涉及到三个方面的工作:
 
-**(1) 基于Java EE的后端框架的配置**
+**基于Java EE的后端框架的配置**
 
-一般的Java Web框架中，都有一个web.xml(一般是webapp/WEB-INF/web.xml)。它支持我们配置**Filter**元素(关于这部分的操作，相关的帖子有很多，由于不是本文的重点，所以便不再赘述)    
+一般的Java Web框架中，都有一个web.xml(一般是webapp/WEB-INF/web.xml)。它支持我们配置**Filter**元素(关于这部分的操作，相关的帖子有很多，由于不是本文的重点，所以便不再赘述)
 
 **定义CrossOriginFilter**
 
@@ -121,7 +121,7 @@ class CrossOriginFilter extends Filter {
 </filter>
 ```
 
-**(2) 前端发送请求时添加相应的参数**
+**前端发送请求时添加相应的参数**
 
 关于上面的请求头参数，**```Access-Control-Allow-Headers```**指定发起异步请求的域能自主设置的请求头。**```Access-Control-Allow-Credentials```**指定发起异步请求的域在发送请求的时候能否携带Cookie； <b style="color:red">浏览器在检测到是跨域请求时，会默认添加一个请求头Origin: domain</b>。
    
@@ -151,6 +151,13 @@ XMLHttpRequest cannot load http://xxxx.com?param=value.
 Response for preflight has invalid HTTP status code 404
 ```
 
+一般在下面几种情况下，浏览器会发送预检表请求(preflight request):
+
+如果发表请求的时候，请求的方法并不是GET, HEAD, POST三者之一; 此外如果发送的是POST请求，但是`Content-type`不属于以下三个:
+`x-www-form-urlencoded`, `multipart/form-data`, `text/plain`(当然这个好像与浏览器有关，Mozilla官方文档说的是从Gecko 2.0起，这三个也不会发了，不过以防意外还是要做好发预检表请求的准备);
+
+如果发送请求的时候，设置了自定义的请求头。
+
 针对Allow-Credential，首先我们要明确的一点就是，虽然我们可以通过设置某些属性来发送跨域请求，但是Cookie还是遵从浏览器的同源策略的，也是就同源的资源才能写和读取Cookie。
 设置成```withCredentials: true```，是为了让**被请求的域名**设置的Cookie能够在**当前域**发送请求的时候带回给被**请求的域名**；另外就是响应头中必须携带```Access-Control-Allow-Credentials: True```并且```Access-Control-Allow-Credentials```不能被设置成通配符```Access-Control-Allow-Credentials: *```。
 
@@ -167,7 +174,7 @@ Response for preflight has invalid HTTP status code 404
     
 ##参考
 
-\> [Mozilla官方文档中对于跨越的详细介绍](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)
+\> [Mozilla官方文档中对于跨域的详细介绍](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)
 
 \> [也谈跨域数据交互解决方案](https://imququ.com/post/cross-origin-resource-sharing.html)
 

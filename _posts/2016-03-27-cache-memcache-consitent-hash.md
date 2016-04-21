@@ -15,7 +15,7 @@ keywords: [一致性哈希，取余，Memcache集群，"客户端分布式"，Xm
 
 Memcache实际上没有集群的概念，它的分布式主要是靠客户端实现的，客户端决定采用什么算法将Key如何均匀的分布到服务器上并且在服务器增加或减小的时候，减小Rehash(重算哈希)。这里借助Memcache的Java客户端[Xmemcached](https://code.google.com/p/xmemcached/wiki/User_Guide)来介绍两种实现。
   
-### <1> Xmemcached对于连接的抽象
+**(1) Xmemcached对于连接的抽象**
    
 ```scala
 val addrs = List("127.0.0.1:11211", "127.0.0.1:11311")
@@ -43,7 +43,7 @@ com.google.code.yanf4j.core.impl.AbstractController Add a session: 127.0.0.1:113
 当我们构建客户端的时候传入了多个服务器端地址，那么在存储的时候就会涉及到选址的问题。**```net.rubyeye.xmemcached.MemcachedSessionLocator```**的多个子类提供了这一问题的解决方案，包括一致性哈希。默认情况下使用的是**```net.rubyeye.xmemcached.impl.ArrayMemcachedSessionLocator ```**。以下分别对默认和一致性哈希的情况进行解析，代码是基于Scala的简化版。
    
     
-### <2> 哈希取余 -- ArrayMemcachedSessionLocator
+**(2) 哈希取余 -- ArrayMemcachedSessionLocator**
      
 ```scala
 // 确定Hash策略
@@ -82,16 +82,12 @@ def getSessionByKey(key: String) = {
 </p>
     
 
-### <3> [一致性哈希](https://www.quora.com/What-is-the-best-way-to-add-remove-a-new-server-in-memcached-without-restarting-it-to-avoid-rehashing-Is-it-possible) -- KetamaMemcachedSessionLocator
+**(3) [一致性哈希](https://www.quora.com/What-is-the-best-way-to-add-remove-a-new-server-in-memcached-without-restarting-it-to-avoid-rehashing-Is-it-possible) -- KetamaMemcachedSessionLocator**
 
-简单来说，就是有一个环（英文中叫Continuum），环上的每一点对应（0 ~ (2 ^ 32))之间的一个整数，通过某种哈希算法将服务器地址与环上的整数相对应，一个服务器大概对应100 ~ 200个整数(magic number)。
-    
-![一致性Hash形成的环](https://www.adayinthelifeof.nl/images/uploads/2011/02/Screen-shot-2011-02-05-at-10.37.32-PM.png)
-    
-将要存储的Key也以某种方式进行哈希，放到环上相应的位置。如果没有找到对应的点，则按照顺时针方向往前，碰到的第一个点对应的服务器就是该Key被存储的服务器(当然还涉及到一些哈希冲突什么的)。
-    
-![Server Hash](https://www.adayinthelifeof.nl/images/uploads/2011/02/Screen-shot-2011-02-05-at-10.37.38-PM.png)
-    
+简单来说就是有一个环（英文中叫Continuum），环上的每一点对应(0 ~ (2 ^ 32))之间的一个整数(如下简略图所示)，通过某种哈希算法将服务器地址与环上的整数相对应，一个服务器大概对应100 ~ 200个整数(magic number)。将要存储的Key也以某种方式进行哈希，放到环上相应的位置。如果没有找到对应的点，则按照顺时针方向往前，碰到的第一个点对应的服务器就是该Key被存储的服务器(当然还涉及到一些哈希冲突什么的)。
+
+![一致性Hash形成的环](/static/images/charts/2016-03-27/continuum.png)
+        
 <p style="display:none">
 这种情况下如果Memcache集群中加入一个节点，受影响的数据量为其总结点缓存量的1 / 3
     
@@ -149,13 +145,10 @@ def buildMap = {
 
 
 ```scala
-    
 public Session send(final Command msg) throws MemcachedException {
-
   MemcachedSession session = (MemcachedSession) this.findSessionByKey(msg
 		.getKey());
   ....
-  
 }
 
 public final Session findSessionByKey(String key) {
