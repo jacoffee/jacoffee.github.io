@@ -345,9 +345,9 @@ foo(List("hello")) // 因为String与Int的共同父类是Any, 所以上例的T�
 
 ```scala
 trait Outer {
-    type AbsT
+  type AbsT
     
-    def handle(proc: this.type => Unit) 
+  def handle(proc: this.type => Unit) 
 }
 
 type Ref = x.AbsT forSome { val x: Outer }
