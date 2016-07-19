@@ -14,7 +14,7 @@ Future在异步编程中使用非常广泛，Scala中的Actor就是建立在Futu
 
 > A Future is a data structure used to retrieve the result of some concurrent operation. This result can be accessed synchronously (blocking) or asynchronously (non-blocking).
 
-## <1> Future的结果 - 非阻塞式 vs 阻塞式收集
+##Future的结果 - 非阻塞式 vs 阻塞式收集
 
 ```scala
 val sumResult = Future((1L to 100000000L).sum)
@@ -96,7 +96,7 @@ sumResult.isCompleted
 
 显然**onComplete**，**onSuccess**，**onFailure**这些回调也是根据当前Future的状态来执行相应的操作的。那么Future内部的状态有哪几种呢？这些状态之间又是如何切换的呢？
 
-## <2> Future的状态以及改变
+##Future的状态以及改变
 
 要研究Future的状态变化，最好的方式就是利用**onComplete**的调用栈并且打断点来摸清整个调用过程，下面通过代码调用来一步一步解释(由于之前没有接触过UML图，所以可能存在一些纰漏，以下涉及到UML图的地方仅供参考)。
 
@@ -104,11 +104,11 @@ sumResult.isCompleted
 
 ### (1) Future的初始化 -- Future.apply
 
-Future初始化的时候(实际上是DefaultPromise的初始化)，会调用**```AbstractPromise```**的updateState方法来设置初始状态。
+Future初始化的时候(实际上是DefaultPromise的初始化)，会调用**`AbstractPromise`**的updateState方法来设置初始状态。
 
 ```scala
 class DefaultPromise[T] extends AbstractPromise { self =>
- updateState(null, Nil) // 实际上更新的是AbstractPromise中的_ref属性
+  updateState(null, Nil) // 实际上更新的是AbstractPromise中的_ref属性
 }
 ```
 
@@ -117,23 +117,23 @@ class DefaultPromise[T] extends AbstractPromise { self =>
 ### (2) Future中的任务开始执行 -- PromiseCompletingRunnable
 
 ```scala
-  // executor ---> package scala.concurrent.impl.ExecutionContextImpl    
-    def apply[T](body: => T)(implicit executor ExecutionContext): 
-       scala.concurrent.Future[T] = {
-       /*
-          这里也体现了Promise的语义执行Runnable并且返回Future
-          每次启动一个异步计算的时候，PromiseCompletingRunnable都会被创建一次
-          body是懒加载的，所以在调用的时候才会被执行
-       */
-       val runnable = new PromiseCompletingRunnable(body)
-       
-       // 异步计算从这个地方开始然后调用PromiseCompletingRunnable的run方法
-      executor.prepare.execute(runnable) 
-              
-      // 返回Future，实际上是DefaultPromise实例，以便后续使用，比如说Compose
-      runnable.promise.future
-    }
+// executor ---> package scala.concurrent.impl.ExecutionContextImpl    
+  def apply[T](body: => T)(implicit executor ExecutionContext): 
+     scala.concurrent.Future[T] = {
+     /*
+        这里也体现了Promise的语义执行Runnable并且返回Future
+        每次启动一个异步计算的时候，PromiseCompletingRunnable都会被创建一次
+        body是懒加载的，所以在调用的时候才会被执行
+     */
+     val runnable = new PromiseCompletingRunnable(body)
+     
+     // 异步计算从这个地方开始然后调用PromiseCompletingRunnable的run方法
+     executor.prepare.execute(runnable) 
+            
+     // 返回Future，实际上是DefaultPromise实例，以便后续使用，比如说Compose
+     runnable.promise.future
   }
+}
 ```
 
 而在**```PromiseCompletingRunnable```**执行的时候，会将**执行结果**封装在**```Try[T]```**中，所以onComplete的回调函数的参数也是**Try[T]**类型的。
@@ -269,7 +269,7 @@ class CallBackRunnable(
 
 #### 1.2 DefaultPromise.dispatchOrAddCallback
     
-这个方法的主要目的是获取Future的状态，从而决定是执行回调还是将回调转移给根Promise。注意这个过程中**```Future```**的执行会导致**```Promise```**的状态发生变化，也就是前面提到的**```PromiseCompletingRunnable中的run方法```**。 以sumFuture为例，
+这个方法的主要目的是获取Future的状态，从而决定是执行回调还是将回调转移给根Promise。注意这个过程中**`Future`**的执行会导致**`Promise`**的状态发生变化，也就是前面提到的**`PromiseCompletingRunnable中的run方法`**。 以sumFuture为例。
 
 ```scala
 private def dispatchOrAddCallback(runnable: Runnable): Unit = {
@@ -296,8 +296,8 @@ private def dispatchOrAddCallback(runnable: Runnable): Unit = {
     这里涉及到链向根DefaultPromise的过程(会在后续的更新中补充)
 
   + **List[CallbackRunnable]**，
-    Future的初始状态是**Nil(List[CallbackRunnable])**，<b style="color:red">如果执行回调函数的线程在执行的时候，Future的执行并没有结束就会将Future的状态更新为List[CallbackRunnable]， 实际上注册了一个监听器(在Future执行完成之后做什么)</b>。代码中如果状态更新成功，什么都没做，返回值是**``()``**。
-   由于Future执行线程和回调函数执行线程共享Future的状态，所以  在**``tryCompleteAndGetListeners``**中也能捕获到状态的变化然后进入不同的操作。
+    Future的初始状态是**Nil(List[CallbackRunnable])**，<b style="color:red"> 如果执行回调函数的线程在执行的时候，Future的执行并没有结束就会将Future的状态更新为List[CallbackRunnable]， 实际上注册了一个监听器(在Future执行完成之后做什么)</b>。代码中如果状态更新成功，什么都没做，返回值是**`()`**。
+   由于Future执行线程和回调函数执行线程共享Future的状态，所以  在**`tryCompleteAndGetListeners`**中也能捕获到状态的变化然后进入不同的操作。
   
 
 至此，一个最基本的Future初始化以及注册回调并收集结果的流程就走完了(对于，状态为DefaultPromise的情况会在后续的更新中完成)。
