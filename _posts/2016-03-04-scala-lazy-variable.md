@@ -10,9 +10,9 @@ description: "本文研究了Scala中懒加载变量背后的实现"
 keywords: [延迟加载，双重检验锁，语法糖]
 ---
 
-在Scala中lazy关键字还是使用的比较多的, lazy变量是在调用的时候初始化一次的。 当多个线程同时访问该变量的时候，这就不可避免的要涉及到**变量共享**， 我们需要确保当该变量在一个线程中初始化之后，另一个线程访问的时候不再初始化。那么Scala到底是如何实现lazy变量的？
+在Scala中lazy关键字还是比较常用的，相较于方法或者函数，它是在被使用的时候第一次初始化，之后会继续使用之前计算的值而不会重新计算。
+不过从本质上来讲，它修饰的是一个变量，所以需要确保该变量在线程A中被初始化之后，另一个线程B访问的时候不再初始化。而lazy关键字也确实保证了这点，实际上就是[双重检验锁](https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java)。
 
-下面是一个基本的测试用例:
 
 ```scala
 class LazyVar {
@@ -63,24 +63,27 @@ public class LazyVar {
 
 关于上面代码实现的几点解释:
 
- <1> **双重检验锁**
+(1) **双重检验锁**
 
-  > In Scala, it use double-checked lock -- when in the synchronized block, it will check again whether the variable been protected has been initialized.
+> In Scala, it use double-checked lock -- when in the synchronized block, it will check again whether the variable been protected has been initialized.
    
-  在调用foo方法的时候，检验bar是否被初始化；如果没有，通过synchronized获取锁。但可能在获取锁的瞬间在另一个线程访问的时候被初始化了，所以还要对标识变量再次检验以确保不会重复初始化。
+在`bar$lzycompute()`中，除了使用`synchronized`关键字，在初始化bar之前还需要再次检验。
 
- <2> **lazy变量的个数与bitmap的实现策略**
+(2) **lazy变量的个数与bitmap的实现策略**
 
-当lazy变量只有1个，直接用布尔值来判断;当lazy变量的个数小于等于8个，可以通过bitmap的对应位数上是1还是0来判断;
-当lazy变量的个数超过8个的时候，一个字节的8个位便不足以再进行判断，需要将bitmap扩展为整形格式，判断也会更复杂，这里不再赘述。
+当lazy变量只有1个，直接用布尔值来判断;
+当lazy变量的个数小于等于8个，可以通过bitmap的对应位数上是1还是0来判断(1byte=8bit);
+当lazy变量的个数超过8个的时候，一个字节的8位便不足以进行判断。需要将bitmap扩展为整形(Int)，判断也会更复杂。
     
- <3> **判断lazy变量是否已经初始化的标识**
+(3) **判断lazy变量是否已经初始化的标识**
 
- 按位与 (&) -- 相同位的两个数，**如果都为1，则结果为1；其它情况均为0**; 按位或 (|) -- 相同位的两个数，**如果其中一个为1，则结果为1；其它情况均为0**。
+按位与 (&) -- 相同位的两个数，**如果都为1，则结果为1；其它情况均为0**; 
 
- 对于bar变量的初始化判断标准就是: 如果bitmap的末位为0，则说明该变量没有被初始化;和0x1的按位与只有在末位为1的时候才会返回1。
-**(this.bitmap$0 & 0x1) == 0**说明bitmap末位是0，所以进行初始化，然后将bitmap的末位赋值为**(this.bitmap$0 | 0x1)**通过按位与将末位变成1。 
+按位或 (|) -- 相同位的两个数，**如果其中一个为1，则结果为1；其它情况均为0**。
 
-##参考
+对于bar变量的初始化判断标准就是: 
 
-<1> [Double-checked lock](https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java)
+如果bitmap的末位为0，则说明该变量没有被初始化;和0x1的按位与只有在末位为1的时候才会返回1。
+**(this.bitmap$0 & 0x1) == 0**说明bitmap末位是0，所以进行初始化。
+
+然后将bitmap的末位赋值为**(this.bitmap$0 | 0x1)**通过按位与将末位变成1，标识该变量已经被初始化。 
