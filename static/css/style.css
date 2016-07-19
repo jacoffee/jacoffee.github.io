@@ -346,6 +346,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .lotus h2, .lotus-h2 {
     font-size: 1.6em;
+    margin-left: 20px;
 }
 .lotus h3, .lotus-h3 {
     font-size: 1.4em;
@@ -353,10 +354,12 @@ h1, h2, h3, h4, h5, h6 {
     margin-top: 1.4em;
 }
 .index h3 {
-    margin-top: 0;
+/*    margin-left: 20px;  */
+    border-bottom: none;
 }
 .lotus h4, .lotus-h4 {
     font-size: 1.2em;
+    margin-left: 24px;
 }
 .lotus h5, .lotus h6, .lotus-h5, .lotus-h6 {
     font-size: 1em;
@@ -469,9 +472,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 .index {
     padding: 1em 0 0 0;
-}
-.index h3 {
-    border-bottom: none;
 }
 .lotus-nav {
     width: 58px;
