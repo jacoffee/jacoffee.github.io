@@ -2,8 +2,8 @@
 layout: post
 category: cache
 date: 2016-03-27 15:29:03 UTC
-title: 基于Xmemcached的一致性哈希研究
-tags: [一致性哈希，取余，Memcache集群，"客户端分布式"，Xmemcached]
+title: 基于Xmemcache的一致性哈希研究
+tags: [一致性哈希，取余，Memcache集群，客户端分布式，Xmemcached]
 permalink: /cache/memcache/cluster/
 key: 5308562e914c171fbd76970d1dbe71db
 description: "本文研究了Memcache集群相关的问题"
@@ -13,9 +13,9 @@ keywords: [一致性哈希，取余，Memcache集群，"客户端分布式"，Xm
 
 谈起Memcache中的一致性哈希，首先要明确的一点是Memcache集群与一般的服务器端集群还不太一样，最显著的一点就是Memcache的各台服务器之间并没有通讯机制，也就是如果一台服务器挂了，其它的服务根本就不知道(关于Memcached如何防止单点故障会在另一篇文章中提到)。
 
-Memcache实际上没有集群的概念，它的分布式主要是靠客户端实现的，客户端决定采用什么算法将Key如何均匀的分布到服务器上并且在服务器增加或减小的时候，减小Rehash(重算哈希)。这里借助Memcache的Java客户端[Xmemcached](https://code.google.com/p/xmemcached/wiki/User_Guide)来介绍两种实现。
+Memcache实际上没有集群的概念，它的分布式主要是靠客户端实现的，客户端决定采用什么算法将Key如何均匀的分布到服务器上并且在服务器增加或减小的时候重算哈希(Rehash)。这里借助Memcache的Java客户端[Xmemcached](https://code.google.com/p/xmemcached/wiki/User_Guide)来介绍两种实现。
   
-**(1) Xmemcached对于连接的抽象**
+**(1) Xmemcache对于连接的抽象**
    
 ```scala
 val addrs = List("127.0.0.1:11211", "127.0.0.1:11311")
@@ -84,7 +84,7 @@ def getSessionByKey(key: String) = {
 
 **(3) [一致性哈希](https://www.quora.com/What-is-the-best-way-to-add-remove-a-new-server-in-memcached-without-restarting-it-to-avoid-rehashing-Is-it-possible) -- KetamaMemcachedSessionLocator**
 
-简单来说就是有一个环（英文中叫Continuum），环上的每一点对应(0 ~ (2 ^ 32))之间的一个整数(如下简略图所示)，通过某种哈希算法将服务器地址与环上的整数相对应，一个服务器大概对应100 ~ 200个整数(magic number)。将要存储的Key也以某种方式进行哈希，放到环上相应的位置。如果没有找到对应的点，则按照顺时针方向往前，碰到的第一个点对应的服务器就是该Key被存储的服务器(当然还涉及到一些哈希冲突什么的)。
+简单来说就是有一个环（英文中叫Continuum），环上的每一点对应<b style="color:red">(0 ~ (2 ^ 32))</b>之间的一个整数(如下简略图所示)，通过某种哈希算法将服务器地址与环上的整数相对应，一个服务器大概对应100 ~ 200个整数(magic number)。将要存储的Key也以某种方式进行哈希，放到环上相应的位置。如果没有找到对应的点，则按照顺时针方向往前，碰到的第一个点对应的服务器就是该Key被存储的服务器(当然还涉及到一些哈希冲突什么的)。
 
 ![一致性Hash形成的环](/static/images/charts/2016-03-27/continuum.png)
         
@@ -139,7 +139,7 @@ def buildMap = {
 
 ```
 
-节点散列的关键就在于计算K的那一行，但是比较尴尬的是由于水平有限，目前还不了解为什么结合布尔操作和位移操作会更均匀的分布。
+节点散列的关键就在于计算K的那一行，但比较尴尬的是由于水平有限，目前还不了解为什么结合布尔操作和位移操作会更均匀的分布。
 
 当Server节点分布在前面提到的Continuum上之后，接下来需要做的就是按照开始提到的将Key映射到相应的节点上。关于这个过程的具体实现在**```net.rubyeye.xmemcached.impl.MemcachedConnector```**中，因为最终客户端会向Memcache服务器端发送各种请求，在Xmemcached中被封装成了Command。
 
@@ -181,7 +181,9 @@ def getSessionByKey(hash: Long) = {
  }
 ```
     
-对上面的实现的简单解释: 如果hash值没有对应的服务器地址，则顺着环往下找；根据红黑树实现的话，应该是找到大于等于当前Key的最小Key，在Java中TreeMap有ceilingKey和floorKey等方法用于锁定相应的Key，Scala没有提供对应的实现，但是提供了from和to, 返回的整个子树而不是某个Key所以我们先可以找到对应的子树 然后找到最大值即可。当然在源码的实现中，还涉及到重试的机制(第一次Key找不到对应的服务器地址，则重算哈希再进行寻找)。获取List[Session]后，由于可能是多个服务器地址所以随机取一个存放即可。
+对上面的实现的简单解释: 
+
+如果哈希值没有对应的服务器地址，则顺着环往下找；根据红黑树实现的话，应该是找到大于等于当前Key的最小Key，在Java中TreeMap有ceilingKey和floorKey等方法用于锁定相应的Key，Scala没有提供对应的实现，但是提供了from和to, 返回的整个子树而不是某个Key所以我们先可以找到对应的子树 然后找到最大值即可。当然在源码的实现中，还涉及到重试的机制(第一次Key找不到对应的服务器地址，则重算哈希再进行寻找)。获取List[Session]后，由于可能是多个服务器地址所以随机取一个存放即可。
       
 接下来的可以做一个小小的验证，使用**buildMap**打印出Hash值对应的服务器地址:
 
