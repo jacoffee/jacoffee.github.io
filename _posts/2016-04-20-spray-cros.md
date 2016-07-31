@@ -5,7 +5,7 @@ date: 2016-04-20 19:51:22 UTC
 title: Spray基础之跨越请求处理
 tags: [跨域请求，预检表请求]
 permalink: /spray/cros/
-key: 
+key: 9d4a67106588420deb413d781e0f804a
 description: "本文解决Spray跨越请求的处理"
 keywords: []
 ---
