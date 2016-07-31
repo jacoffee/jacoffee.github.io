@@ -14,7 +14,7 @@ keywords: [路径依赖类型，类型投影，类型相等检验]
 
 ###路径依赖类型
 
-它可以看做是对象的成员所指向的类型(Scala In Depth 中有这样一句话 It refers to a type found on a specific object instance)，之所以路径依赖是因为如果**没有对象或者是类的实例**，那路径依赖类型也无从谈起；另外一点就是由于依赖了当前的实例，所以**该类型便不能绑定在其它的实例上**。
+它可以看做是对象的成员所指向的类型(Scala In Depth中有这样一句话It refers to a type found on a specific object instance)，之所以路径依赖是因为如果**没有对象或者是类的实例**，那路径依赖类型也无从谈起；另外一点就是由于依赖了当前的实例，所以**该类型便不能绑定在其它的实例上**。
 
 ```scala
 class Outer {
@@ -53,13 +53,15 @@ scala> x.foo(y.y)
 
 ###类型投影
 
-它相对于路径依赖类型减少了一些限制，并不依赖类的实例。针对上例就是，路径依赖类型Outer#Inner，它指代的类型是任何Outer实例中的任何Inner类型
+它相对于路径依赖类型减少了一些限制，并不依赖类的实例。针对上例就是，路径依赖类型`Outer#Inner`，它指代的类型是任何Outer实例中的任何Inner类型
 
 ```scala
 scala> x.bar(y.y)
 res0: Null = null
 ```
-实际上，类型依赖的类型都可以使用类型投影来代替， 如下例。
+
+实际上，类型依赖的类型都可以使用类型投影来代替，如下例。
+
 
 ```scala
 scala> class Foo { type T = String }
