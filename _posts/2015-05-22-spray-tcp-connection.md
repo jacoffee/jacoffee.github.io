@@ -77,7 +77,7 @@ Tcp.Close
 所以在上图提到的管道操作，会涉及到大量消息的转变(比如说ServerFrontend将HttpMessagePart消息转换成HttpResponsePartRenderingContext，传递给管道中的下游)，实际上也就是请求中的状态改变(从请求阶段变成了响应)。
 </p>
 
-在阅读的源码时候还有一个比较重要的地方没有研究，那就是Spray的管道操作，在``**spray.can.server.HttpServerConnection**``中对管道的每一部分进行简单的描述，它主要是用于TCP连接建立之后的请求渲染和请求生成的，基本的流程就是在TCP连接管道上进行数据的写入和读取。
+在阅读的源码时候还有一个比较重要的地方没有研究，那就是Spray的管道操作，在**`spray.can.server.HttpServerConnection`**中对管道的每一部分进行简单的描述，它主要是用于TCP连接建立之后的请求渲染和请求生成的，基本的流程就是在TCP连接管道上进行数据的写入和读取。
 
 
 
