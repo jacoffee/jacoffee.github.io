@@ -72,9 +72,7 @@ trait Apply[F[_]] // Apply属于高阶类型
 
 下面通过上下文定界中的一个实例来进一步理解这两个概念，在[Scala基础之类型类(type class pattern)](/scala/type-class/)中讲到过上下文定界。
 
-```for [A: T]，编译器将会尝试寻找形如T[A]的隐式类型实例```
-
-在这个地方，我们还需要考虑到`T`能够接受的类型。`scala.reflect.ClassTag`是一阶类型，所以它只能接受特定类型`T`，因此下面的第二种情况无法通过编译。
+```for [A: T]，编译器将会尝试寻找形如T[A]的隐式类型实例```，在这个地方，我们还需要考虑到`T`能够接受的类型。
 
 ```scala
 scala> def func[C: ClassTag] = implicitly[ClassTag[C]]
@@ -88,7 +86,7 @@ scala> def func[CC[_]: ClassTag] = implicitly[ClassTag[CC]]
                                                        ^
 ```
 
-我们可以使用类型别名(type alias)来解决这个问题:
+不过我们可以使用类型别名(type alias)来解决这个问题:
 
 ```scala
 type HigherOrdering[CC[T]] = ClassTag[CC[_]]
