@@ -10,9 +10,9 @@ description: "本文解释了Scala中一阶类型和高阶类型的区别"
 keywords: [类型推断，existential类型，一阶类型, 高阶类型]
 ---
 
-最早有一阶类型(first-order type)和高阶类型(higher-kinded type)的概念源于Stackoverflow上的一个[关于类型的帖子](http://stackoverflow.com/questions/6246719/what-is-a-higher-kinded-type-in-scala/6427289#6427289), 很多答者从不同的角度说明了这两个概念。在我看来类型的基本功能在于**抽象**，从本质上来讲，这两者的区别在与抽象能力的不同。
+最早有一阶类型(first-order type)和高阶类型(higher-kinded type)的概念源于Stackoverflow上的一个[关于类型的帖子](http://stackoverflow.com/questions/6246719/what-is-a-higher-kinded-type-in-scala/6427289#6427289), 很多答者从不同的角度说明了这两个概念。在我看来类型的基本功能在于**抽象**，从本质上来讲，这两者的区别在于抽象能力的不同。
 
-在[Scala的基础问题汇总](/scala/questions/)中提到过一个Console命令**:kind**用于查看类型信息，我们可以以此为原型进行展开。
+在[Scala的基础问题汇总](/scala/questions/)中提到过一个Console命令**:kind**用于查看类型信息，我们可以以此为基础进行展开。
 
 ```scala
 scala> :kind -v Int
@@ -95,7 +95,7 @@ type HigherOrdering[CC[T]] = ClassTag[CC[_]]
 def func[CC[_]: HigherOrdering] = implicitly[HigherOrdering[CC]]
 def func1[CC[_]: HigherOrdering](implicit evidence: HigherOrdering[CC]) = evidence
 
-// One liner
+// 类型lambda
 def func2[CC[_]: ({type λ[CC[T]] = ClassTag[CC[_]]})#λ] = implicitly[ClassTag[CC[_]]] 
 
 scala> func2[List]
