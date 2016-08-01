@@ -25,13 +25,7 @@ abstract class RDD[T: ClassTag](
     ....)
 ```
 
-当然上面只是列举了一部分，本文只介绍比较常见的注解以及定义的方法。
-
-# 解决
-
-<1> 注解的作用域
-
-一般来说，注解可以作用于vals, vars, defs, classes, objects, traits, and types甚至是表达式的后面。
+一般来说，注解可以作用于vals, vars, defs, classes, objects, traits 和 types甚至是表达式的后面。
 
 ```scala
 import scala.reflect.runtime.{ universe => ju }
@@ -51,7 +45,7 @@ non-variable type argument String in type pattern List[String] is unchecked
 since it is eliminated by erasure
 ```
 
-另外, 注解实际上也是普通的类只不过Compiler对其进行特殊的支持，所以我们才能那样书写。比如说，我们常见的序列号的注解。
+另外, 注解实际上也是普通的类只不过编译器对其进行特殊的支持，所以我们才能那样书写。比如说，我们常见的序列号的注解。
 
 ```scala
 class SerialVersionUID(uid: Long) extends scala.annotation.StaticAnnotation
@@ -71,14 +65,9 @@ warning: method bigMistake in class B is deprecated: use newShinyMethod() instea
 one warning found
 ```
 
-<2> 几种常见的注解
+### @volatile
 
-最常见应该是上面已经提到的Deprecated，另外几种常见的如下:
-
-(1) @volatile
-
-实际上这个注解或是关键字，大多用于被并发访问的共享变量。虽然Scala对于并发的处理就是尽量减少共享变量，当我们不得不这样的时候就可以使用volatile， 它告诉JVM，当某个值在某个地方被更新的时候，要确保下次另一个线程访问的时候是最新的值(当然实际情况可能没有这么简单)。
-volatile涉及的并发知识点还是很多的，但这并不是本文的重点。
+实际上这个注解或是关键字，大多用于被并发访问的共享变量。在JVM内存模型中happens-before规则有一条就是volatile变量法则(有兴趣可以阅读Java并发编程实践 第16章Java内存模型)，对于volatile变量，同一变量的写操作总是先于读操作。
 
 ```scala
 class Person(@volatile var name: String) {
@@ -88,9 +77,9 @@ class Person(@volatile var name: String) {
 }
 ```
 
-(2) @tailrec 
+### @tailrec 
 
-这个注解是与[尾递归优化](/scala/tail-recurison/)有关的，在Scala中如果写了一个需要递归的方法，这样我们就能够在方法的签名处添加@tailrec告诉Scala Compiler进行尾递归优化(有兴趣可以去Programming In Scala第8章看看)。
+这个注解是与[尾递归优化](/scala/tail-recurison/)有关的。
 
 ```scala
 // 阶乘
@@ -103,13 +92,14 @@ def factorial(n: Int) = {
 	go(n, 1)
 }
 ```
-(3) @Unchecked
 
-上面已经提到了，一般是在模式匹配的时候用到的，告诉Compiler有些地方不用"检查"了。如前所述，List[String @ unchecked]。
+### @Unchecked
 
-(4) @transient
+一般是在模式匹配的时候用到的，告诉编译器有些地方不用"检查"了。如前所述，List[String @ unchecked]。
 
-这个注解一般用于序列化的时候标识某个字段不想要被序列化，这样即使它所在的对象被序列化，它也不会。
+### @transient
+
+这个注解一般用于序列化的时候，标识某个字段不用被序列化。
 
 ```scala
 import java.io.{ FileOutputStream, FileInputStream }
@@ -145,34 +135,22 @@ zml
 
 由于age被标记为@transient，在反序列化的时候，就获取不到原始值了所以被赋值为默认值。
 
-(5) @inline
+### @inline
 
-这个注解，在Scala.Predef中见到过一次。
+这个注解，在Scala.Predef中见到过一次。官方文档中的解释跟没说一样，
+倒是[StackOverflow上一个的答案](http://stackoverflow.com/questions/2709095/does-the-inline-annotation-in-scala-really-help-performance)，个人觉得比较能说明作用。
 
-> An annotation on methods that requests that the compiler should
-try especially hard to inline the annotated method.
-
-文档中的解释跟没有一样，在StackOverflow上找到几个问题，其中参考<5>中的有一段解释，个人觉得比较能说明作用。
-
->  Instead of a function call resulting in parameters being placed on the stack and an invoke operation occurring, 
-the definition of the function is copied at compile time to where the invocation was made, 
+>  Instead of a function call resulting in parameters being placed on the stack and an invoke operation occurring, the definition of the function is copied at compile time to where the invocation was made, 
 saving the invocation overhead at runtime.
 
-大致的意思就是@inline能够避免方法的参数被放到栈上，以及"显示的调用"，因为编译器在编译的时候会将整个方法copy到它被调用的地方。
+大致的意思就是@inline能够避免方法的参数被放到栈上，以及"显示的调用"。因为编译器在编译的时候会将整个方法复制到它被调用的地方。
 
 
-# 参考
+##参考
 
-<1> [annotation](https://www.artima.com/pins1ed/annotations.html)
+\> [注解](https://www.artima.com/pins1ed/annotations.html)
 
-<2> [volatile](https://twitter.github.io/scala_school/zh_cn/concurrency.html#danger)
+\> [volatile](https://twitter.github.io/scala_school/zh_cn/concurrency.html#danger)
 
-<3> [should-my-scala-actors-properties-be-marked-volatile](http://stackoverflow.com/questions/1031167/should-my-scala-actors-properties-be-marked-volatile)
-
-<4> [concurrency](https://twitter.github.io/scala_school/zh_cn/concurrency.html#danger)
-
-<5> [when-should-i-and-should-i-not-use-scalas-inline-annotation](http://stackoverflow.com/questions/4593710/when-should-i-and-should-i-not-use-scalas-inline-annotation)
-
-<6> [does-the-inline-annotation-in-scala-really-help-performance](http://stackoverflow.com/questions/2709095/does-the-inline-annotation-in-scala-really-help-performance)
-
+\> [什么时候使用inline注解](http://stackoverflow.com/questions/4593710/when-should-i-and-should-i-not-use-scalas-inline-annotation)
 
