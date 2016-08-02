@@ -352,10 +352,8 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 1.4em;
     border-bottom: 1px dotted #d8d8d8;
     margin-top: 1.4em;
-    margin-left: 1.4em;
 }
 .index h3 {
-/*    margin-left: 20px;  */
     border-bottom: none;
 }
 .lotus h4, .lotus-h4 {
@@ -634,6 +632,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 .lotus-post img:hover {
     cursor: pointer;
+}
+.lotus-post h3 {
+   margin-left: 1.4em;
 }
 .lotus-post .lotus-post-end {
     height: 21px;
