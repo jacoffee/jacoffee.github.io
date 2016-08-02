@@ -167,6 +167,9 @@ div.highlight {
     margin: 0 0 10px 25px;
     border-radius: 0px 2px 2px 0;
 }
+h2.highlight, b.highlight {
+    color: #0077bb; /* 将标题改为蓝色 */
+}
 pre, code {
     font-family: "Courier New", Courier, monospace;
     overflow-x: auto;
