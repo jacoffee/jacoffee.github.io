@@ -80,6 +80,28 @@ get {
 }
 ```
 
+在Route实现过程，一个需要特别注意的点就是业务逻辑放置在不同的地方，所执行的次数也会有所不同。
+
+```scala
+val route: Route = get {
+   println("MARK")
+   path("/") {
+     complete("OK")
+   }
+}
+
+val route: Route = get {
+   path("/") {
+     complete {
+       println("MARK")
+       "OK"
+     }
+   }
+ }
+```
+
+上面两种路由从逻辑上来讲是一样的，但是后者的**MARK**每次响应GET请求的时候都会执行，而前者只会在第一次加载的时候执行。上面两种写法最终生成的都是函数字面量(function literal)，不同的是前者在生成的过程**MARK**就已经执行; 而后者并没有执行，当请求进来的时候，`complete`中的逻辑才会真正的执行。
+
 **`HttpServiceBase`**要求所有的子类调用**`runRoute`**方法的时候提供**``Route``**函数实例
 
 ```scala
