@@ -16,7 +16,7 @@ keywords: [数据集，分批获取，缓冲，游标]
 
 事情的起因是一条查询(下表是实际场景中的简化版， <b style="color:red">所有的效率问题与当前环境有关，相应的结论仅供参考</b>)，`tbl_stu_teacher`(大概30几万行)记录的是学生和老师的对应关系，最终的汇总为某个学生被哪些老师教了，即输出`Map<StuId, List<TeacherId>>`。
 
-<table>
+<table style="margin-left: 26px">
     <tr>
         <th>stu_id</th>
         <th>teacher_id</th>
