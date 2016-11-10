@@ -4,7 +4,7 @@
  * site: http://www.pizn.net
  */
 $(document).ready(function() {
-    //为什么我会写这个呢？
+
     var iLotus = {
         Version: "1.0",
         Author: "PIZn",
