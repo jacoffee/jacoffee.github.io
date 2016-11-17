@@ -76,10 +76,10 @@ case "$refname","$newrev_type" in
 	 refs/heads/*,commit)
 		# branch
 	    # 获取分支的简称，即去掉refs/heads/前缀 --> master
-		BRANCH="$(git rev-parse --symbolic --abbrev-ref $refname)"
+		branch="$(git rev-parse --symbolic --abbrev-ref $refname)"
 		
 		# Jenkins build trigger url
-		URL="http://xxxx/buildByToken/build?job=JOB_NAME/"${BRANCH}"&token=TOKEN"
+		URL="http://xxxx/buildByToken/build?job=JOB_NAME/"${branch}"&token=TOKEN"
 		
 		echo "${refname} receive some updates"
 		curl -sS $URL
@@ -90,6 +90,21 @@ esac
 由于hooks文件夹下的内容本质只是一堆脚本，所以我们可以通过修改<b style="color:red">脚本内容来添加自己所需要的回调</b>。
 
 另外要注意虽然叫回调，<b class="highlight">但它们的执行时机却是发生在真正的改动执行之前</b>，它们会检查相应的更新如果符合要求，就进行反之则阻止。 就拿上面的update来说(如果是向远端分支提交新的改动)，实际上是以新的对象(ref)去替换老的对象，如果引进回调， 那么就要在回调执行成功之后才会触发真正的更新。
+
+上面获取分支名的做法对于<b style="color:red">新建的分支</b>是不适用的，会报如下错误:
+
+```bash
+atal: ambiguous argument 'refs/heads/branch_name': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+```
+
+个人的理解是因为结合上面提到的先通过检查再进行相应的操作，因为新建的分支提交上来的时候，refs/heads文件中根本没有这个分支相关的东西，所以`rev-parse`根本获取不到东西。对于获取分支名也可以采取另外一种方法，虽然有点Hack的味道:
+
+```bash
+# NF为属性的总个数 也就是输出最后一个
+branch=$(echo "${refname}" | awk -F/ '{print $NF}')
+```
 
 实际上每种回调都是由特定的服务触发的，比如说update就是由**git-receive-pack**来触发的，关于它的底层实现可以参考[git的 pack协议](https://github.com/git/git/blob/master/Documentation/technical/pack-protocol.txt)，[git-receive-pack的运行机制](http://stackoverflow.com/questions/10662056/how-does-git-receive-pack-work)。
 
