@@ -309,7 +309,7 @@ li[class^="icon-"].icon-large:before, li[class*=" icon-"].icon-large:before {
  * lotus design
 *************************/
 
-.lotus p, .lotus pre, .lotus ul, .lotus ol, .lotus dl, .lotus form, .lotus hr, .lotus table, .lotus-p, .lotus-pre, .lotus-ul, .lotus-ol, .lotus-dl, .lotus-form, .lotus-hr, .lotus-table {
+.lotus p, .lotus ul, .lotus ol, .lotus dl, .lotus form, .lotus hr, .lotus table, .lotus-p, .lotus-pre, .lotus-ul, .lotus-ol, .lotus-dl, .lotus-form, .lotus-hr, .lotus-table {
     margin-bottom: 1em;
     vertical-align: middle;
 }
