@@ -213,9 +213,11 @@ shuffledRDD.compute()
 
 ###总结
 
-(1) ShuffleDependency产生ShuffleMapStage，ShuffleMapStage生成ShuffleMapTask
-(2) Shuffle write发生在ShuffleMapTask的计算过程中，每一个ShuffleMapTask会对应一个ShuffleWriter，它会将分区中元素按照相应的规则写入不同的文件中，也就是我们通常看到的map out files或者是block files
-(3) Shuffle read通过MapoutTracker获取相应的block file并借助各种Map对于数据进行汇总，这个过程涉及到bytes spilled到磁盘的过程
+**(1) ShuffleDependency产生ShuffleMapStage，ShuffleMapStage生成ShuffleMapTask**
+
+**(2) Shuffle write发生在ShuffleMapTask的计算过程中，每一个ShuffleMapTask会对应一个ShuffleWriter，它会将分区中元素按照相应的规则写入不同的文件中，也就是我们通常看到的map out files或者是block files**
+
+**(3) Shuffle read通过MapoutTracker获取相应的block file并借助各种Map对于数据进行汇总，这个过程涉及到bytes spilled到磁盘的过程**
 
 ##参考
 
