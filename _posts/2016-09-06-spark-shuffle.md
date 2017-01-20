@@ -129,7 +129,8 @@ HashShuffleWriter只是一个逻辑概念，因为真正的写入操作是`Shuff
 ```
 
 当ShuffleMapTask结束之后，还涉及到一个问题就是map out文件的路径汇报，也就是将相关的位置信息经由executor上面的`MapOutputTrackerWorker`
-汇报给Driver上的`MapOutputTracker`。
+汇报给Driver上的`MapOutputTracker`, 这样其它executor需要获取相应的位置时就会向driver发送请求，
+所以我们经常会在日志中看到这样的输出**MapOutputTrackerMasterEndpoint: Asked to send map output locations for shuffle shuffleId to hostname:5505**。
 
 ```scala
 executor.run()
