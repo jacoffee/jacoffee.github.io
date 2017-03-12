@@ -175,4 +175,4 @@ override def getPartitions: Array[Partition] = {
 
 ##参考
 
-\> [apgenius-balancing](https://gist.github.com/pbailis/4964307)
+\> [randomized load balancing](https://gist.github.com/pbailis/4964307)

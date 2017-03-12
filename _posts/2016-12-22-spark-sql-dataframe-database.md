@@ -83,7 +83,7 @@ saveTable()
     stmt.executeBatch()
 ```
 
-因为是通过`foreachPartition`进行数据库操作，显然我们需要控制分区数量以免crash数据库, 可以通过`df.coalesce`或者`df.repartition`，关于它们的区别可以参考[Spark基础之coalesce和repartition](http://roadtopro.me/spark/partitions/coalesce-repartition)。
+因为是通过`foreachPartition`进行数据库操作，显然我们需要控制分区数量以免crash数据库, 可以通过`df.coalesce`或者`df.repartition`，关于它们的区别可以参考[Spark基础之coalesce和repartition](/spark/partitions/coalesce-repartition)。
 
 ##关于DataFrame的数据库读取
 

@@ -161,8 +161,8 @@ Response for preflight has invalid HTTP status b 404
 
     
 ```js
-// A: xx.roadtopro.me
-// B: yy.roadtopro.me
+// A: xx.roadtopro.cn
+// B: yy.roadtopro.cn
 
     cross-domain
  A ==============> B

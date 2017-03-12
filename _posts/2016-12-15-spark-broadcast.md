@@ -22,7 +22,7 @@ broadcast的主要实现在`org.apache.spark.broadcast.TorrentBroadcast`中，�
 
 <b class="highlight">(1) TorrentBroadcast的初始化</b>
 
-在SparkEnv初始化的时候，BroadcastManager也完成初始化并且创建了新的`TorrentBroadcastFactory`，然后通过`newBroadcast`方法创建`TorrentBroadcast`。由于每一个broadcast变量需要先存储然后再获取，那么就需要使用某种标识，也就是我们在日志中看到的**broadcast_0**，**broadcast_0_piece0**。
+在SparkEnv初始化的时候，BroadcastManager也完成初始化并且创建了新的`TorrentBroadcastFactory`，然后通过`newBroadcast`方法创建`TorrentBroadcast`。由于每一个broadcast变量需要先存储然后再获取，那么就需要使用某种标识，也就是我们在日志中看到的**`broadcast_0`**，**`broadcast_0_piece0`**。
 
 ```scala
 val mapBC = sc.broadcast(Map("a" -> 1))
@@ -38,7 +38,7 @@ mapBC.getValue()
 
 比如说刚开始在driver上进行广播操作:
 
-首先会将对象直接以**MEMORY_AND_DISK**的storage level放到BlockManager中，方便之后的本地获取(不用反序列化，直接使用)，唯一ID为`broadcast_broadcastId`的格式。
+首先会将对象直接以**`MEMORY_AND_DISK`**的storage level放到BlockManager中，方便之后的本地获取(不用反序列化，直接使用)，唯一ID为`broadcast_broadcastId`的格式。
 
 然后按照`spark.broadcast.blockSize`指定的大小(默认是4m)将对象切分形成`Array[ByteBuffer]`，以`MEMORY_AND_DISK_SER`的storage level存储到BlockManager中，这样别的节点可以通过Netty通讯获取这些"碎片"，唯一ID为`broadcast_broadcastId_field_Index`的格式。
 
@@ -86,7 +86,7 @@ Executor BlockManager ===> BlockManagerMaster ===> BlockManagerMasterEndpoint
 
 它首先通过`broadcast_broadcastId`去本地的BlockManager中获取，因为之前有可能已经获取过了。
 
-如果没有的话，获取之前拆分的block数`numBlocks`，按照指定规则拼接成`pieceId`(broadcast_broadcastId_field_Index)；同样先从本地获取，然后从远端获取。
+如果没有的话，获取之前拆分的block数numBlocks，按照指定规则拼接成pieceId(**`broadcast_broadcastId_field_Index`**)；同样先从本地获取，然后从远端获取。
 从远端获取，实际上就是给`BlockManagerMaster`发送获取Block位置的请求，<b style="color:red">但可能返回多个可供选择的位置</b>，遍历进行获取，一旦成功则返回。
 
 成功获取之后，就会存储在自己的BlockManager中，这样避免下一次重复获取。随着时间的推移，每一个Block可供获取的位置越来越多，直至最后成功的『下载』完整个广播变量，颇有些BitTorrent的感觉。
