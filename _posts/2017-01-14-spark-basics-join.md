@@ -96,15 +96,17 @@ Spark基础之Shuffle](/spark/shuffle)，如果参与join的RDD没有经过处�
 假设上图的RDDA, RDDB join的时候采用的是`HashPartitioner(10)`，那么RDD C中的某个分区中都是`key.hashCode % 10`为1的数据，因此RDD C的Partition1需要从RDD A
 的Partition1，Partition2，从RDD B的Partition 2中获取数据。
 
-试想一下，如果两个RDD都按照Partitioner预先对于数据进行了调整，那么在join的时候就只需要从固定个父分区中获取数据，因此就避免了shuffle。 当然关于join操作，前期通过各种逻辑减少参与计算的数据也是很有必要的，更多关于join的优化可以参考[高性能Spark](https://www.safaribooksonline.com/library/view/high-performance-spark/9781491943199/ch04.html)这本书。
+试想一下，如果两个RDD都按照同样的Partitioner预先对于数据进行了调整，那么在join的时候就只需要从固定个父分区中获取数据，因此就可以在join的时候避免了shuffle。 当然关于join操作，前期通过各种逻辑减少参与计算的数据也是很有必要的，更多关于join的优化可以参考[高性能Spark](https://www.safaribooksonline.com/library/view/high-performance-spark/9781491943199/ch04.html)这本书。
 
 
 ```scala
-val reduceRDDA = rddA.reduceByKey(new HashPartitioner(10), func)
+val reducedRDDA = rddA.reduceByKey(new HashPartitioner(10), func)
 
-val pa = reduceRDDA.partitioner.getOrElse(new HashPartitioner(reduceRDDA.getNumPartitions))
+val partitionerOfRDDA = reducedRDDA.partitioner.getOrElse(new HashPartitioner(reducedRDDA.getNumPartitions))
 
-val reduceRDDB = rddB.reduceByKey(pa, func)
+val reduceRDDB = rddB.reduceByKey(partitionerOfRDDA, func)
+
+val resultRDD = reducedRDDA join reduceRDDB
 ```
 
 ##DataFrame SortMergeJoin
@@ -133,7 +135,7 @@ SortMergeJoin(LR, RR, JP(LR, RR))
     do
         if (V(X) <= V(Y))
           if Equal
-            Outpy(Row(X), Row(Y)) # with projection
+            Output(Row(X), Row(Y)) # with projection
           else    
            X move forward
        else
@@ -143,7 +145,7 @@ SortMergeJoin(LR, RR, JP(LR, RR))
 
 首先对于两边的**关系**按照**连表键**进行升序排序，然后开始遍历两边的记录。想象有两个指针X, Y分别指向左右的记录。每次左右两边任意一边移动之后开始进行**扫描行**的比较，如果相等就加入最后的结果集中，另外哪边小就将哪边的指针向前移动，最后直到两边的记录都被遍历完，整个操作结束。
 
-但是在DataFrame的join中，左右两边的键可能都会重复。如果按照上面的规则，下面的RR中第2次3所对应的行就无法被获取到了，具体解决方案可以参考
+但是在DataFrame的join中，左右两边的键可能都会重复。如果按照上面的规则，下面的右边关系(RR)中第2次3所对应的行就无法被获取到了，具体解决方案可以参考
 [org.apache.spark.sql.execution.joins.SortMergeJoin](https://github.com/apache/spark/blob/v1.6.1/sql/core/src/main/scala/org/apache/spark/sql/execution/joins/SortMergeJoin.scala#L32)中的`doExecute()`方法。
 
 ```bash
@@ -166,7 +168,7 @@ val shortShuffleMgrNames = Map(
 val shuffleMgrName = conf.get("spark.shuffle.manager", "sort")
 ```
 
-所以，RDD在join的时候会按照join键排序，因此上面的l1, l2中无论元素怎么调整，最终输出的结果还是一样的。
+所以，RDD在join的时候会按照join键排序，因此上面l1, l2无论怎么调整元素顺序，最终输出的结果还是一样的。
 
 
 ```scala
