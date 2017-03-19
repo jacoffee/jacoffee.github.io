@@ -210,15 +210,33 @@ shuffledRDD.compute()
 接下来进入聚合阶段, 像上面的reduceByKey，在shuffle write的时候就已经在分区内部的进行一次聚合(**mapSideCombine**)，此时只需要按照指定的函数，比如说上面的 `value1 + value2`汇总值即可。这个逻辑是由`ExternalAppendOnlyMap`实现的，在聚合Value的过程中，map的内存占用会越来越大。
 因此，会涉及到是否spill到磁盘的逻辑，简单的理解就是当超过某个阈值之后(`spark.shuffle.spill.initialMemoryThreshold`)，就会spill到磁盘。<b style="color:red">但实际过程中还会尝试申请更多内存</b>，具体逻辑可参考`org.apache.spark.util.collection.Spillable`的**maybeSpill**方法。
 
-我们有时会在Spark UI中的Tasks视图中看到**shuffle spill(memory)**和**shuffle spill(disk)**这两个指标 -- 前者指的是spill到磁盘的所有Map的预计字节大小的总和(**total estimated byte size**), 后者指的是spill到磁盘的所有Map的实际大小。
+我们有时会在Spark UI中的Tasks视图中看到**shuffle spill(memory)**和**shuffle spill(disk)**这两个指标 -- 前者指的是发生Spill的时候，当前collection的内存占用，而后者则是实际spill到磁盘上的字节大小。
+
+```scala
+// org.apache.spark.util.collection.Spillable
+
+protected def maybeSpill(collection: C, currentMemory: Long): Boolean = {
+    var shouldSpill = false
+
+    ...
+    // Actually spill
+    if (shouldSpill) {
+     // ExternalAppendOnlyMap.spill => spill到磁盘的操作
+      spill(collection)
+      _memoryBytesSpilled += currentMemory
+      ...
+    }
+    shouldSpill
+}
+```
 
 ###总结
 
-**(1) ShuffleDependency产生ShuffleMapStage，ShuffleMapStage生成ShuffleMapTask**
+(1) ShuffleDependency产生ShuffleMapStage，ShuffleMapStage生成ShuffleMapTask
 
-**(2) Shuffle write发生在ShuffleMapTask的计算过程中，每一个ShuffleMapTask会对应一个ShuffleWriter，它会将分区中元素按照相应的规则写入不同的文件中，也就是我们通常看到的map out files或者是block files**
+(2) Shuffle write发生在ShuffleMapTask的计算过程中，每一个ShuffleMapTask会对应一个ShuffleWriter，它会将分区中元素按照相应的规则写入不同的文件中，也就是我们通常看到的map out files或者是block files
 
-**(3) Shuffle read通过MapoutTracker获取相应的block file并借助各种Map对于数据进行汇总，这个过程涉及到bytes spilled到磁盘的过程**
+(3) Shuffle read通过MapoutTracker获取相应的block file并借助各种Map对于数据进行汇总，这个过程涉及到bytes spilled到磁盘的过程
 
 ##参考
 
