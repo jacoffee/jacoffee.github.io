@@ -10,7 +10,7 @@ description: 本文介绍了RDD的join操作以及DataFrame的SortMergeJoin操�
 keywords: [SortMergeJoin, SortShuffleWriter]
 ---
 
-RDD中的join操作一般是针对`RDD[(K, V)]`来进行的，用于将各个分区中键相同的元素组织起来。对应的在DataFrame中，也可以进行join操作(像比较常见的SortMergeJoin)，它可以避免RDD join使用不当而造成的shuffle。接下来，本文将通过RDD join以及DataFrame SortMergeJoin的过程来解释，为什么RDD join会产生shuffle以及DataFrame SortMergeJoin是通过何种手段来避免shuffle的？
+RDD中的join操作一般是针对**RDD[(K, V)]**来进行的，用于将各个分区中键相同的元素组织起来。对应的在DataFrame中，也可以进行join操作(像比较常见的SortMergeJoin)，它可以避免RDD join使用不当而造成的shuffle。接下来，本文将通过RDD join以及DataFrame SortMergeJoin的过程来解释，为什么RDD join会产生shuffle以及DataFrame SortMergeJoin是通过何种手段来避免shuffle的？
 
 ##RDD Join
 
@@ -83,7 +83,7 @@ val joinViaCoGroup = (rdd1 cogroup rdd2).flatMapValues { pair =>
 
 <b class="highlight">(3) 关于partitioner的选择</b>
 
-如果参与join的任意一个RDD有**partitioner**，则会选择那个**partitioner**，否则就使用HashPartitioner。至于JoinedRDD的分区数，如果`spark.default.parallelism`设置了，则使用，否则就选择上游RDD中分区数最大的(**Unless spark.default.parallelism is set, the number of partitions will be the same as the number of partitions in the largest upstream RDD**)。
+如果参与join的任意一个RDD有**partitioner**，则会选择那个**partitioner**，否则就使用HashPartitioner。至于JoinedRDD的分区数，如果**spark.default.parallelism**设置了，则使用，否则就选择上游RDD中分区数最大的(Unless spark.default.parallelism is set, the number of partitions will be the same as the number of partitions in the largest upstream RDD)。
 
 <b class="highlight">(4) 关于shuffle</b>
 
@@ -93,7 +93,7 @@ Spark基础之Shuffle](/spark/shuffle)，如果参与join的RDD没有经过处�
 
 ![RDD Join](http://static.zybuluo.com/jacoffee/st7jvu6tboqzs72bc7g3ycxb/image_1b6sqkq5s1peh14ki1cr27tlir9.png)
 
-假设上图的RDDA, RDDB join的时候采用的是`HashPartitioner(10)`，那么RDD C中的某个分区中都是`key.hashCode % 10`为1的数据，因此RDD C的Partition1需要从RDD A
+假设上图的RDDA, RDDB join的时候采用的是**HashPartitioner(10)**，那么RDD C中的某个分区中都是`key.hashCode % 10`为1的数据，因此RDD C的Partition1需要从RDD A
 的Partition1，Partition2，从RDD B的Partition 2中获取数据。
 
 试想一下，如果两个RDD都按照同样的Partitioner预先对于数据进行了调整，那么在join的时候就只需要从固定个父分区中获取数据，因此就可以在join的时候避免了shuffle。 当然关于join操作，前期通过各种逻辑减少参与计算的数据也是很有必要的，更多关于join的优化可以参考[高性能Spark](https://www.safaribooksonline.com/library/view/high-performance-spark/9781491943199/ch04.html)这本书。
@@ -102,7 +102,10 @@ Spark基础之Shuffle](/spark/shuffle)，如果参与join的RDD没有经过处�
 ```scala
 val reducedRDDA = rddA.reduceByKey(new HashPartitioner(10), func)
 
-val partitionerOfRDDA = reducedRDDA.partitioner.getOrElse(new HashPartitioner(reducedRDDA.getNumPartitions))
+val partitionerOfRDDA = 
+    reducedRDDA.partitioner.getOrElse(
+      new HashPartitioner(reducedRDDA.getNumPartitions)
+    )
 
 val reduceRDDB = rddB.reduceByKey(partitionerOfRDDA, func)
 
@@ -146,7 +149,7 @@ SortMergeJoin(LR, RR, JP(LR, RR))
 首先对于两边的**关系**按照**连表键**进行升序排序，然后开始遍历两边的记录。想象有两个指针X, Y分别指向左右的记录。每次左右两边任意一边移动之后开始进行**扫描行**的比较，如果相等就加入最后的结果集中，另外哪边小就将哪边的指针向前移动，最后直到两边的记录都被遍历完，整个操作结束。
 
 但是在DataFrame的join中，左右两边的键可能都会重复。如果按照上面的规则，下面的右边关系(RR)中第2次3所对应的行就无法被获取到了，具体解决方案可以参考
-[org.apache.spark.sql.execution.joins.SortMergeJoin](https://github.com/apache/spark/blob/v1.6.1/sql/core/src/main/scala/org/apache/spark/sql/execution/joins/SortMergeJoin.scala#L32)中的`doExecute()`方法。
+[org.apache.spark.sql.execution.joins.SortMergeJoin](https://github.com/apache/spark/blob/v1.6.1/sql/core/src/main/scala/org/apache/spark/sql/execution/joins/SortMergeJoin.scala#L32)中的**doExecute()**方法。
 
 ```bash
 LR   -----    RR
@@ -156,7 +159,7 @@ LR   -----    RR
 5
 ```
 
-关于排序的操作，在RDD中也有相应的实现，也就是`org.apache.spark.shuffle.sort.SortShuffleWriter`，它是通过`org.apache.spark.shuffle.ShuffleManager`获取的，SparkEnv初始化的时候，默认配置的是`SortShuffleManager`。
+关于排序的操作，在RDD中也有相应的实现，也就是**org.apache.spark.shuffle.sort.SortShuffleWriter**，它是通过**org.apache.spark.shuffle.ShuffleManager**获取的，SparkEnv初始化的时候，默认配置的是SortShuffleManager。
 
 ```scala
 val shortShuffleMgrNames = Map(
