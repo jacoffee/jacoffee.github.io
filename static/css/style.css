@@ -57,8 +57,8 @@ article p {
 audio, canvas, video {
     display: inline-block;
 }
-body, button, input, select, textarea {
-    font: 500 14px/1.8 'Georgia, serif', 'Hiragino Sans GB', sans-serif;
+body, button, input, select, textarea { 
+    font: 500 16px/2 'Source Sans Pro',sans-serif;
 }
 table {
     border-collapse: collapse;
