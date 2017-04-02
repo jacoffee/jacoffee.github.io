@@ -22,7 +22,7 @@ HDFS的高可用(high availability)主要指的是namenode的高可用，也就�
 
 下面，我们以自动切换模式为例，来解释上面两个问题。
 
-###ZooKeeper quorum和ZKFailoverController(ZKFC)
+##ZooKeeper quorum和ZKFailoverController(ZKFC)
 
 ZooKeeper quorum实际上就是Zookeeper集群，主要用来维护集群中的一些重要状态信息(比如说哪个namenode是active的)，并且将这些信息的变动发送给客户端以及发送节点故障信息给客户端。
 
@@ -75,7 +75,7 @@ numChildren = 0
 
 所以，HDFS中namenode的故障检测是依赖Zookeeper的，这解决了我们上面提到的第一个问题。
 
-###Quorum Journal Manager(QJM)
+##Quorum Journal Manager(QJM)
 
 在[Hadoop Namenode和DataNode](/hadoop/namenode-datanode)中，我们提到的fsimage和edit log都是存在同一个节点的。如果节点发生故障，那么其它的namenode就无法获取最新的edit log。
 
@@ -87,7 +87,7 @@ numChildren = 0
 
 ![HDFS HA所涉及到的组件](http://static.zybuluo.com/jacoffee/zev7l6ixwog40eigqms16guf/image_1b9sedk4vtia1med1q4u9lm449.png)
 
-###基本过程
+##基本过程
 
 ZKFC进程一直监控着namenode进程的状态，并且向Zookeeper汇报。当出现故障后，销毁之前建立的会话，Zookeeper删除相应的Znode。此时，其它的ZKFC监测到目前Zookeeper中没有master znode，并尝试创建master znode，一旦成功便告知namenode开始进行转换(standby --> active)。
 
