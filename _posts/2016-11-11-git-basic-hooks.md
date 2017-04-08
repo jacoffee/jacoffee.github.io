@@ -2,7 +2,7 @@
 layout: post
 category: git
 date: 2016-11-10 03:38:55 UTC
-title: git基础之回调(hooks)
+title: Git基础之回调(hooks)
 tags: [git-receive-pack，回调，传输协议]
 permalink: /git/basic/hooks
 key: 3f12c79935cd5191995734c82742620a
@@ -99,7 +99,7 @@ Use '--' to separate paths from revisions, like this:
 'git <command> [<revision>...] -- [<file>...]'
 ```
 
-个人的理解是因为结合上面提到的先通过检查再进行相应的操作，因为新建的分支提交上来的时候，refs/heads文件中根本没有这个分支相关的东西，所以`rev-parse`根本获取不到东西。对于获取分支名也可以采取另外一种方法，虽然有点Hack的味道:
+个人的理解是因为结合上面提到的先通过检查再进行相应的操作，因为新建的分支提交上来的时候，refs/heads文件中根本没有这个分支相关的东西，所以**rev-parse**根本获取不到东西。对于获取分支名也可以采取另外一种方法，虽然有点Hack的味道:
 
 ```bash
 # NF为属性的总个数 也就是输出最后一个

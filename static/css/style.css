@@ -38,7 +38,7 @@ Author: original Style by 展新(pizner@gmail.com) and modified by Allen(3615416
 *************************/
 
 html {
-    color: #1F0909;
+    color: #424242;
     background: #f3f2ee;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
@@ -121,6 +121,11 @@ ul.item li {
     margin-left: 50px;
 }
 
+ul.item ul li {
+    list-style: circle;
+    margin-left: 70px;
+}
+
 .clearfix:after {
     content: ".";
     display: block;
@@ -177,17 +182,13 @@ h2.highlight, b.highlight {
     color: #0077bb; /* 将标题改为蓝色 */
 }
 pre, code {
-    font-family: "Courier New", Courier, monospace;
     overflow-x: auto;
     vertical-align: middle;
 }
-/* pre { font-size: 12px; border: 1px solid #d8d8d8; border-left-width: 0.4em;  background: rgba(214, 214, 214, 0.5); padding: 10px; } */
 code {
     color: #4d4d4d;
-    background: rgba(214, 214, 214, 0.5);
-    padding: 0 0.2em;
+    background: rgba(215, 215, 215, 0.9);
     border: 1px solid #bdbdbd;
-    vertical-align: top;
     font-weight: bold;
 }
 small {
@@ -645,7 +646,7 @@ h1, h2, h3, h4, h5, h6 {
     cursor: pointer;
 }
 .lotus-post h3 {
-   margin-left: 1.4em;
+   margin-left: 20px;
 }
 .lotus-post .lotus-post-end {
     height: 21px;
