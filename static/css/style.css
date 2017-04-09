@@ -121,6 +121,10 @@ ul.item li {
     margin-left: 50px;
 }
 
+ul.item li p {
+    text-indent: 0px;
+}
+
 ul.item ul li {
     list-style: circle;
     margin-left: 70px;

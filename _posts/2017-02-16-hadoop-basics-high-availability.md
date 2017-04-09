@@ -36,9 +36,9 @@ ZooKeeper quorum实际上就是Zookeeper集群，主要用来维护集群中的�
 <b class="highlight">(3) 基于Zookeeper的active namenode选举</b>
 
 Zookeeper会通过写一致性来选举出**唯一的**active namenode(通过锁的机制来完成)。
-当多个ZKFC同时尝试创建一个临时的Znode(`/hadoop-ha/${dfs.nameservice}/ActiveStandbyElectorLock`)，如果哪一个成功了，对应的namenode就变成了active。当连接断开或是其它情况导致会话被销毁时，ZKFC会主动删除该Znode。再次进入选举过程。
+当多个ZKFC同时尝试创建一个临时的Znode(**/hadoop-ha/${dfs.nameservice}/ActiveStandbyElectorLock**)，如果哪一个成功了，对应的namenode就变成了active。当连接断开或是其它情况导致会话被销毁时，ZKFC会主动删除该Znode。再次进入选举过程。
 
-我们可以通过`zk-shell`(pip install zk-shell)来打印出Zookeeper中相应的节点。
+我们可以通过**zk-shell**(pip install zk-shell)来打印出Zookeeper中相应的节点。
 
 ```bash
 zk-shell hostname:2181 --run-once "tree /hadoop-ha"
@@ -52,7 +52,7 @@ zk-shell hostname:2181 --run-once "tree /hadoop-ha"
 │   │   ├── ActiveStandbyElectorLock
 ```
 
-然后通过Zookeeper命令行就可以知道`ActiveStandbyElectorLock`中的数据，该Znode就包含了active namdenode的相关信息:
+然后通过Zookeeper命令行就可以知道ActiveStandbyElectorLock中的数据，该Znode就包含了active namdenode的相关信息:
 
 ```bash
 ./zkCli.sh -server hostname:2181
