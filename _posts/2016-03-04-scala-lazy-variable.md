@@ -5,7 +5,7 @@ date: 2016-03-04 11:29:03 UTC
 title: Scala基础之懒加载变量
 tags: [延迟加载，双重检验锁，语法糖]
 permalink: /scala/lazy-variable/
-key: cbf39c821f9351c5ac7d70065c9d793d
+key: 866d194653539d111283d82008583bd0
 description: "本文研究了Scala中懒加载变量背后的实现"
 keywords: [延迟加载，双重检验锁，语法糖]
 ---
