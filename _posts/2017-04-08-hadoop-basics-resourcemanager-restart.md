@@ -5,7 +5,7 @@ date: 2017-04-08 09:30:55 UTC
 title: Hadoop基础之ResourceManager重启过程中的恢复机制
 tags: [重启恢复，RPC通讯，Znode，Zookeeper高可用]
 permalink: /hadoop/resourcemanager-restart
-key: 07ad3cd4d543af43685fd86c1cb207b6
+key: 8f7342ec2f931b0d7e7550f0625e1655
 description: 本文介绍了ResourceManager重启过程的恢复机制以及具体配置
 keywords: [重启恢复，RPC通讯，Znode，Zookeeper高可用]
 ---
