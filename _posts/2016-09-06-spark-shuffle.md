@@ -12,9 +12,18 @@ keywords: [缓存，压缩流，shuffle write，shuffle read，Netty通讯，Blo
 
 Spark中的stage划分是基于<b style="color:red">Shuffle Dependency</b>的(**Spark stages are created by breaking the RDD graph at shuffle boundaries**)。
 
-Shuffle总体分为两个部分: **shuffle write** -- 将ShuffleMapTask中的元素写到相应的文件中; **shuffle read** -- 从Shuffle block中去读取之前存储的block，基本的流程如下图:
+Shuffle总体分为两部分，基本的流程如下图:
 
-![shuffle](http://static.zybuluo.com/jacoffee/hfocl66r91nem7xy6c5u0g3j/image_1b3tm4rmk1bkq1u1mlsehun1vvm9.png)
+<ul class="item">
+  <li>
+    <b>shuffle write</b> -- 将ShuffleMapTask中的元素写到相应的文件中(当然也可以在内存中，文末会提到)
+  </li>
+  <li>
+    <b>shuffle read</b> -- 从Shuffle block中去读取之前存储的文件
+  </li>
+</ul>
+
+![spark shuffle process](http://static.zybuluo.com/jacoffee/hfocl66r91nem7xy6c5u0g3j/image_1b3tm4rmk1bkq1u1mlsehun1vvm9.png)
 
 下面以一个简单的例子来梳理一下Shuffle的整个过程:
 
@@ -28,7 +37,7 @@ val finalRDD = sc.parallelize(pairList).reduceByKey(_ + _)
 
 上面的操作会产生两个Stage: 
 
-(1) **Stage 0 -- ShuffleMapStage**(对应parallelize操作)，该Stage是在DAG执行流程中为shuffle产生数据的中间stage，它总是发生在每次shuffle操作(e.g. reduceByKey, join)之前并且可能会包含多个管道操作(e.g. map, filter)。但被执行之后，他们会存储map out文件(`org.apache.spark.storage.FileSegment`)以被后续的reduce任务读取。
+(1) **Stage 0 -- ShuffleMapStage**(对应parallelize操作)，该Stage是在DAG执行流程中为shuffle产生数据的中间stage，它总是发生在每次shuffle操作(e.g. reduceByKey, join)之前并且可能会包含多个管道操作(e.g. map, filter)。但被执行之后，它们会存储map out文件(**org.apache.spark.storage.FileSegment**)以被后续的reduce任务读取。
 
 (2) **Stage 1 -- ResultStage**(对应reduceByKey操作)，该Stage是一个Job的最后阶段。
 
@@ -38,10 +47,10 @@ INFO DAGScheduler: Parents of final stage: List(ShuffleMapStage 0)
 INFO DAGScheduler: Missing parents: List(ShuffleMapStage 0)
 ```
 
-###Shuffle write(HashShuffle)
+##Shuffle write(HashShuffle)
 
-在Stage的提交过程中，如果有父Stage，会先提交父Stage以及它的相关任务; 如果RDD之间是**`ShuffleDependency`**(ParallelCollectionRDD, ShuffledRDD)，则会产生ShuffleMapStage，进而产生ShuffleMapTask，<b style="color:red">而shuffle write正是发生在ShuffleMapTask的计算过程中的</b>。
-**`ShuffleMapTask`**的主要任务就是根据ShuffleDependency中定义的Partitioner将RDD中的分区数据重新分配到不同的文件中，以让shuffle read获取(**A ShuffleMapTask divides the elements of an RDD into multiple buckets**)。
+在Stage的提交过程中，如果有父Stage，会先提交父Stage以及它的相关任务; 如果RDD之间是ShuffleDependency(ParallelCollectionRDD, ShuffledRDD)，则会产生ShuffleMapStage，进而产生ShuffleMapTask，<b style="color:red">而shuffle write正是发生在ShuffleMapTask的计算过程中的</b>。
+ShuffleMapTask的主要任务就是根据ShuffleDependency中定义的Partitioner将RDD中的分区数据重新分配到不同的文件中，以让shuffle read获取(**A ShuffleMapTask divides the elements of an RDD into multiple buckets**)。
 
 ```scala
 dagScheduler.submitJob()
@@ -49,10 +58,10 @@ dagScheduler.submitJob()
   dagScheduler.submitWaitingStages()
    dagScheduler.submitStage(stage) 
     dagScheduler.submitMissingTasks()
-        case stage: ShuffleMapStage => partitionsToCompute.map { id =>new ShuffleMapTask(...) }        
+        case stage: ShuffleMapStage => partitionsToCompute.map { id => new ShuffleMapTask(...) }        
 ```
 
-所以接下来，我们着重来看一下**`ShuffleMapTask`**是如何实现shuffle write的，实际上就是
+所以接下来，我们着重来研究一下ShuffleMapTask是如何实现shuffle write的，实际上就是
 **HashShuffleWriter的write操作做了哪些事。**
 
 <b class="highlight">(1) 生成HashShuffleWriter</b>
@@ -78,7 +87,7 @@ shuffleMapTask.runTask()
     hashShuffleWriter = manager.getWriter(..partitionId..)         
 ```
 
-**SparkContext**初始化的时候会生成**唯一的SparkEnv**， 而它会生成各种ShuffleManager(包括<b style="color:red">HashShuffleManager</b>， SortShuffleManager等)用于管理Shuffle的各个流程。当分区需要进行shuffle write的时候，HashShuffleManager会生成一个HashShuffleWriter，<b style="color:red">也就是说一个分区(一个Task)对应一个HashShuffleWriter</b>。在HashShuffleWriter的初始化过程中还会生成一个`FileShuffleBlockResolver` -- <b style="color:red">每一个Execuctor中只有一个</b> --
+**SparkContext**初始化的时候会生成**唯一的SparkEnv**， 而它会生成各种ShuffleManager(包括**HashShuffleManager**， SortShuffleManager等)用于管理Shuffle的各个流程。当分区需要进行shuffle write的时候，HashShuffleManager会生成一个HashShuffleWriter，**也就是说一个分区(一个Task)对应一个HashShuffleWriter**。在HashShuffleWriter的初始化过程中还会生成一个FileShuffleBlockResolver(每一个Execuctor中只有一个),
 它主要负责给shuffle task分配block(后面会详细解释)。
 
 <b class="highlight">(2) HashShuffleWriter的写入过程</b>
@@ -103,13 +112,13 @@ hashShuffleWriter.stop(success = true).get
         }
 ```
 
-HashShuffleWriter只是一个逻辑概念，因为真正的写入操作是`ShuffleWriterGroup`中的writers负责的。每一个ShuffleWriterGroup都会维护<b style="color:red">numOfReducer</b>个`DiskBlockObjectWriter`, 也就是<b style="color:red">ShuffleDependency中的Partitioner中的分区数 -- ShuffledRDD的分区数</b>。然后ShuffleMapTask中的Iterator中的每一个元素都会通过key基于Partitioner计算出新的分区编号，也就是上面的bucketId，每一个bucket分配一个`DiskBlockObjectWriter`，然后将它们写入相应的`SerializationStream`中。
+HashShuffleWriter只是一个逻辑概念，因为真正的写入操作是`ShuffleWriterGroup`中的writers负责的。每一个ShuffleWriterGroup都会维护**numOfReducer**个DiskBlockObjectWriter, 也就是**ShuffleDependency中的Partitioner中的分区数 -- ShuffledRDD的分区数**。然后ShuffleMapTask中的Iterator中的每一个元素都会通过key基于Partitioner计算出新的分区编号，也就是上面的bucketId，每一个bucket分配一个DiskBlockObjectWriter，然后将它们写入相应的SerializationStream中。
 
-而`DiskBlockObjectWriter`则是由`BlockManager`(运行在每一个节点上 -- Driver和Executor -- 它提供本地或者远程，获取和存储block的接口无论是内存，磁盘还是off-heap)通过`getDiskWriter`生成的，并且关联了一个**blockId**, 它会被后续的shuffle read使用到，所以`BlockManager`提供了类似于`getBlockData`的方法。
+而DiskBlockObjectWriter则是由BlockManager(运行在每一个节点上 -- Driver和Executor -- 它提供本地或者远程，获取和存储block的接口无论是内存，磁盘还是off-heap)通过getDiskWriter生成的，并且关联了一个**blockId**, 它会被后续的shuffle read使用到，所以BlockManager提供了类似于getBlockData的方法。
 
-注意在`FileShuffleBlockResolver`初始化的时候定义了一个`spark.shuffle.file.buffer`, 也就是`SerializationStream`中的buffer size，所以当流中字节超过指定的大小时，会被flush到文件中，<b style="color:red">而这个文件是和一个DiskBlockObjectWriter相对应的</b>，DiskBlockObjectWriter会不断往该文件中追加字节，直到`hashShuffleWriter.stop`调用之后，<b style="color:red">所有写入完成形成一个最终的文件，也就是`FileSegment`(一个DiskBlockObjectWriter会对应一个FileSegment)</b>。
+注意在`FileShuffleBlockResolver`初始化的时候定义了一个**spark.shuffle.file.buffer**, 也就是SerializationStream中的buffer size，所以当流中字节超过指定的大小时，会被flush到文件中，**而这个文件是和一个DiskBlockObjectWriter相对应的**，DiskBlockObjectWriter会不断往该文件中追加字节，直到**hashShuffleWriter.stop**调用之后，所有写入完成形成一个最终的文件，也就是FileSegment(一个DiskBlockObjectWriter会对应一个FileSegment)。
 
-关于这个追加过程在`DiskBlockObjectWriter`的源码中有一段解释:
+关于这个追加过程在DiskBlockObjectWriter的源码中有一段解释:
 
 ```scala
 /**
@@ -128,8 +137,8 @@ HashShuffleWriter只是一个逻辑概念，因为真正的写入操作是`Shuff
 */
 ```
 
-当ShuffleMapTask结束之后，还涉及到一个问题就是map out文件的路径汇报，也就是将相关的位置信息经由executor上面的`MapOutputTrackerWorker`
-汇报给Driver上的`MapOutputTracker`, 这样其它executor需要获取相应的位置时就会向driver发送请求，
+当ShuffleMapTask结束之后，还涉及到一个问题就是map out文件的路径汇报，也就是将相关的位置信息经由executor上面的**MapOutputTrackerWorker**
+汇报给Driver上的**MapOutputTracker**, 这样其它executor需要获取相应的位置时就会向driver发送请求，
 所以我们经常会在日志中看到这样的输出**MapOutputTrackerMasterEndpoint: Asked to send map output locations for shuffle shuffleId to hostname:5505**。
 
 ```scala
@@ -149,7 +158,7 @@ executor.run()
 
 再次结合文章开头的shuffle write示意图，整个流程就相对清晰了。
 
-###Shuffle Read
+##Shuffle Read
 
 在ShuffleMapStage运行完成之后，ResultStage开始运行，这里我们主要关注shuffle read是在何时被触发的。 所以，我们直接从Excecutor的任务执行开始切入。
 
@@ -171,8 +180,7 @@ executor.launchTask(...taskDesc.taskId ... taskDesc.serializedTask ..)
 execBackend.statusUpdate(taskId, TaskState.FINISHED, serializedResult)
 ```
 
-从上面简化的代码来看，executor上面的任务启动之后会经过一系列调用触发Task的<b style="color:red">runTask</b>方法，从而触发我们在action中的函数，本例中就是collect， 
-`(iter: Iterator[(String, Int)]) => iter.toArray`，而它最终触发了rdd的"计算"。
+从上面简化的代码来看，executor上面的任务启动之后会经过一系列调用触发Task的**runTask**方法，从而触发我们在action中的函数。
 这里计算也许是从checkpoint处获取，也许是从cache中获取，也许是真正的计算。 本例中仅考虑真正的计算，那么我们就可以在ShuffledRDD的compute方法中看到ShuffleReader的相关逻辑。
 
 <b class="highlight">(2) ShuffleReader的读取逻辑</b>
@@ -202,13 +210,13 @@ shuffledRDD.compute()
 ```
 
 首先，ShuffleReader是由`BlockStoreShuffleReader`实现的;
-当计算分区中的数据时，它需要获取上一个阶段map out的文件。它会根据shuffleId, 分区的index等信息去driver上的`mapOutputTracker`获取block的信息。<b style="color:red">同样的每一个分区会对应一个BlockStoreShuffleReader</b>。
+当计算分区中的数据时，它需要获取上一个阶段map out的文件。它会根据shuffleId, 分区的index等信息去driver上的mapOutputTracker获取block的信息。**同样的每一个分区会对应一个BlockStoreShuffleReader**。
 
 `ShuffleBlockFetcherIterator`初始化的时候，会进行将本地block获取和远程block获取进行拆分，本地获取交由本地blockManager负责；而远程block则通过发送FetchRequest来获取
-。Spark限制了每一批次请求中请求字节的总大小(`spark.reducer.maxSizeInFlight`), 因此Block的请求是分批完成的，请求完成之后返回的ManagedBuffer通过相应的处理反序列化成了`Iterator[(K, V)]`。
+。Spark限制了每一批次请求中请求字节的总大小(spark.reducer.maxSizeInFlight), 因此Block的请求是分批完成的，请求完成之后返回的ManagedBuffer通过相应的处理反序列化成了Iterator[(K, V)]。
 
-接下来进入聚合阶段, 像上面的reduceByKey，在shuffle write的时候就已经在分区内部的进行一次聚合(**mapSideCombine**)，此时只需要按照指定的函数，比如说上面的 `value1 + value2`汇总值即可。这个逻辑是由`ExternalAppendOnlyMap`实现的，在聚合Value的过程中，map的内存占用会越来越大。
-因此，会涉及到是否spill到磁盘的逻辑，简单的理解就是当超过某个阈值之后(`spark.shuffle.spill.initialMemoryThreshold`)，就会spill到磁盘。<b style="color:red">但实际过程中还会尝试申请更多内存</b>，具体逻辑可参考`org.apache.spark.util.collection.Spillable`的**maybeSpill**方法。
+接下来进入聚合阶段, 像上面的reduceByKey，在shuffle write的时候就已经在分区内部的进行一次聚合(**mapSideCombine**)，此时只需要按照指定的函数，比如说上面的 **value1 + value2**汇总值即可。这个逻辑是由ExternalAppendOnlyMap实现的，在聚合Value的过程中，map的内存占用会越来越大。
+因此，会涉及到是否spill到磁盘的逻辑，简单的理解就是当超过某个阈值之后(spark.shuffle.spill.initialMemoryThreshold)，就会spill到磁盘。但实际过程中还会尝试申请更多内存，具体逻辑可参考**org.apache.spark.util.collection.Spillable**的**maybeSpill**方法。
 
 我们有时会在Spark UI中的Tasks视图中看到**shuffle spill(memory)**和**shuffle spill(disk)**这两个指标 -- 前者指的是发生Spill的时候，当前collection的内存占用，而后者则是实际spill到磁盘上的字节大小。
 
@@ -230,13 +238,13 @@ protected def maybeSpill(collection: C, currentMemory: Long): Boolean = {
 }
 ```
 
-###总结
+##总结
 
-(1) ShuffleDependency产生ShuffleMapStage，ShuffleMapStage生成ShuffleMapTask
-
-(2) Shuffle write发生在ShuffleMapTask的计算过程中，每一个ShuffleMapTask会对应一个ShuffleWriter，它会将分区中元素按照相应的规则写入不同的文件中，也就是我们通常看到的map out files或者是block files
-
-(3) Shuffle read通过MapoutTracker获取相应的block file并借助各种Map对于数据进行汇总，这个过程涉及到bytes spilled到磁盘的过程
+<ul class="item">
+  <li>ShuffleDependency产生ShuffleMapStage，ShuffleMapStage生成ShuffleMapTask</li>
+  <li>Shuffle write发生在ShuffleMapTask的计算过程中，每一个ShuffleMapTask会对应一个ShuffleWriter，它会将分区中元素按照相应的规则写入不同的文件中，也就是我们通常看到的map out files或者是block files</li>
+  <li>Shuffle read通过MapoutTracker获取相应的block file并借助各种Map对于数据进行汇总，这个过程涉及到将元素写入到磁盘的过程</li>
+</ul>
 
 ##参考
 

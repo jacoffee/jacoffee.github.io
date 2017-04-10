@@ -10,11 +10,11 @@ description: "本文尝试解决如下问题: 在Spark的YARN Master模式下，
 keywords: [YarnMaster，YarnClient，ApplicationMaster，ExecutorCores，Parallelism，NodeManager，DataNode，MemorySlot]
 ---
 
-Spark在实际开发中一般使用YARN或Mesos作为集群管理器，它们一般有两个组件: Master服务(YARN ResourceManager, Mesos Master), 它们决定应用在哪些节点的哪些Executor被执行; Slave服务(YARN Nodemanager，Mesos Slave)，它们上面启动了Executor。Master服务也会监控Slave的状态以及资源消耗。
+Spark在实际开发中一般使用YARN或Mesos作为集群管理器，它们一般有两个组件: Master服务(YARN ResourceManager, Mesos Master), 它们决定在哪些节点的哪些Executor上执行任务; Slave服务(YARN Nodemanager，Mesos Slave)，它们上面启动了Executor。Master服务也会监控Slave的状态以及资源消耗。
 
 ##Spark在YARN上的部署
 
-Spark在YARN上一般有[两种部署模式](https://spark.apache.org/docs/2.0.0/running-on-yarn.html)，一种是Client模式，一种是Master模式。它们之间一个显著的区别就是<b style="color:red">Driver Program运行的位置</b>。前者是在启动程序的机器上运行的，而后者是**Hadoop ResoureManager**选择一个集群中的一个节点，启动**ApplicationMaster进程**，然后新开一个线程运行**Driver Program**，这一点在Yarn的日志中很容易发现。
+Spark在YARN上一般有[两种部署模式](https://spark.apache.org/docs/2.0.0/running-on-yarn.html)，一种是Client模式，一种是Master模式。它们之间一个显著的区别就是**Driver Program运行的位置**。前者是在启动程序的机器上运行的，而后者是**Hadoop ResoureManager**选择集群中的一个节点，启动**ApplicationMaster进程**，然后新开一个线程运行**Driver Program**，这一点在Yarn的日志中很容易发现。
 
 ```bash
 INFO ApplicationMaster: Starting the user application in a separate Thread
@@ -22,7 +22,7 @@ INFO ApplicationMaster: Starting the user application in a separate Thread
 
 对于Master模式的运行流程，大致如下:
 
-(1) ApplicationMaster启动之后，会向**ResourceManager**注册，告知RM自己的一些基本信息，比如Hostname，Driver RPCEndRef之类。注册完成之后会生成一个`org.apache.spark.deploy.yarn.YARNAllocator`。
+(1) ApplicationMaster启动之后，会向**ResourceManager**注册，告知ResourceManager自己的一些基本信息，比如Hostname，Driver RPCEndRef之类。注册完成之后会生成一个`org.apache.spark.deploy.yarn.YARNAllocator`。
 
 ```java
 ApplicationMaster.main
@@ -42,7 +42,7 @@ INFO YarnAllocator: Container request (host: Any, capability: <memory:2984, vCor
 ...
 ```
 
-(3) 资源申请完成之后，开始启动容器以及Executor
+(3) 资源申请完成之后，通过**ContainerManagementProtocol**(ApplicationMaster与NodeManager之间的通讯协议)，开始在NodeManager上启动容器以及Executor
 
 ```java
 ApplicationMaster.registerAM()
@@ -58,17 +58,17 @@ INFO YarnAllocator: Launching container container_e65_1478591460077_1290_01_0000
 INFO YarnAllocator: Launching ExecutorRunnable. driverUrl: spark://CoarseGrainedScheduler@192.168.111.195:35611,  executorHostname: server191
 ```
 
-(4) 之后Driver Program会将Job划分为不同的Stage和Task，然后向Application Master发出资源请求，Application Master会与Resource Manager进行沟通以获取不同的资源组合(Container)，然后将任务分发到不同的Container上去执行
+(4) 之后Driver Program会将Job划分为不同的Stage和Task，然后向ApplicationMaster发出资源请求，ApplicationMaster会与Resource Manager进行沟通以获取不同的资源组合(Container)，然后将任务分发到不同的Container上去执行
 
 ![节点内存结构图](http://static.zybuluo.com/jacoffee/kzgp16jizmthkuz0e3kfso0q/image_1b262vvmr16q614el1tj775i1vmum.png)
 
 ## YARN Master模式的资源分配
 
-在YARN资源管理中，一个Container(YARN对于资源的一种抽象，包括CPU和内存)对应一个Executor，实际上就是一个JVM实例，可以同时执行多个Task(通过executor-cores指定)。一个节点可以根据资源情况启动多个Container。Container一般分为`Driver Container`和`Executor Container`(官方并没有这种划分，这里只是为了理解方便)。 这个`Driver Container`实际上就是运行`ApplicationMaster`的。
+在YARN资源管理中，一个Container(YARN对于资源的一种抽象，包括CPU和内存)对应一个Executor，实际上就是一个JVM实例，可以同时执行多个Task(通过executor-cores指定)。一个节点可以根据资源情况启动多个Container。Container一般分为**Driver Container**和**Executor Container**(官方并没有这种划分，这里只是为了理解方便)。 这个**Driver Container**实际上就是运行**ApplicationMaster**的。
 
-在计算一个节点(Hadoop DataNode)可分配给Container的内存时，首先要剔除如下几部分: `Hadoop DataNode`守卫进程(1000MB)，`Hadoop NodeManager`守卫进程(1000MB)，节点本身运行(一般会留出1G)，剩下的物理内存才是真正可以分配给Container的，一般会通过`yarn-site.xml`中的**yarn.nodemanager.resource.memory-mb**属性进行设置，它指定了节点上所有的Container可以使用的总内存。
+在计算一个节点(Hadoop DataNode)可分配给Container的内存时，首先要剔除如下几部分: **Hadoop DataNode**守卫进程(1000MB)，**Hadoop NodeManager**守卫进程(1000MB)，节点本身运行(一般会留出1G)，剩下的物理内存才是真正可以分配给Container的，一般会通过**yarn-site.xml**中的**yarn.nodemanager.resource.memory-mb**属性进行设置，它指定了节点上所有的Container可以使用的总内存。
 
-对于Executor，`ExecutorMemoryRequired = Executor-Memory + ExecutorMemoryOverhead` 前者我们一般通过`executor-memory`参数指定，后者的计算公式如下:
+对于Executor，**ExecutorMemoryRequired = ExecutorMemory + ExecutorMemoryOverhead** 前者我们一般通过**executor-memory**参数指定，后者的计算公式如下:
 
 ```scala
 // org.apache.spark.deploy.yarn.YarnAllocator
@@ -80,12 +80,12 @@ protected val memoryOverhead: Int = sparkConf.get(EXECUTOR_MEMORY_OVERHEAD).getO
     math.max((MEMORY_OVERHEAD_FACTOR * executorMemory).toInt, MEMORY_OVERHEAD_MIN)).toInt
 ```
 
-对于MemoryOverhead，首先会读取我们设置的，如果没有显示设置。则会取`ExecutorMemory * 0.1`与<b style="color:red">384m</b>之间的最大值。
+对于MemoryOverhead，首先会读取我们设置的，如果没有显示设置。则会取**ExecutorMemory * 0.1**与**384m**之间的最大值。
 
-但是**ExecutorMemoryRequired**计算出来的值并不是最终Container申请的内存大小，还有一个因素需要考虑: <b style="color:red">yarn.scheduler.minimum-allocation-mb</b>, 该属性可以理解为<b style="color:red">YARN内存分配的最小单位</b>，默认是1024m。也就是说最终Container申请的内存一定是该属性的整数倍，如果说**ExecutorMemoryRequired**计算出来为<b style="color:red">2984m</b>， 那么实际申请的就是<b style="color:red">3G</b>
+但是**ExecutorMemoryRequired**计算出来的值并不是最终Container申请的内存大小，还有一个因素需要考虑: <b>yarn.scheduler.minimum-allocation-mb</b>, 该属性可以理解为**YARN内存分配的最小单位，默认是1024m**。也就是说最终Container申请的内存一定是该属性的整数倍，如果说ExecutorMemoryRequired计算出来为2984m， 那么实际申请的就是3G。
 
-关于ExecutorMemory部分，我们主要从两个方面考虑: <b style="color:red">Execution内存</b>和<b style="color:red">用于存储的内存(cache)</b>。
-从1.6版本起，在SparkEnv初始化的时候，提供了两种`MemoryManager`:
+关于ExecutorMemory部分，我们主要从两个方面考虑: Execution内存和用于存储的内存(cache)。
+从1.6版本起，在SparkEnv初始化的时候，提供了两种MemoryManager:
 
 ```scala
 // org.apache.spark.SparkEnv
@@ -99,11 +99,11 @@ val memoryManager: MemoryManager =
   }
 ```
 
-默认的情况下使用`org.apache.spark.memory.UnifiedMemoryManager`(<b class="highlight">A MemoryManager that enforces a soft boundary between execution and storage such that either side can borrow memory from the other.</b>)，也就是上面两种类型的内存使用并没有严格界限，可以互相占用。这也是1.6版本在内存管理方面的一个优化。
+默认的情况下使用**org.apache.spark.memory.UnifiedMemoryManager**(<b class="highlight">A MemoryManager that enforces a soft boundary between execution and storage such that either side can borrow memory from the other.</b>)，也就是上面两种类型的内存使用并没有严格界限，可以互相占用。这也是1.6版本在内存管理方面的一个优化。
 
-相反如果我们选择了LegacyMode，则会使用`org.apache.spark.memory.StaticMemoryManager`(<b class="highlight">A MemoryManager that statically partitions the heap space into disjoint regions.</b>)，也就是`spark.shuffle.memoryFraction`和 `spark.storage.memoryFraction`指定的内存区域会被严格区分，不能互相占用。
+相反如果我们选择了LegacyMode，则会使用**org.apache.spark.memory.StaticMemoryManager**(<b class="highlight">A MemoryManager that statically partitions the heap space into disjoint regions.</b>)，也就是**spark.shuffle.memoryFraction**和 **spark.storage.memoryFraction**指定的内存区域会被严格区分，不能互相占用。
 
-而对于`Driver Memory`，计算逻辑大致相同，只不过是通过ApplicationMasterOverhead来表达的:
+而对于Driver Memory，计算逻辑大致相同，只不过是通过ApplicationMasterOverhead来表达的:
 
 ```scala
 // org.apache.spark.deploy.yarn.Client
@@ -172,7 +172,7 @@ TotalMemoryNeeded	6144
 TotalVCoresNeeded	1
 ```
 
-`TotalVCoresNeeded`会显示成1，即使设置成了多个，这个其实并不是计算的问题，而是[Hadoop配置的问题](http://stackoverflow.com/questions/33248108/spark-executor-on-yarn-client-does-not-take-executor-core-count-configuration)。
+**TotalVCoresNeeded**会显示成1，即使设置成了多个，这个其实并不是计算的问题，而是[Hadoop配置的问题](http://stackoverflow.com/questions/33248108/spark-executor-on-yarn-client-does-not-take-executor-core-count-configuration)。
 
 ##参考
 
