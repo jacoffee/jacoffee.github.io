@@ -19,21 +19,23 @@ keywords: [分布式文件系统，数据拆分单元，HDFS Block，并发度]
 sc.textFile("/path/xx", 100).partitions.size
 ```
 
-期待是100， 结果却是192。当时觉得是自己理解的有问题，于是再次阅读了相关部分的源码，遂对这个问题有了一个清晰的认识。
+期待是100， 结果却是192。于是再次阅读了相关部分的源码，遂对这个问题有了一个清晰的认识。
 
-实际上我们传递的这个分区数指的是理论上最小的分区数**NumPartition**, 也就是说如果文件总大小为**TotalFileSize**, 那么如果按照`TotalFileSize / NumPartition`进行文件切分那么正好就可以满足**NumPartition**个分区。
+实际上我们传递的这个参数指的是理论上**最小的分区数**, 也就是说如果文件总大小为**TotalFileSize**, 那么如果按照`TotalFileSize / NumPartition`进行文件切分那么正好就可以满足**NumPartition**个分区。
 
-但是由于我们读取的是HDFS文件，所以还需要将HDFS的**块大小**(BlockSize)和**传递的切分单元**(每个分区中多少字节的记录)考虑进去。`org.apache.hadoop.mapred.FileInputFormat`中的`getSplits`也体现了这一逻辑。总而言之，<b class="highlight">分区数大小就是由上面三者共同决定的</b>。
+但是由于读取的是HDFS文件，所以还需要将HDFS的**块大小**(BlockSize)和**传递的切分单元**(每个分区中多少字节的记录)考虑进去。**org.apache.hadoop.mapred.FileInputFormat**中的**getSplits**也体现了这一逻辑。总而言之，<b class="highlight">分区数大小就是由上面三者共同决定的</b>, 基本流程就是:
 
-基本流程就是:
+<ul class="item">
+  <li>计算HDFS中所有文件的总大小(TotalLen)</li>
+  <li>计算理想拆分单元GoalSize(GoalSize = TotalLen / NumPartition)</li>
+  <li>将理想拆分单元GoalSize，与BlockSize，HDFS MinSplitSize进行比较，得出最终的拆分单元ResultSize(<code>ResultSize = Max(HDFS MinSplitSize,  Min(GoalSize, BlockSize))</code>)</li>
+  <li>
+    遍历HDFS中的文件，依次按照ResultSize进行切分，然后构造InputSplit对象。当剩余的大小Remaining与ResultSize达到某种比例时，则停止；剩下的则再单独生成一个InputSplit对象。
+  </li>
+</ul>
 
-(1) 计算HDFS中所有文件的总大小**TotalLen**
 
-(2) 计算理想拆分单元`GoalSize = TotalLen / NumPartition`，与BlockSize，HDFS MinSplitSize进行比较。`ResultSize = Max(HDFS MinSplitSize,  Min(GoalSize, BlockSize))`
-
-(3) 遍历HDFS中的文件，依次按照`ResultSize`进行切分，然后构造**InputSplit**对象。当剩余的大小Remaining与ResultSize达到某种比例时，则停止；剩下的则再单独生成一个**InputSplit**对象。
-
-在我的案例中`(380 * 64 / 100)M > 128M`(HDFS MinSplitSize = 1), 所以最终应该是使用128M作为切分单元。因此，每个文件被拆分了3个分区，最终形成192个分区。
+在我的案例中**(380 * 64 / 100)M > 128M**(HDFS MinSplitSize = 1), 所以最终应该是以**128m**作为切分单元。因此，每个文件被拆分了3个分区，最终形成192个分区。
 
 
 ```scala

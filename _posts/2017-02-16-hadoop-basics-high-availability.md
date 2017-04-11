@@ -81,7 +81,7 @@ numChildren = 0
 
 为了保证高可用，HDFS中采用了**Quorum Journal Manager**，实际上就是journal node的集群。当active namenode将**修改操作**写入到半数以上的journal node中并且"反馈"已经成功了，该操作才算真正完成。一般部署三台的话，就需要两台以上确认成功写入。
 
-与此同时，standby namenode也会定期读取edit logs进行fsimage的合并工作，和[Hadoop Namenode和DataNode](/hadoop/namenode-datanode)中提到的类似。通过这种机制，所有的stanby namenode都确保自己能够获取HDFS的最新状态。不仅如此，我们知道所有文件的block位置都是存储在namenode的内存中的，为了加速failover，datanode会同时向active和standby namenode汇报位置信息。
+与此同时，standby namenode也会定期读取edit logs进行fsimage的合并工作，和[Hadoop Namenode和DataNode](/hadoop/namenode-datanode)中提到的类似。通过这种机制，所有的stanby namenode都确保自己能够获取HDFS的最新状态。不仅如此，我们知道所有文件的block位置都是存储在namenode的内存中的，为了加速故障切换(failover)，datanode会同时向active和standby namenode汇报位置信息。
 
 所以，HDFS中的QJM解决了我们上面提到的第二个问题。
 
