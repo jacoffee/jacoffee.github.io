@@ -60,11 +60,18 @@ audio, canvas, video {
 body, button, input, select, textarea { 
     font: 500 16px/2 'Source Sans Pro',sans-serif;
 }
-table {
+
+article.lotus-post table {
     border-collapse: collapse;
     border-spacing: 0;
     width: 100%;
+    margin-left: 20px;
 }
+
+article.lotus-post table td p {
+    margin-bottom: 0px;
+}
+
 table.standard-table {
    margin-left: 25px;
 }
