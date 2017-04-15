@@ -192,6 +192,12 @@ div.highlight {
 h2.highlight, b.highlight {
     color: #0077bb; /* 将标题改为蓝色 */
 }
+
+pre, code {
+    overflow-x: auto;
+    vertical-align: middle;
+}
+
 code {
     color: #4d4d4d;
     background: rgba(215, 215, 215, 0.9);
