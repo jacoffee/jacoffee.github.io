@@ -10,7 +10,7 @@ static_url: "http://jacoffee-blog.b0.upaiyun.com"
 
 
 # Build settings
-markdown: redcarpet
+markdown: kramdown
 lineanchors: true
 extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink", "tables", "with_toc_data"]
 

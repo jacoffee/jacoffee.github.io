@@ -135,7 +135,7 @@ Checkpoint大致可以分为如下三个流程:
         <b>检出阶段: </b> 当rdd.runJob执行完成之后，会执行rdd的doCheckpoint，此时checkpoint的状态变为<code>CheckpointingInProgress</code>，也就是正在checkpoint中
     </li>
     <li>
-        <b>检出完成: </b> 通过ReliableCheckpointRDD的方法writeRDDToCheckpointDirectory，将原RDD中的数据写入磁盘，然后将checkpoint状态改<code>为Checkpointed</code>，调用原RDD的markCheckpointed方法清除原RDD的所有依赖以及分区
+        <b>检出完成: </b> 通过ReliableCheckpointRDD的方法writeRDDToCheckpointDirectory，将原RDD中的数据写入磁盘，然后将checkpoint状态改为<code>Checkpointed</code>，调用原RDD的markCheckpointed方法清除原RDD的所有依赖以及分区
     </li>
 </ul>
 
