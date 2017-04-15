@@ -114,7 +114,7 @@ def verboseF[A](x: A, y:A)(implicit ord: Ordering[A]) = {
 
 我们可以看到类型类就好像给继承提供了补充方案，通过隐式转换A类型被转换成了B[A]类型，同时拥有了B[A]类型的各种方法。
 
-## 参考
+##  参考
 
 \> [上下文定界限和视界](http://docs.scala-lang.org/tutorials/FAQ/context-and-view-bounds.html)
 

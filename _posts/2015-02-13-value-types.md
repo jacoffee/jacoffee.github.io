@@ -268,7 +268,7 @@ trait Outer {
 type Ref = x.AbsT forSome { val x: Outer }
 ```
 
-## 参考
+##  参考
 
 \> Scala Reference 3.2
 

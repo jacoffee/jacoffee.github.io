@@ -12,7 +12,7 @@ keywords: [重启恢复，RPC通讯，Znode，Zookeeper高可用]
 
 周五的时候，向Hadoop集群提交了一个任务，运行的过程中ResourceManager进程由于某些原因突然中止了。通过**yarn-daemon.sh start resourcemanager**命令重启之后，发现之前的应用仍然顺利执行。猜想可能是由于ResourceManager重启恢复的某种机制才能保证了应用的继续运行。通过[官网中的ResourceManger Restart](https://hadoop.apache.org/docs/r2.7.2/hadoop-yarn/hadoop-yarn-site/ResourceManagerRestart.html)找到一些答案，现整理如下。
 
-##重启过程
+## 重启过程
 
 为了降低ResourceManager重启带来的影响，它就必须在正常运行时去记录一些状态信息，这样在重启之后才能去获取并且构造对应状态的实例。这个过程经历了两个阶段的发展:
 
@@ -39,7 +39,7 @@ keywords: [重启恢复，RPC通讯，Znode，Zookeeper高可用]
     </li>
 </ul>
 
-##基本配置
+## 基本配置
 
 为了存储应用元数据，我们需要使用一些可靠的外部存储系统，比如说Zookeeper、HDFS还有官网中提到的LevelDB。下面主要介绍Zoookeeper的相关配置:
 
@@ -80,7 +80,7 @@ keywords: [重启恢复，RPC通讯，Znode，Zookeeper高可用]
 
 通过ZKRMStateRoot键我们可以确认，ResourceManager的信息已经被存储。
 
-##实际操作
+## 实际操作
 
 在验证的过程中(伪分布式集群模式 - Pseudodistributed mode，Hadoop 2.7.2)，我们可以先启动应用，等它进行RUNNING状态之后，
 通过`yarn-daemon.sh stop resourcemanager`命令杀掉ResourceManager进程，这时候可以看到Client会尝试重连ResourceManager Server，然后再通过`yarn-daemon.sh start resourcemanager`，之后发现应用恢复之前的状态然后继续正常运行了。

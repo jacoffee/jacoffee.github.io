@@ -16,7 +16,7 @@ Java虚拟机运行时数据区大致如下图所示:
 
 ![运行时的数据区](http://static.zybuluo.com/jacoffee/4xx5mebu4d935hmsx5oqowed/image_1bckucvas1bdu1phi1fsj14526jm9.png)
 
-##程序计数器(The pc Register)
+## 程序计数器(The pc Register)
 
 可以理解为线程执行字节码的**行号指示器**，在查看字节码的时候我们可以看到各种数字。字节码解释器就是通过改变计数器来执行相应的字节码指令。
 
@@ -31,7 +31,7 @@ Java虚拟机运行时数据区大致如下图所示:
 
 在Java虚拟机多线程的情况，线程轮流切换并分配处理器时间来执行。在任何确定时间，一个处理器(如果多核，就是一个内核)都会只会执行一个线程的指令。那么当线程切换之后要知道上一次的执行位置，就需要为每一个线程分配一个区域去记录这个位置以便回来之后能够继续执行。
 
-##虚拟机栈(JVM Stacks)
+## 虚拟机栈(JVM Stacks)
 
 > Each Java Virtual Machine thread has a private Java Virtual Machine stack, created at the same time as the thread
 
@@ -41,11 +41,11 @@ Java虚拟机运行时数据区大致如下图所示:
 
 ![图例1. Java虚拟机栈](http://static.zybuluo.com/jacoffee/5oju39tesa0qlacggc2e4953/image_1aqufoa34ojufg514971q3clm5m.png)
 
-##本地方法栈(native method stack)</b>
+## 本地方法栈(native method stack)</b>
 
 虚拟机栈为Java虚拟机执行Java方法(字节码)服务，而本地方法栈则为Java虚拟机执行Native方法服务
 
-##堆(Heap)
+## 堆(Heap)
 
 这个区域可能是我们日常中接触最多的，因为几乎任何Java项目都会配置相应的堆参数(形如-Xmx2048, -Xms2048); 堆的内存区域大致可以分为新生代(young generation)和老生代(old generation)，其中新生代又可以细分为(Eden区、Survivor区)。
 
@@ -115,7 +115,7 @@ Java虚拟机运行时数据区大致如下图所示:
 java -XX:MaxMetaSpaceSize=256m com.xxx.xxx
 ```
 
-##方法区(Method Area)
+## 方法区(Method Area)
 
 > It stores per-class structures such as run-time constant pool, field and method data, the code for methods and constructors
 
@@ -133,7 +133,7 @@ Constant pool:
    ...
 ```
 
-##参考
+## 参考
 
 \> 深入理解Java虚拟机
 

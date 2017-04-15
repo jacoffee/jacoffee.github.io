@@ -170,7 +170,7 @@ Response for preflight has invalid HTTP status b 404
 
 假设A和B共享Cookie，在B中登录之后会设置相关的Cookie。A跨域请求B的某些资源，如果设置了**withCredentials: false**，则相应的Cookie在发送请求的时候将会被忽略。这样请求B的资源(需要从Cookie中获取某些信息)时就会因信息丢失而失败。
       
-##参考
+## 参考
 
 \> [Mozilla官方文档中对于跨域的详细介绍](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)
 

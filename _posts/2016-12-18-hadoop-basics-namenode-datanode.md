@@ -10,7 +10,7 @@ description: 本文简单介绍了HDFS中NameNode和DataNode的基本情况
 keywords: [fsimage, checkpoint, 副本, 灾备]
 ---
 
-##NameNode和SecondaryNameNode
+## NameNode和SecondaryNameNode
 
 NameNode主要是管理文件系统树(filesystem tree)和所有文件目录以及文件的元数据的(metadata)，它们以<b class="highlight">fsimage的形式存在磁盘中</b>，当然运行的时候是在NameNode的内存中的并且会定期落盘。而**edit logs**则记录了每一次改动。Secondary NameNode的主要工作就是fsimage的合并以及在namnode发生故障进行时相关的恢复。
 
@@ -154,7 +154,7 @@ blockpoolID: blockPool的唯一标识，包括了所有该NameNode管理的命�
 
 
 
-##DataNode
+## DataNode
 
 DataNodes主要根据NameNode或者是客户端的要求对于block进行各种操作，包括创建block的创建，删除以及接受NameNode的block replication指令，同时它们也会定期向NameNode反馈block的位置变化情况。当文件被存储的时候，它会被分成**一个或者多个block**并且被存放到不同的DataNode上面(由于replication level一般是3，所以通常会放到3个DataNode上面)。
 
@@ -187,7 +187,7 @@ ${dfs.DataNode.data.dir}/
 └── in_use.lock
 ```
 
-##参考
+## 参考
 
 \> Hadoop权威指南第4版 第二章分布式文件系统
 

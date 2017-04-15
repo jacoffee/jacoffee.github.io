@@ -28,7 +28,7 @@ java -XX:+PrintCommandLineFlags -version
 jmap -heap PID
 ```
 
-##垃圾回收算法
+## 垃圾回收算法
 
 对于垃圾回收算法，目前已经有很多实现(Parellel、CMS、G1)，但大致会涉及到如下几个过程。
 
@@ -65,7 +65,7 @@ jmap -heap PID
 </ul>
 
 
-##分代垃圾回收
+## 分代垃圾回收
 
 目前大多数虚拟机的垃圾回收机制都采用了分代回收(Generational Collection)的思想，也就是将堆中的内存区域分为新生代和老生代，分别采用不同的机制进行垃圾回收，比如说对于对象存活率较低的新生代，我们可以采用使用复制算法的收集器(如Parallel New)，只用付出复制一小部分对象的代价。而对于存活率较高的老生代，一般很难再开辟出空间进行复制，所以一般采用了使用标记-清除(如CMS)或者标记压缩(如G1)的收集器。
 
@@ -80,7 +80,7 @@ jmap -heap PID
 </ul>
 
 
-##并发标记-清除垃圾收集(Concurrnt Mark Sweep Garbage Collection)
+## 并发标记-清除垃圾收集(Concurrnt Mark Sweep Garbage Collection)
 
 下面主要通过日志来了解并发标记-清除收集器的具体过程。
 
@@ -252,7 +252,7 @@ CMS: abort preclean due to time 2016-05-25T12:02:34.670+0800: 76797.475:
 开始清理那些没有被标记为live对象，也就是Java虚拟机认为无用的对象。清除完成之后，进行CMS收集器内部数据结构的调整以准备下一阶段的GC。
 
 
-##参考
+## 参考
 
 \> [Oracle官网对于CMS的介绍](https://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/cms.html)
 

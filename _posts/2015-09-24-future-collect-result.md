@@ -14,7 +14,7 @@ Future在异步编程中使用非常广泛，Scala中的Actor就是建立在Futu
 
 > A Future is a data structure used to retrieve the result of some concurrent operation. This result can be accessed synchronously (blocking) or asynchronously (non-blocking).
 
-##Future的结果 - 非阻塞式 vs 阻塞式收集
+## Future的结果 - 非阻塞式 vs 阻塞式收集
 
 ```scala
 val sumResult = Future((1L to 100000000L).sum)
@@ -96,7 +96,7 @@ sumResult.isCompleted
 
 显然**onComplete**，**onSuccess**，**onFailure**这些回调也是根据当前Future的状态来执行相应的操作的。那么Future内部的状态有哪几种呢？这些状态之间又是如何切换的呢？
 
-##Future的状态以及改变
+## Future的状态以及改变
 
 要研究Future的状态变化，最好的方式就是利用**onComplete**的调用栈并且打断点来摸清整个调用过程，下面通过代码调用来一步一步解释(由于之前没有接触过UML图，所以可能存在一些纰漏，以下涉及到UML图的地方仅供参考)。
 

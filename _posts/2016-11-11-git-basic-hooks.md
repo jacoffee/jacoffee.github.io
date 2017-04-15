@@ -109,7 +109,7 @@ branch=$(echo "${refname}" | awk -F/ '{print $NF}')
 实际上每种回调都是由特定的服务触发的，比如说update就是由**git-receive-pack**来触发的，关于它的底层实现可以参考[git的 pack协议](https://github.com/git/git/blob/master/Documentation/technical/pack-protocol.txt)，[git-receive-pack的运行机制](http://stackoverflow.com/questions/10662056/how-does-git-receive-pack-work)。
 
 
-##参考
+## 参考
 
 \> [git中的回调是什么](http://githooks.com/)
 

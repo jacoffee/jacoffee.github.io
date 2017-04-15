@@ -81,7 +81,7 @@ $ scalac -Ylog:jvm Test.scala
 回到开始的案例，当同一作用域内同时出现了特质和单例对象时，编译器会尝试在`Test.class`中添加静态代理，但此时`trait Test`**编译之后实际上是Java中的接口**，而接口是不能定义静态方法的。
 所以`Test.class`中并没有对应的`main`方法，所以不能成为一个可运行的程序。
 
-##参考
+## 参考
 
 \> [Scala里的静态代理(static-forwarders)](http://hongjiang.info/scala-static-forwarders/)
 

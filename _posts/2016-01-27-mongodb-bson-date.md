@@ -75,7 +75,7 @@ ISODate("2016-01-27T09:59:53.602Z")
 **(2)** MongoDB还有一种**供内部使用**的时间类型叫Timestamps，比如说**oplog**中有一个**ts**属性，就是使用该类型。一般我们开发的时候并不会使用这个类型。
 
 
-##参考
+## 参考
 
 \> [W3C对于datetime的规范](https://www.w3.org/TR/NOTE-datetime)
 

@@ -94,7 +94,7 @@ property.hive.log.dir = /path/hive/log
 ```
 
 
-##参考
+## 参考
 
 \> [配置Tez计算引擎](https://cwiki.apache.org/confluence/display/Hive/Hive+on+Tez)
 

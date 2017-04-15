@@ -51,7 +51,7 @@ keywords: [BlockManager, Block, getOrCompute]
 
 下面我们来了解一下上述两个操作的大致流程:
 
-##缓存(Cache)
+## 缓存(Cache)
 
 RDD缓存就是将分区的计算结果存放在内存或是磁盘中，下次需要计算同样分区的时候直接通过**BlockManager**去获取，大致分为如下几个流程:
 
@@ -91,7 +91,7 @@ getOrCompute
         doPutIterator(blockId, makeIterator, ....)
 ```
 
-##检出(Checkpoint)
+## 检出(Checkpoint)
 
 在RDD计算结束之后会将所有分区依次写入到可靠的外部存储中(reliable system, such as HDFS)，一般是由于RDD之间的依赖链太长或是需要在不同的Job之间共享。
 

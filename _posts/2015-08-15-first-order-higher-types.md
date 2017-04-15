@@ -111,7 +111,7 @@ scala> func2[Int]
 注意第二种写法，func1中`evidence`的类型是**```HigherOrdering[CC]```**，而不能是**```HigherOrdering[CC[_]]```**，HigherOrdering类型需要接受**一个可以接受类型参数的类型**。
 
 
-##参考
+## 参考
 
 \> [使用高阶类型定义上下文定界](http://stackoverflow.com/questions/5541154/context-bounds-shortcut-with-higher-kinded-types#)
 

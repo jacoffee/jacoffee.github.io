@@ -69,7 +69,7 @@ dataFrameWriter.jdbc(url, )
 因为Spark SQL会根据传入的url来寻找对应的数据库方言也就是确认对应的Column类型，因为OracleDialect只对于String类型进行了处理，对于LongType则因为没有对应的映射而采用了默认的即BIGINT，[Spark 2.0 OracleDialect的完整实现](https://github.com/apache/spark/blob/branch-2.1/sql/core/src/main/scala/org/apache/spark/sql/jdbc/OracleDialect.scala)。
 
 
-##关于DataFrame的数据库写入
+## 关于DataFrame的数据库写入
 
 <b class="highlight">DataFrame的数据库写入就是在`foreachPartition`中进行JDBC的数据库操作</b>，并且将每一次分区操作控制在了一个事务中同时使用了Preparement的Batch避免了多次插入，相关逻辑在`org.apache.spark.sql.DataFrameWriter`中实现。
 
@@ -85,7 +85,7 @@ saveTable()
 
 因为是通过`foreachPartition`进行数据库操作，显然我们需要控制分区数量以免crash数据库, 可以通过`df.coalesce`或者`df.repartition`，关于它们的区别可以参考[Spark基础之coalesce和repartition](/spark/partitions/coalesce-repartition)。
 
-##关于DataFrame的数据库读取
+## 关于DataFrame的数据库读取
 
 相较于写入，读取则显得相对复杂一点。它主要涉及到以下几个步骤，相关逻辑在`org.apache.spark.sql.DataFrameReader`中实现:
 

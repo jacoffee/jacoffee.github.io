@@ -47,7 +47,7 @@ INFO DAGScheduler: Parents of final stage: List(ShuffleMapStage 0)
 INFO DAGScheduler: Missing parents: List(ShuffleMapStage 0)
 ```
 
-##Shuffle write(HashShuffle)
+## Shuffle write(HashShuffle)
 
 在Stage的提交过程中，如果有父Stage，会先提交父Stage以及它的相关任务; 如果RDD之间是ShuffleDependency(ParallelCollectionRDD, ShuffledRDD)，则会产生ShuffleMapStage，进而产生ShuffleMapTask，<b style="color:red">而shuffle write正是发生在ShuffleMapTask的计算过程中的</b>。
 ShuffleMapTask的主要任务就是根据ShuffleDependency中定义的Partitioner将RDD中的分区数据重新分配到不同的文件中，以让shuffle read获取(**A ShuffleMapTask divides the elements of an RDD into multiple buckets**)。
@@ -158,7 +158,7 @@ executor.run()
 
 再次结合文章开头的shuffle write示意图，整个流程就相对清晰了。
 
-##Shuffle Read
+## Shuffle Read
 
 在ShuffleMapStage运行完成之后，ResultStage开始运行，这里我们主要关注shuffle read是在何时被触发的。 所以，我们直接从Excecutor的任务执行开始切入。
 
@@ -238,7 +238,7 @@ protected def maybeSpill(collection: C, currentMemory: Long): Boolean = {
 }
 ```
 
-##总结
+## 总结
 
 <ul class="item">
   <li>ShuffleDependency产生ShuffleMapStage，ShuffleMapStage生成ShuffleMapTask</li>
@@ -246,6 +246,6 @@ protected def maybeSpill(collection: C, currentMemory: Long): Boolean = {
   <li>Shuffle read通过MapoutTracker获取相应的block file并借助各种Map对于数据进行汇总，这个过程涉及到将元素写入到磁盘的过程</li>
 </ul>
 
-##参考
+## 参考
 
 \> [Spark Internals](https://github.com/JerryLead/SparkInternals/blob/master/markdown/english/4-shuffleDetails.md)

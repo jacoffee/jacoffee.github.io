@@ -12,7 +12,7 @@ keywords: [SortMergeJoin, SortShuffleWriter]
 
 RDD中的join操作一般是针对**RDD[(K, V)]**来进行的，用于将各个分区中键相同的元素组织起来。对应的在DataFrame中，也可以进行join操作(像比较常见的SortMergeJoin)，它可以避免RDD join使用不当而造成的shuffle。接下来，本文将通过RDD join以及DataFrame SortMergeJoin的过程来解释，为什么RDD join会产生shuffle以及DataFrame SortMergeJoin是通过何种手段来避免shuffle的？
 
-##RDD Join
+## RDD Join
 
 我们可以看到对于key相同的元素，首先会在rdd1中找到相应的元素，比如(1, "a")，然后在遍历rdd2中对应key所有的元素`(1, "b"), (1, "c")`，最后进行组合`List((1,(a,b)), (1,(a,c)), (1,(b,b)))`，基本流程如下:
 
@@ -112,7 +112,7 @@ val reduceRDDB = rddB.reduceByKey(partitionerOfRDDA, func)
 val resultRDD = reducedRDDA join reduceRDDB
 ```
 
-##DataFrame SortMergeJoin
+## DataFrame SortMergeJoin
 
 由于Spark SQL中很多操作的设计借鉴了关系型数据库的思想，所以我们先来简单了解一下数据库中SortMergeJoin算法的大致流程。
 
@@ -220,6 +220,6 @@ WholeStageCodegen
 ```
 
 
-##参考
+## 参考
 
 \> [shuffle free join](http://blog.hydronitrogen.com/2016/05/13/shuffle-free-joins-in-spark-sql/)

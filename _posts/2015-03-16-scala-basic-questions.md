@@ -154,7 +154,7 @@ scala> :javap Foo#apply
 ```
 
 
-##参考
+## 参考
 
 \> [private[this] vs private的字节码区别](https://gist.github.com/twolfe18/5767545)
 

@@ -140,7 +140,7 @@ protected void processResults(ResultHandler handler, int flags) throws IOExcepti
 从上面的代码片段可以看出，若**pgStream**中接收到的是'D'，则将查询数据转移到**tuples**中，若收到的是'C'，则通过`handleResultRows`(回调)将tuples转移到Result中的**rows**中，以便后面使用。
 
 
-##参考
+## 参考
 
 \> [ResultSet中fetchSize的真实作用](http://stackoverflow.com/questions/1318354/what-does-statement-setfetchsizensize-method-really-do-in-sql-server-jdbc-driv)
 

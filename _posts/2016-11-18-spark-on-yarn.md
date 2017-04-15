@@ -12,7 +12,7 @@ keywords: [YarnMaster，YarnClient，ApplicationMaster，ExecutorCores，Paralle
 
 Spark在实际开发中一般使用YARN或Mesos作为集群管理器，它们一般有两个组件: Master服务(YARN ResourceManager, Mesos Master), 它们决定在哪些节点的哪些Executor上执行任务; Slave服务(YARN Nodemanager，Mesos Slave)，它们上面启动了Executor。Master服务也会监控Slave的状态以及资源消耗。
 
-##Spark在YARN上的部署
+## Spark在YARN上的部署
 
 Spark在YARN上一般有[两种部署模式](https://spark.apache.org/docs/2.0.0/running-on-yarn.html)，一种是Client模式，一种是Master模式。它们之间一个显著的区别就是**Driver Program运行的位置**。前者是在启动程序的机器上运行的，而后者是**Hadoop ResoureManager**选择集群中的一个节点，启动**ApplicationMaster进程**，然后新开一个线程运行**Driver Program**，这一点在Yarn的日志中很容易发现。
 
@@ -62,7 +62,7 @@ INFO YarnAllocator: Launching ExecutorRunnable. driverUrl: spark://CoarseGrained
 
 ![节点内存结构图](http://static.zybuluo.com/jacoffee/kzgp16jizmthkuz0e3kfso0q/image_1b262vvmr16q614el1tj775i1vmum.png)
 
-## YARN Master模式的资源分配
+##  YARN Master模式的资源分配
 
 在YARN资源管理中，一个Container(YARN对于资源的一种抽象，包括CPU和内存)对应一个Executor，实际上就是一个JVM实例，可以同时执行多个Task(通过executor-cores指定)。一个节点可以根据资源情况启动多个Container。Container一般分为**Driver Container**和**Executor Container**(官方并没有这种划分，这里只是为了理解方便)。 这个**Driver Container**实际上就是运行**ApplicationMaster**的。
 
@@ -174,7 +174,7 @@ TotalVCoresNeeded	1
 
 **TotalVCoresNeeded**会显示成1，即使设置成了多个，这个其实并不是计算的问题，而是[Hadoop配置的问题](http://stackoverflow.com/questions/33248108/spark-executor-on-yarn-client-does-not-take-executor-core-count-configuration)。
 
-##参考
+## 参考
 
 \> Hadoop权威指南 第四版 第十章搭建Hadoop集群之YARN和MapReduce的内存设置
 
