@@ -10,7 +10,7 @@ description: "本文收集一些Scala基本问题的解答"
 keywords: [修饰符]
 ---
 
-###类和对象
+### 类和对象
 
 (1) **作为属性修饰符，private[this]和private的区别**
 
@@ -67,7 +67,7 @@ public final class Message$ implements Product, Serializable {
 }
 ```
 
-###命令行技巧
+### 命令行技巧
 
 (1) `:paste`, `:kind`, `:type`, `:settings`, `:javap`等命令使用
 

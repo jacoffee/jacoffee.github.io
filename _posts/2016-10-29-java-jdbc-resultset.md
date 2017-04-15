@@ -38,7 +38,7 @@ keywords: [数据集，分批获取，缓冲，游标]
 
 改进之后大概快了7，8倍左右，开始以为是SQL优化的结果。 后来在Oracle中运行了上面两个查询，发现查询时间的差距很小。然后尝试<b style="color:red">调整初始方案的fetchSize</b>，发现速度也快了不少。所以，基本上可以认定提升的主要原因是**fetchSize的调整**。
 
-###逻辑解释
+### 逻辑解释
 
 结果集对应的是一次查询结果，可以理解为指向查询结果的游标(Cursor)，所以并没有将所有的查询结果加载到JVM内存。
 
@@ -73,7 +73,7 @@ private int getFastInt(int columnIndex) throws SQLException, NumberFormatExcepti
 
 > 建立数据库连接之后，通过创建Statement，执行SQL语句，并创建结果集(ResultSet)，它指向的是查询结果。 其中涉及到两个层面的遍历，一个是结果集中的游标对于查询结果的遍历，一个是对于ResultRow中的数据遍历，也就是真正将Row数据转换成Java对象的过程。所以数据的加载，是通过多次分批加载到JVM内存的。
 
-###代码层面
+### 代码层面
 
 ```java
 //org.postgresql.Driver

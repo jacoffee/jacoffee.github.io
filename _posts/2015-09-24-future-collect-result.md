@@ -102,7 +102,7 @@ sumResult.isCompleted
 
 ![Future的初始化和结果收集UML](/static/images/charts/2015-09-24/future_init.png)
 
-### (1) Future的初始化 -- Future.apply
+###  (1) Future的初始化 -- Future.apply
 
 Future初始化的时候(实际上是DefaultPromise的初始化)，会调用**`AbstractPromise`**的updateState方法来设置初始状态。
 
@@ -114,7 +114,7 @@ class DefaultPromise[T] extends AbstractPromise { self =>
 
 所以，**Future初始化之后状态变成了Nil(类型实际上是List[CallbackRunnable])**。
 
-### (2) Future中的任务开始执行 -- PromiseCompletingRunnable
+###  (2) Future中的任务开始执行 -- PromiseCompletingRunnable
 
 ```scala
 // executor ---> package scala.concurrent.impl.ExecutionContextImpl    
@@ -203,7 +203,7 @@ private def tryCompleteAndGetListeners(v: Try[T]):
 
   + 其它情况，则返回null
 
-### (3) Future注册回调 -- Future.onComplete
+###  (3) Future注册回调 -- Future.onComplete
 
 Future的异步调用体现在当Future初始化之后，一个异步计算就已经开始；一般情况，我们会为Future注册相关的回调，要么是对正常的返回值进行处理，要么是对异常进行处理。同样以源码入手。
 

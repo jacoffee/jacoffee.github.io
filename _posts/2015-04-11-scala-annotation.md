@@ -65,7 +65,7 @@ warning: method bigMistake in class B is deprecated: use newShinyMethod() instea
 one warning found
 ```
 
-### @volatile
+###  @volatile
 
 实际上这个注解或是关键字，大多用于被并发访问的共享变量。在JVM内存模型中happens-before规则有一条就是volatile变量法则(有兴趣可以阅读Java并发编程实践 第16章Java内存模型)，对于volatile变量，同一变量的写操作总是先于读操作。
 
@@ -77,7 +77,7 @@ class Person(@volatile var name: String) {
 }
 ```
 
-### @tailrec 
+###  @tailrec
 
 这个注解是与[尾递归优化](/scala/tail-recurison/)有关的。
 
@@ -93,11 +93,11 @@ def factorial(n: Int) = {
 }
 ```
 
-### @Unchecked
+###  @Unchecked
 
 一般是在模式匹配的时候用到的，告诉编译器有些地方不用"检查"了。如前所述，List[String @ unchecked]。
 
-### @transient
+###  @transient
 
 这个注解一般用于序列化的时候，标识某个字段不用被序列化。
 
@@ -135,7 +135,7 @@ zml
 
 由于age被标记为@transient，在反序列化的时候，就获取不到原始值了所以被赋值为默认值。
 
-### @inline
+###  @inline
 
 这个注解，在Scala.Predef中见到过一次。官方文档中的解释跟没说一样，
 倒是[StackOverflow上一个的答案](http://stackoverflow.com/questions/2709095/does-the-inline-annotation-in-scala-really-help-performance)，个人觉得比较能说明作用。

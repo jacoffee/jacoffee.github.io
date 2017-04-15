@@ -142,7 +142,7 @@ CMS: abort preclean due to time 2016-05-25T12:02:34.670+0800: 76797.475:
 
 ![ParNew && CMS](http://static.zybuluo.com/jacoffee/1y7bmy3v41kx4ii2r1p7ffkj/image_1bcplls60s8d6541krv11opb7f9.png)
 
-###新生代垃圾回收(Minor GC)
+### 新生代垃圾回收(Minor GC)
 
 ```bash
 2016-05-25T12:02:28.988+0800: 76791.792: 
@@ -181,7 +181,7 @@ CMS: abort preclean due to time 2016-05-25T12:02:34.670+0800: 76797.475:
 垃圾回收完成之后，堆区内存占用从**3540527**变成了**2709351**，节省出**831176**;
 新生代占用内存从**857276**变成了**24956**，节省出**832320**，这部分的对象被移动到了老生代。
 
-###老生代垃圾回收(Major GC)
+### 老生代垃圾回收(Major GC)
 
 <b class="highlight">(1) 初始标记(Initial Remark)</b>
 

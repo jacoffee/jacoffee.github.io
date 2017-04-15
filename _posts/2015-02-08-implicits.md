@@ -14,7 +14,7 @@ keywords: [隐式转换, 隐式方法, 隐式类, 视界, 类型参数]
 
 隐式转换是指Scala编译器会帮助完成指定的"转换"，从而减少重复代码并且在一定程度上扩展现有库的功能。隐式参数就是不需要你显示传递参数(Scala编译器会帮你传递当然你也可以显示的传递)。
 
-###基本使用
+### 基本使用
 
 (1) **减少重复代码**
 
@@ -75,7 +75,7 @@ object Predef {
 Map(1 -> "one", 2 -> "two") 
 ```
 
-###隐式参数
+### 隐式参数
 
 编译器会自动帮你传递这个参数，如果找不到就会报错。简单来说就是`someCall(a)`在实际调用的时候会变成`someCall(a)(b)`。
 
@@ -107,7 +107,7 @@ trait CanBuildFrom[-From, -Elem, +To] {}
 def map[B, That](f: A => B)(implicit bf: CanBuildFrom[Repr, B, That]): That = {}
 ```
 
-### 视界(View Bound)
+###  视界(View Bound)
 
 对于`O <% T`, 只要O可以被隐式转换成T或者O是T的子类或者就是T类型，那么我就可以随意使用O。
 
@@ -148,7 +148,7 @@ class WrappedString(val self: String) extends AbstractSeq[Char]
 with IndexedSeq[Char] with StringLike[WrappedString] {
 ```
 
-### 隐式类型的规则
+###  隐式类型的规则
 
 \> 只有使用implicit标记的定义(val, def, class)才会被编译器当作隐式类型去使用
 
@@ -180,7 +180,7 @@ def testCompanionScope(euro: Euro) = ...
 
 \> 如果某个作用域有多个隐式转换，我们可以通过显示的声明来控制哪个隐式转换需要用到
     
-### 隐式类型的寻找
+###  隐式类型的寻找
 
 \> 搜索当前作用域
 

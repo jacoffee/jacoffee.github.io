@@ -66,7 +66,7 @@ hdfs oiv -i fsimage_xxx -o ~/Desktop/fsimage.xml -p XML
 
 > Each fsimage file contains a serialized form of all the directory and file inodes in the filesystem. Each inode is an internal representation of a file or directory’s metadata and contains such information as the **file’s replication level**, **modification** and **access times**, **access permissions**, **block size**, and **the blocks the file is made up of**. For directories, the modification time, permissions, and quota metadata are stored.
 
-###NameNode文件结构
+### NameNode文件结构
 
 NameNode的相关文件都放在**${dfs.namenode.name.dir}**(在hdfs-site.xml中配置)，默认地址**file://${hadoop.tmp.dir}/dfs/name**(hadoop.tmp.dir属性在core-site.xml中配置)。
 
@@ -90,7 +90,7 @@ ${dfs.namenode.name.dir}
 └── in_use.lock
 ```
 
-###文件镜像和编辑日志(filesystem images & edit logs)
+### 文件镜像和编辑日志(filesystem images & edit logs)
 
 <b class="highlight">(1) 文件镜像(filesystem images)和编辑日志(edit logs)</b>
 
@@ -158,7 +158,7 @@ blockpoolID: blockPool的唯一标识，包括了所有该NameNode管理的命�
 
 DataNodes主要根据NameNode或者是客户端的要求对于block进行各种操作，包括创建block的创建，删除以及接受NameNode的block replication指令，同时它们也会定期向NameNode反馈block的位置变化情况。当文件被存储的时候，它会被分成**一个或者多个block**并且被存放到不同的DataNode上面(由于replication level一般是3，所以通常会放到3个DataNode上面)。
 
-###DataNode文件结构
+### DataNode文件结构
 
 默认的位置: **${dfs.DataNode.data.dir}(在hdfs-site.xml中配置)**
 

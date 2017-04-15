@@ -12,7 +12,7 @@ keywords: [值类型，类型投影，类型指示器，参数类型，元祖类
 
 在Scala中每一个值都是有类型的，具体如下:
 
-### 单例类型(Singleton Types)
+###  单例类型(Singleton Types)
 
 基本格式: **p.type** 
 
@@ -35,7 +35,7 @@ class Concrete0 extends Abstract0 {
 (new Concrete0).set(3).get
 ```
 
-### 类型投影(Type Projection)
+###  类型投影(Type Projection)
 
 基本格式: **T#X**
 
@@ -49,7 +49,7 @@ class Outer {
 }
 ```
 
-### 参数化类型(Parameterized Types)
+###  参数化类型(Parameterized Types)
 
 基本格式: T[U1, U2, U3]
 
@@ -68,13 +68,13 @@ class F[M[_], X] { ... }
 class S[K <: String] { ... }
 ```
 
-### 元祖类型(Tuple Types)
+###  元祖类型(Tuple Types)
 
 基本格式: **(T1 ... Tn), n>=2**
 
 说明: 等价写法Tuple[T1...Tn]
 
-### 注解类型(Annotated Types)
+###  注解类型(Annotated Types)
 
 基本格式: **SimpleType {Annotation}**
 
@@ -99,7 +99,7 @@ case barList: List[Bar @ unchecked]
 }
 ```
 
-### 复合类型(Compound Types)
+###  复合类型(Compound Types)
 
 基本格式: **T1 with ... with Tn { Refinement }**
 
@@ -177,7 +177,7 @@ object HeightTest extends App {
 }
 ```
 
-### 中置类型(Infix Types)
+###  中置类型(Infix Types)
 
 基本格式: **T1 op T2**
 
@@ -216,7 +216,7 @@ object InfixTest extends App {
 }
 ```
 
-### 函数类型(Function Types)
+###  函数类型(Function Types)
 
 基本格式: **FunctionArgs => Type**
 
@@ -235,7 +235,7 @@ trait Functionn[-T1,..., -Tn, +R] {
     override def toString = "<function>" 
 }
 ```
-### 存在类型(Existential Types) - 2015-08-02 更新
+###  存在类型(Existential Types) - 2015-08-02 更新
 
 对于存在类型的定义，参见《Scala In Depth》:
 
