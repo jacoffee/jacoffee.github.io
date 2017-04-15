@@ -100,7 +100,9 @@ keywords: [重启恢复，RPC通讯，Znode，Zookeeper高可用]
 17/04/08 21:54:00 INFO TaskSetManager: Finished task 3.0 in stage 0.0 (TID 3) in 2460 ms on 192.168.31.65 (3/30)
 ```
 
-最后在实践过程中发现一个问题，如果**yarn.resourcemanager.recovery.enabled**被设置成true之后，**ContainerId**的格式也会发生改变:
+最后，如果启动恢复ResourceManager状态信息的机制之后，有两点需要注意:
+
+ContainerId的格式会发生改变，因此就需要**spark-assembly-1.6.2-hadoopx.x.x.jar**中对应的Hadoop版本要能识别这种新的ContainerId，否则就会出现下面的异常。因为我开始在尝试的时候使用的是**spark-assembly-1.6.2-hadoop2.4.0.jar**，当ResourceManager重启之后，ContainerId使用了新的格式所以无法被之前版本的读取。
 
 ```bash
 # 之前  container_集群时间戳_应用编号_尝试编号_容器编号
@@ -109,11 +111,12 @@ container_1491640108912_0001_01_000001
 container_e01_1491640108912_0001_01_000001
 ```
 
-因此，就需要**spark-assembly-1.6.2-hadoopx.x.x.jar**中对应的Hadoop版本要能识别这种新的ContainerId，否则就会出现下面的异常。因为我开始在尝试的时候使用的是**spark-assembly-1.6.2-hadoop2.4.0.jar**，当ResourceManager重启之后，ContainerId使用了新的格式所以无法被之前版本的读取。
-
 ```bash
 java.lang.IllegalArgumentException: Invalid ContainerId: container_e01_1491640108912_0001_01_000001
 ...
 Caused by: java.lang.NumberFormatException: For input string: "e01"
 ```
+
+启动恢复ResourceManager状态信息的机制之后，如果借助Zookeeper存储状态信息，则首先需要启动Zookeeper。因为在ResourceManager启动时会尝试建立连接，如果Zookeeper没有启动则会导致ResourceManager启动失败。
+
 

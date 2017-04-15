@@ -197,13 +197,12 @@ h2.highlight, b.highlight {
 
 pre, code {
     overflow-x: auto;
-    vertical-align: middle;
 }
 
 code {
     color: #4d4d4d;
     background: rgba(215, 215, 215, 0.9);
-    border: 1px solid #bdbdbd;
+    border: 0px solid #bdbdbd;
     font-weight: bold;
 }
 small {
