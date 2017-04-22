@@ -159,7 +159,7 @@ CMS: abort preclean due to time 2016-05-25T12:02:34.670+0800: 76797.475:
         <b>76791.792: </b>垃圾回收开始的时间，相对于Java虚拟机的启动时间(start-up time)，也就是Java虚拟机启动之后76791.792秒之后触发了这次GC。
     </li>
     <li>
-        <b>GC (Allocation Failure): </b> 表明触发垃圾回收的原因是对象无法被放入新生代。
+        <b>GC (Allocation Failure): </b> 表明触发垃圾回收的原因是新生代**Eden**区没有足够的空间放入更多的对象。
     </li>
     <li>
         <b>ParNew: </b>垃圾回收所使用的收集器，上面已经提到过
@@ -187,7 +187,7 @@ CMS: abort preclean due to time 2016-05-25T12:02:34.670+0800: 76797.475:
 
 标记GC Roots能够**直接**关联的对象，会导致应用线程阻塞(stop-the-world)。
 
-**[GC [1 CMS-initial-mark: 2684394K(4194304K)] 2712309K(5138048K), 0.0220000 secs]**  
+**[GC [1 CMS-initial-mark: 2684394K(4194304K)] 2712309K(5138048K), 0.0220000 secs]**
 老生代占用内存(老生代分配内存) -> 堆占用内存(堆分配内存) -> 用时。
 
 <b class="highlight">(2) 并发标记阶段(Concurrent Mark)</b>
