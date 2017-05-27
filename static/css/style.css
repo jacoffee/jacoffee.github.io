@@ -563,7 +563,7 @@ h1, h2, h3, h4, h5, h6 {
     float: left;
 }
 .lotus-double .article-first {
-    width: 54%;
+    width: 60%;
     /*border-right: 1px dotted #C8C8C8;*/
 }
 .lotus-double .article-last {
@@ -695,9 +695,17 @@ h1, h2, h3, h4, h5, h6 {
     margin-top: 1em;
 }
 .lotus-nextpage .lotus-nextpage-left {
+    width: 50%;
+    float: left;
+}
+.lotus-nextpage .lotus-nextpage-left a {
     float: left;
 }
 .lotus-nextpage .lotus-nextpage-right {
+    width: 50%;
+    float: right;
+}
+.lotus-nextpage .lotus-nextpage-right a {
     float: right;
 }
 .lotus-disqus {
