@@ -53,7 +53,7 @@ spark.driver.extraClassPath guava-18.0.jar
 spark.executor.extraClassPath guava-18.0.jar
 ```
 
-第一个属性在spark-submit中为**--jars**的形式，而在**spark-defaults.conf**需要改为**spark.jars**，它可以让某些依赖在集群中共享，在Spark源码中也有提到。然后通过extraClassPath 属性将它分别添加到driver和executor的classpth上，并且采用的是prepend(放在最前面那)方式。
+第一个属性在spark-submit中为**--jars**的形式，而在**spark-defaults.conf**需要改为**spark.jars**，它可以让某些依赖在集群中共享，在Spark源码中也有提到。然后通过extraClassPath 属性将它分别添加到driver和executor的classpth上，并且采用的是prepend(放在最前面)方式。
 
 ```bash
 org.apache.spark.SparkContext
