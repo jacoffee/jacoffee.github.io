@@ -12,7 +12,7 @@ keywords: [内嵌模式，服务层之间的boundary, Metastore server, JDBC]
 
 今天在Spark Standalone集群中部署thriftserver的时候，发现自己对于HiveServer2、Metastore server等几个概念还不是很清晰，主要是对于Hive的几种部署模式还不是很清晰。它们的主要的区别在于Metastore的部署方式，它存储了表结构和分区(partition)的相关元数据。Metastore中有一张表叫**tbls**记录了所有hive表的创建时间、类型和拥有者等。
 
-## 内嵌模式 - Embeded Mode
+## 内嵌模式 - Embedded Mode
 
 Metastore默认采用derby存储，这种模式一般用于单元测试并且同一时间只能有一个活跃用户(也就是启动的时候在**hive-site.xml**中配置的**hive.server2.thrift.client.user**)，还有一点就是它需要在你运行hive命令的目录下创建**Metastore_db**文件夹(初次运行的时候)。
 
