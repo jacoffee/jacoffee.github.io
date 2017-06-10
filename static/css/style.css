@@ -133,9 +133,12 @@ ul.item li p {
     text-indent: 0px;
 }
 
+ul.item ul.item {
+    margin-left: 0;
+}
+
 ul.item ul li {
     list-style: circle;
-    margin-left: 70px;
 }
 
 .clearfix:after {
