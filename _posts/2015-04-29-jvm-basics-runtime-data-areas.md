@@ -41,7 +41,7 @@ Java虚拟机运行时数据区大致如下图所示:
 
 ![图例1. Java虚拟机栈](http://static.zybuluo.com/jacoffee/5oju39tesa0qlacggc2e4953/image_1aqufoa34ojufg514971q3clm5m.png)
 
-## 本地方法栈(native method stack)</b>
+## 本地方法栈(native method stack)
 
 虚拟机栈为Java虚拟机执行Java方法(字节码)服务，而本地方法栈则为Java虚拟机执行Native方法服务
 
@@ -121,7 +121,7 @@ java -XX:MaxMetaSpaceSize=256m com.xxx.xxx
 
 **它用于存放虚拟机加载的类信息、常量、静态变量、即时编译器编译后的代码等**，和堆一样也被所有的线程共享。而在Hot VM中则是使用永生代(PermGen)来实现的，但是在Java 7、8版本中，该区域经历了较大的变动，包括内部一些东西的迁移，比如说静态变量放回到堆中等。
 
-每一个类或接口都有常量池，在**.class**中表现为contant_pool表，通过**javap -verbose classname**命令可以观察到。运行时常量池在类被加载到虚拟机之后被创建，位于方法区，也就是常量池在运行时的表现。它包括若干种不同的常量: **编译期可知的数值字面量**(28l, 8.9d, 4.0f等)，在运行期间解析之后才能获得**方法或字段引用**(常量池表中的Methodref，Fieldref)。
+每一个类或接口都有常量池，在.class中表现为contant_pool表，通过**javap -verbose classname**命令可以观察到。运行时常量池在类被加载到虚拟机之后被创建，位于方法区，也就是常量池在运行时的表现。它包括若干种不同的常量: **编译期可知的数值字面量**(28l, 8.9d, 4.0f等)，在运行期间解析之后才能获得**方法或字段引用**(常量池表中的Methodref，Fieldref)。
 
 ```bash
 Constant pool:
