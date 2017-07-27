@@ -47,7 +47,8 @@ Java虚拟机运行时数据区大致如下图所示:
 
 ## 堆(Heap)
 
-这个区域可能是我们日常中接触最多的，因为几乎任何Java项目都会配置相应的堆参数(形如-Xmx2048, -Xms2048); 堆的内存区域大致可以分为新生代(young generation)和老生代(old generation)，其中新生代又可以细分为(Eden区、Survivor区)。
+这个区域是我们日常中接触最多的，Java虚拟机的调优大多数都是针对这个区域的，典型的就是各种GC算法。
+我们在程序中创建的所有的对象都被分配在了堆上，与此同时对象的成员变量也在这个区域(不管是原生类型还是引用类型)。堆的内存区域大致可以分为新生代(young generation)和老生代(old generation)，其中新生代又可以细分为(Eden区、Survivor区)。
 
 ![图例2. Java堆区结构图](http://static.zybuluo.com/jacoffee/r4dqfvrfi889gyo13hsk4lzk/image_1bcmii0ti37dv4418tr1lhr13t09.png)
 
