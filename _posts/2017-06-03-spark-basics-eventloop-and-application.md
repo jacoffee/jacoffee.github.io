@@ -30,7 +30,7 @@ EventLoop主要包含如下几个方面:
 <ul class="item">
     <li>用于接受事件的双端队列(LinkedBlockingDeque) -- eventQueue。Blocking体现在当队列满了之后，如果再次插入元素的操作将会被阻塞， 如果队列是空的话，该操作同样会被阻塞，直到有了元素</li>
     <li>一个不断从队列中取出事件并且执行的守卫进程(Daemon Thread) -- eventThread</li>
-    <li>控制线程是否继承执行的条件变量(condition) -- stopped，这个模型在Java Thread中使用的非常多</li>
+    <li>控制线程是否继续执行的条件变量(condition) -- stopped，这个模型在Java Thread中使用的非常多</li>
     <li>
         取出事件之后的回调 -- onReceive，不同的事件对应不同的处理，有点类似Actor中的receive模式
     </li>
@@ -40,7 +40,7 @@ EventLoop主要包含如下几个方面:
 
 <p align="center">图1.EventLoop的组成</p>
 
-下面我们通过JobGenerator(Spark Streaming)中的EventLoop的执行流程来更好理解上面这幅图:
+下面我们通过JobGenerator(Spark Streaming)中的EventLoop来更好的理解上面的流程:
 
 <b class="highlight">(1) 启动EventLoop </b>
 
@@ -72,7 +72,7 @@ private def processEvent(event: JobGeneratorEvent) {
 
 ```scala
 def stop() = {
-    if (compareAndSwap(false, true)) {
+    if (compareAndSet(false, true)) {
         eventThread.interrupt()
         try {
             eventThread.join()
@@ -105,7 +105,7 @@ while (true) {
 <ul class="item">
     <li>用于发送消息的KafkaProducer</li>
     <li>将与KafkaMessage相关的行为抽象成事件，如GenerateMessages</li>
-    <li>与KafkaMessage事件相关的EventLoop负责接收事件，与事件的处理。</li>
+    <li>与KafkaMessage事件相关的EventLoop负责接收事件与事件的处理。</li>
     <li>随着应用程序一起初始化的Timer，用于定时向EventLoop提交GenerateMessages事件</li>
     <li>各种事件的实际逻辑处理方法 -- processEvent</li>
 </ul>

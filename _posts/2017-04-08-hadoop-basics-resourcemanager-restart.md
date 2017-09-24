@@ -119,4 +119,7 @@ Caused by: java.lang.NumberFormatException: For input string: "e01"
 
 启动恢复ResourceManager状态信息的机制之后，如果借助Zookeeper存储状态信息，则首先需要启动Zookeeper。因为在ResourceManager启动时会尝试建立连接，如果Zookeeper没有启动则会导致ResourceManager启动失败。
 
+## 参考
 
+\> [ResourceManager restart](https://hadoop.apache.org/docs/r2.7.2/hadoop-yarn/hadoop-yarn-site/ResourceManagerHA.html#Manual_transitions_and_failover)
+\> [Nodemanager restart](https://hadoop.apache.org/docs/r2.7.2/hadoop-yarn/hadoop-yarn-site/NodeManagerRestart.html)

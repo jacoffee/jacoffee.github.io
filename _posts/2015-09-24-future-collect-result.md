@@ -86,7 +86,7 @@ object BlockContext {
 }
 ```
 
-在最初阅读**```current```**方法时候会疑惑，为什么**```Thread.currentThread```**会匹配**```BlockContext```**类型，源码中的解释是: 有些线程池实现的时候会让Thread继承BlockContext。
+在最初阅读**current**方法时候会疑惑，为什么Thread.currentThread会匹配**BlockContext**类型，源码中的解释是: 有些线程池实现的时候会让Thread继承BlockContext。
 
 对于非阻塞式的取值，我们可以通过Future的相关方法来判断它的当前状态。
 
@@ -96,13 +96,13 @@ sumResult.isCompleted
 
 显然**onComplete**，**onSuccess**，**onFailure**这些回调也是根据当前Future的状态来执行相应的操作的。那么Future内部的状态有哪几种呢？这些状态之间又是如何切换的呢？
 
-## Future的状态以及改变
+## 1.Future的状态以及改变
 
 要研究Future的状态变化，最好的方式就是利用**onComplete**的调用栈并且打断点来摸清整个调用过程，下面通过代码调用来一步一步解释(由于之前没有接触过UML图，所以可能存在一些纰漏，以下涉及到UML图的地方仅供参考)。
 
 ![Future的初始化和结果收集UML](/static/images/charts/2015-09-24/future_init.png)
 
-###  (1) Future的初始化 -- Future.apply
+### 1.1 Future的初始化 -- Future.apply
 
 Future初始化的时候(实际上是DefaultPromise的初始化)，会调用**`AbstractPromise`**的updateState方法来设置初始状态。
 
@@ -114,7 +114,7 @@ class DefaultPromise[T] extends AbstractPromise { self =>
 
 所以，**Future初始化之后状态变成了Nil(类型实际上是List[CallbackRunnable])**。
 
-###  (2) Future中的任务开始执行 -- PromiseCompletingRunnable
+### 1.2 Future中的任务开始执行 -- PromiseCompletingRunnable
 
 ```scala
 // executor ---> package scala.concurrent.impl.ExecutionContextImpl    
@@ -140,21 +140,20 @@ class DefaultPromise[T] extends AbstractPromise { self =>
 
 ```scala
 class PromiseCompletingRunnable[T](body: => T) {
-       val promise = new Promise.DefaultPromise[T]()
-       override def run() = {
-          promise complete {
-              try {
-                Success(T)
-              } catch {
-                case NonFatal(e) => Failure(e)
-              }
-              
-          }       
-       }
+   val promise = new Promise.DefaultPromise[T]()
+   override def run() = {
+      promise complete {
+          try {
+            Success(T)
+          } catch {
+            case NonFatal(e) => Failure(e)
+          }
+      }
+   }
 }
 ```
 
-#### 1. DefaultPromise.complete
+#### 1.2.1 DefaultPromise.complete
 
 ```scala
 // 如果该Promise已经完成则报错，否则就返回DefaultPromise的当前实例
@@ -163,20 +162,20 @@ def complete(result: Try[T]): this.type =
   else throw IllegalStateException("Promise already completed.") 
 ```
 
-#### 2. DefaultPromise.tryComplete
+#### 1.2.2 DefaultPromise.tryComplete
 
 ```scala
 // tryComplete返回true则说明没有完成，返回false则说明完成
 def tryComplete(result: Try[T]) = {
-    tryCompleteAndGetListeners(result) {
-       case null => false
-       case rs if rs.isEmpty => true
-       case rs => rs.foreach(r => r.executeWithValue(result)); true;
-    }
+  tryCompleteAndGetListeners(result) {
+     case null => false
+     case rs if rs.isEmpty => true
+     case rs => rs.foreach(r => r.executeWithValue(result)); true;
+  }
 }
 ```
 
-#### 3. DefaultPromise.tryCompleteAndGetListeners
+#### 1.2.3 DefaultPromise.tryCompleteAndGetListeners
 
 ```scala
 @tailrec
@@ -194,16 +193,16 @@ private def tryCompleteAndGetListeners(v: Try[T]):
 }
 ```
 
-  前面提到过，**DefaultPromise**的状态是由**AbstractPromise**的**_ref**属性维护的。状态有以下几种:
-  
-  + **List[CallbackRunnable[T]]**(最开始的状态是Nil)。
-  则接下来会将**DefaultPromise**的状态设置成**Try[T]**。在sumFuture的那种情况中，模式匹配会进到这种情况。然后**tryComplete**返回当前**DefaultPromise**实例并且它的状态已经变成了**Try[T]**
+前面提到过，**DefaultPromise**的状态是由**AbstractPromise**的**_ref**属性维护的。状态有以下几种:
 
-  + **DefaultPromise[_]**(一般是调用了map, flatMap生成了新的DefaultPromise)，这里涉及到链向根DefaultPromise的过程(会在后续的更新中补充)
++ **List[CallbackRunnable[T]]**(最开始的状态是Nil)。
+则接下来会将**DefaultPromise**的状态设置成**Try[T]**。在sumFuture的那种情况中，模式匹配会进到这种情况。然后**tryComplete**返回当前**DefaultPromise**实例并且它的状态已经变成了**Try[T]**
 
-  + 其它情况，则返回null
++ **DefaultPromise[_]**(一般是调用了map, flatMap生成了新的DefaultPromise)，这里涉及到链向根DefaultPromise的过程(会在后续的更新中补充)
 
-###  (3) Future注册回调 -- Future.onComplete
++ 其它情况，则返回null
+
+### 1.3 Future注册回调 -- Future.onComplete
 
 Future的异步调用体现在当Future初始化之后，一个异步计算就已经开始；一般情况，我们会为Future注册相关的回调，要么是对正常的返回值进行处理，要么是对异常进行处理。同样以源码入手。
 
@@ -218,7 +217,7 @@ sumResult onComplete {
 
 ![dispatchOrAddCallback](/static/images/charts/2015-09-24/dispatchOrAddCallback.png)
 
-#### 1. DefaultPromise.onComplete
+#### 1.3.1 DefaultPromise.onComplete
 
 ```scala
 def onComplete[U](func: Try[T] => U)
@@ -229,7 +228,7 @@ def onComplete[U](func: Try[T] => U)
 }
 ```
 
-#### 1.1 scala.concurrent.impl.CallbackRunnable
+#### 1.3.2 scala.concurrent.impl.CallbackRunnable
 
 因为Java中Runnable的实现(run方法)默认是返回空的，所以此处基于Runnable再实现了一个，主要的目的是为了注入回调，让Future完成之后执行该回调。
 
@@ -267,7 +266,7 @@ class CallBackRunnable(
 }
 ```
 
-#### 1.2 DefaultPromise.dispatchOrAddCallback
+#### 1.3.3 DefaultPromise.dispatchOrAddCallback
     
 这个方法的主要目的是获取Future的状态，从而决定是执行回调还是将回调转移给根Promise。注意这个过程中**`Future`**的执行会导致**`Promise`**的状态发生变化，也就是前面提到的**`PromiseCompletingRunnable中的run方法`**。 以sumFuture为例。
 
@@ -287,17 +286,17 @@ private def dispatchOrAddCallback(runnable: Runnable): Unit = {
   }
 ```
 
- 前面提到过，**DefaultPromise**的状态有三种情况，在**执行回调函数的线程上**(Future运行和回调执行是不同的线程)通过取Future的状态来决定如何操作
- 
-  + **Try[T]** 
-    表示已经执行完了，可以开始执行回调函数，这个比较好理解。**CallbackRunnable**的**executeWithValue**被调用，触发**run**方法，从而执行**onComplete**中注册的回调。
+前面提到过，**DefaultPromise**的状态有三种情况，在**执行回调函数的线程上**(Future运行和回调执行是不同的线程)通过取Future的状态来决定如何操作
 
-  + **DefaultPromise[_]**(一般是调用了map, flatMap生成了新的DefaultPromise)，
-    这里涉及到链向根DefaultPromise的过程(会在后续的更新中补充)
++ **Try[T]** 
+  表示已经执行完了，可以开始执行回调函数，这个比较好理解。**CallbackRunnable**的**executeWithValue**被调用，触发**run**方法，从而执行**onComplete**中注册的回调。
 
-  + **List[CallbackRunnable]**，
-    Future的初始状态是**Nil(List[CallbackRunnable])**，<b style="color:red"> 如果执行回调函数的线程在执行的时候，Future的执行并没有结束就会将Future的状态更新为List[CallbackRunnable]， 实际上注册了一个监听器(在Future执行完成之后做什么)</b>。代码中如果状态更新成功，什么都没做，返回值是**`()`**。
-   由于Future执行线程和回调函数执行线程共享Future的状态，所以  在**`tryCompleteAndGetListeners`**中也能捕获到状态的变化然后进入不同的操作。
++ **DefaultPromise[_]**(一般是调用了map, flatMap生成了新的DefaultPromise)，
+  这里涉及到链向根DefaultPromise的过程(会在后续的更新中补充)
+
++ **List[CallbackRunnable]**，
+  Future的初始状态是**Nil(List[CallbackRunnable])**，<b style="color:red"> 如果执行回调函数的线程在执行的时候，Future的执行并没有结束就会将Future的状态更新为List[CallbackRunnable]， 实际上注册了一个监听器(在Future执行完成之后做什么)</b>。代码中如果状态更新成功，什么都没做，返回值是**`()`**。
+ 由于Future执行线程和回调函数执行线程共享Future的状态，所以  在**`tryCompleteAndGetListeners`**中也能捕获到状态的变化然后进入不同的操作。
   
 
 至此，一个最基本的Future初始化以及注册回调并收集结果的流程就走完了(对于，状态为DefaultPromise的情况会在后续的更新中完成)。
