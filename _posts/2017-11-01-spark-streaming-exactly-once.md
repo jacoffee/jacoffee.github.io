@@ -64,11 +64,11 @@ cp_.graph.restoreCheckpointData()
 
 上面提到过，如果Offset被checkpoint之后，任务执行失败了，由于Spark是分partition计算的，可能一部分数据已经落入存储了，那么batch重新计算的时候，就可能会产生重复数据，所以需要我们自己手动控制。
 
-+ ElasticSearch
+### 2.1 ElasticSearch
 
 在ES中，如果ID相同，则会直接更新，借助这一特性，我们可以为每一条记录分配**唯一的ID**，这样即使batch重算，也不会出现重复数据。
 
-+ 数据库
+### 2.2 数据库
 
 由于我们在批次中checkpoint了相关的信息，比如说批次时间，批次对应的offset等，所以在重算或者恢复的时候，这些信息依然可以获得，结合partitionId便可以构成当前批次的唯一标识。
 
