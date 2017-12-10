@@ -4,7 +4,7 @@ category: elasticsearch
 date: 2017-11-26 06:30:55 UTC
 title: 关于Elasticsearch中phrase query使用的一点总结
 tags: []
-permalink: /elasticsearch/phrase-query
+permalink: /search/elasticsearch/phrase-query
 key: 
 description: 本文通过Elasticsearch sql中的A=B查询条件的延伸，阐述了phrase query中使用需要注意的地方
 keywords: [Go-to search, 分词, Term, Term position]
@@ -12,7 +12,7 @@ keywords: [Go-to search, 分词, Term, Term position]
 
 今天在排查一个Elasticsearch sql查询问题时发现了phrase query使用过程中的一个问题，基本描述如下:
 
-索引中某个属性A(**ik_max_word**分词)有下面一条记录:
+索引中某个属性A([ik_max_word分词](https://github.com/medcl/elasticsearch-analysis-ik))有下面一条记录:
 
 ```bash
 %VIP%宣布鲁炜落马同一天 中纪委还发出另一个强烈信号
