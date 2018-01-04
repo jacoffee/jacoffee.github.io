@@ -12,7 +12,7 @@ keywords: [JDBCType, DataType, LogicalRelation]
 
 之前用过Dataframe来读取MongoDB，PG，总体来说还算比较顺利。但今天在读写Oracle的时候却发现了一些问题，因此跟踪了一下源码顺便将基本的用法和背后的原理整理了一下(spark version=1.6.2)。
 
-首先对于`DataFrame on Oracle`，要么就不用，要么就采用Spark 2.0及以上的版本，不然的话在<b style="color:red">Spark DataType到JDBCType的映射上会有问题</b>。
+首先对于**DataFrame on Oracle**，要么就不用，要么就采用Spark 2.0及以上的版本，不然的话在<b style="color:red">Spark DataType到JDBCType的映射上会有问题</b>。
 
 ```scala
 // spark 1.6
@@ -94,6 +94,8 @@ saveTable()
 也就是通过某种条件将Record进行分组，然后放入不同的分区。目前可以按照**某个Column的上下界(必须是整型)结合分区数**或者是提供一系列<b style="color:red">互斥的查询条件</b>进行划分。
 
 以Column上下界为例，最简单的逻辑就是lowerBound按照步长`(upperBound - lowerBound) / numPartitions`往上累计，每累计一次作为一次查询条件。
+通过下面的where查询条件，我们可以得知<b style="color:red">这种方式实际上将整表都取出来了</b>，所以在使用的时候需要注意。
+
 
 ```scala
 sqlc.read.jdbc(url, tableName, "COLUMNNAME", 1, 96, 10, dbProps)
@@ -116,7 +118,10 @@ List(
 它还有一个重载接口: 
 
 ```scala
-def jdbc(url: String, table: String,predicates: Array[String], connectionProperties: Properties): DataFrame
+def jdbc(
+  url: String, table: String, 
+  predicates: Array[String], connectionProperties: Properties
+): DataFrame
 ```
 
 由于这个查询条件是用于划分分区的，所以应该是互斥的。
