@@ -99,7 +99,8 @@ getOrCompute
 import org.apache.spark.rdd.RDD
 
 private[spark] var checkPointData: Option[RDDCheckpointData[T]] = None
-// RDD调用该方法的时候，给checkPointData赋值
+// RDD调用该方法的时候，给checkPointData赋值， 此时并没有真正的检出，而是设置了一种状态。
+// 因为在该方法被调用的时候，RDD刚刚被构建好，所以计算逻辑还没有执行
 def checkpoint() {
     ...
     checkPointData = Some(new ReliableRDDCheckpointData(this))
