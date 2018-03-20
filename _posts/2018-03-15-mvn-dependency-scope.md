@@ -34,6 +34,7 @@ abstract class Node extends NodeSeq {
 }
 ```
 
+
 ```xml
 <!-- XML node ->
 <dependency xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
