@@ -37,7 +37,9 @@ abstract class Node extends NodeSeq {
 
 ```xml
 <!-- XML node ->
-<dependency xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
+<dependency
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://maven.apache.org/POM/4.0.0">
   <groupId>org.apache.spark</groupId>
   <artifactId>spark-sql_2.10</artifactId>
   <version>1.6.2</version>
@@ -127,7 +129,7 @@ def mvnPackage(pomPath: String) = {
 }
 ```
 
-虽然，本文中提到的方法实用性并不是太高，但这种解决问题的方式个人觉得还是挺有意思的，在此过程中，进一步熟悉了Scala XML操作、Java中代码中操作Process等知识点。完整版代码，请参照[]()
+虽然，本文中提到的方法实用性并不是太高，但这种解决问题的方式个人觉得还是挺有意思的，在此过程中，进一步熟悉了Scala XML操作、Java中代码中操作Process等知识点。完整版代码，请参照[Build.scala](https://github.com/jacoffee/codebase/blob/master/src/main/scala/com/jacoffee/codebase/Build.scala)
 
 ## 参考
 
