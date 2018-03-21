@@ -128,3 +128,10 @@ private static void registerShutdownHook(ZooKeeper zk) {
 ```
 
 本质上，自己借助Zookeeper实现分布式锁，只是为了理解官网提到的实现机制。在实际开发中，如果遇到需要使用分布式锁的场景，不妨尝试一下[apache curator](http://curator.apache.org/curator-recipes/shared-reentrant-read-write-lock.html)，Zookeeper的客户端框架，有点类似于Guava之于Java。另外需要注意，[Curator和Zookeeper版本兼容问题](https://stackoverflow.com/questions/35734590/apache-curator-unimplemented-errors-when-trying-to-create-znodes)。
+
+
+## 参考
+
+\> [分布式锁实现](https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html)
+
+\> [twitter commons 通过Zookeeper实现分布式锁](https://github.com/twitter/commons/blob/master/src/java/com/twitter/common/zookeeper/DistributedLockImpl.java)
