@@ -16,56 +16,44 @@
     <!--[if lt IE 9]>
     <script src="{{ site.url }}/static/js/html5.js" type="text/javascript"></script>
     <![endif]-->
+    <meta name="baidu-site-verification" content="edRhhAm9Mo" />
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" class="home blog lotus index">
     <nav class="lotus-nav">
         <ul>
-            {% for link in site.nav %} 
-                {% assign active = nil %} 
-                {% assign homeClass = nil %} 
-                {% if page.url == link.url %} 
-                    {% assign active = 'current' %} 
-                {% endif %} 
-                {% if link.class == 'home' %} 
-                    {% assign homeClass = 'home ' %} 
-                {% endif %}
+            {% for link in site.nav %} {% assign active = nil %} {% assign homeClass = nil %} {% if page.url == link.url %} {% assign active = 'current' %} {% endif %} {% if link.class == 'home' %} {% assign homeClass = 'home ' %} {% endif %}
             <li class="{{ homeClass }}{{ active }}">
                 <a href="{{ link.url }}" rel="bookmark" title="{{link.text}}">
                     <i class="{{ link.icon }}"></i>
-                </a>
-                {{ indicator }}
+                </a> {{ indicator }}
             </li>
             {% endfor %}
         </ul>
     </nav>
-
     {{ content }}
-
-
     <footer class="lotus-footer">
         <p>©2018 allen with website template from <a href="https://github.com/pizn/iLotus" target="_blank">iLotus</a> </p>
     </footer>
     <script src="{{ site.url }}/static/js/jquery.js" type="text/javascript"></script>
     <script src="{{ site.url }}/static/js/jquery.scrollTo.js" type="text/javascript"></script>
     <script src="{{ site.url }}/static/js/iLotus.js" type="text/javascript"></script>
-    <!--
-    多说公共JS代码 start (一个网页只需插入一次)
+    <div id="SOHUCS" sid="1212121" ></div> 
     <script type="text/javascript">
-        var duoshuoQuery = {
-            short_name: "roadtopro"
-        };
-        (function() {
-            var ds = document.createElement('script');
-            ds.type = 'text/javascript';
-            ds.async = true;
-            ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-            ds.charset = 'UTF-8';
-            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
-        })();
+    (function() {
+        var appid = 'cytyUeetR';
+        var conf = 'prod_7e31b74034cc04095e2432d10be76fe2';
+        var width = window.innerWidth || document.documentElement.clientWidth;
+        if (width < 960) {
+            window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="http://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>');
+        } else { var loadJs = function(d, a) { var c = document.getElementsByTagName("head")[0] || document.head || document.documentElement; var b = document.createElement("script");
+                b.setAttribute("type", "text/javascript");
+                b.setAttribute("charset", "UTF-8");
+                b.setAttribute("src", d); if (typeof a === "function") { if (window.attachEvent) { b.onreadystatechange = function() { var e = b.readyState; if (e === "loaded" || e === "complete") { b.onreadystatechange = null;
+                                a() } } } else { b.onload = a } } c.appendChild(b) };
+            loadJs("http://changyan.sohu.com/upload/changyan.js", function() { window.changyan.api.config({ appid: appid, conf: conf }) }); }
+    })();
     </script>
-    多说公共JS代码 end
-    -->
 </body>
 
 </html>
