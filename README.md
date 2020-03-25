@@ -7,8 +7,6 @@ scala, java, python, lift, mongo, lucene.....
 **The system is under MIT Agreement**
 
 #### Other Tools Used
-+ **DNSPod**: DNS Resolution and accelerating
-+ **Duoshuo**: Comment plugin 
 + **iLotus**: A Jekyll theme developed by [掌心](http://www.zhanxin.info/jekyll/2014-01-04-another-jekyll-theme-ilotus.html)
 + **[jekyll-pygments-themes](https://github.com/jwarby/jekyll-pygments-themes)**: For code snippets highlighting
 
