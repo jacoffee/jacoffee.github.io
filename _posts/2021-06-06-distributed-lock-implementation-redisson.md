@@ -14,42 +14,39 @@ keywords: [分布式锁，事务，Redisson]
 
 我们知道`java.util.concurrent.locks.Lock` 定义了Java中实现显示锁的规范，而Redisson中的Lock实现了它，因此我们可以通过lock和unlock来加锁和释放，非常简洁和方便。
 
-```
- # Redis使用环境
- master: redis-cli -h xxxxxx -a xxxxxx
- slave: redis-cli -h xxxxxx -a xxxxxx
-  public static void main(String[] args) {
-         Config config = new Config();
-         // use "rediss://" for SSL connection
-         MasterSlaveServersConfig masterSlaveServersConfig = config.useMasterSlaveServers();
-         masterSlaveServersConfig
-                 .setPassword("xxxxxx")
-                 .setDatabase(30)
-                 .setMasterConnectionPoolSize(10)
-                 .setMasterConnectionMinimumIdleSize(10)
-                 .setMasterAddress("redis://xxxxxx:6379")
-                 .addSlaveAddress("redis://xxxxxx:6379");
- 
-         RedissonClient redissonClient = Redisson.create(config);
-         RLock rlock = redissonClient.getLock("jacoffee-lock");
-         try {
-             // 对应的数据库会创建名为jacoffee-lock，类型为none
-             rlock.lock();
-             System.out.println(getIpAddress() + " get the lock");
-             TimeUnit.SECONDS.sleep(20);
-         } catch (SocketException | InterruptedException e) {
-             e.printStackTrace();
-         } finally {
-             rlock.unlock();
-         }
+```java
+public static void main(String[] args) {
+     Config config = new Config();
+     // use "rediss://" for SSL connection
+     MasterSlaveServersConfig masterSlaveServersConfig = config.useMasterSlaveServers();
+     masterSlaveServersConfig
+         .setPassword("xxxxxx")
+         .setDatabase(30)
+         .setMasterConnectionPoolSize(10)
+         .setMasterConnectionMinimumIdleSize(10)
+         .setMasterAddress("redis://xxxxxx:6379")
+         .addSlaveAddress("redis://xxxxxx:6379");
+
+     RedissonClient redissonClient = Redisson.create(config);
+     RLock rlock = redissonClient.getLock("jacoffee-lock");
+     try {
+         // 对应的数据库会创建名为jacoffee-lock，类型为none
+         rlock.lock();
+         System.out.println(getIpAddress() + " get the lock");
+         TimeUnit.SECONDS.sleep(20);
+     } catch (SocketException | InterruptedException e) {
+         e.printStackTrace();
+     } finally {
+         rlock.unlock();
      }
+}
 ```
 
 通过debug,  我们可以从上面这段简单代码得出如下信息:
 
 + **rlock.lock()**方法成功获取锁之后，会在对应的Redis数据库创建类型为**hash，key为jacoffee-lock**，键值对为**f9d9be78-5d47-4975-b95e-da0753d2b0c2:1 ----> 1**
 
-```
+```bash
  xxxxxx:6379[30]> type 'jacoffee-lock'
  hash
  xxxxxx:6379[30]> hgetall "jacoffee-lock"
@@ -59,7 +56,7 @@ keywords: [分布式锁，事务，Redisson]
 
 + 由于debug导致主进程阻塞，有可能导致锁过期，最后再去检查的时候，会报当前线程未持有锁，也就是`释放锁的时候的身份验证`
 
-```
+```java
  Exception in thread "main" java.lang.IllegalMonitorStateException: attempt to unlock lock, not locked by current thread by node id: ecdd57d7-a505-42f4-867b-c9c35ba1f2d8 thread-id: 1
      at org.redisson.RedissonBaseLock.lambda$unlockAsync$1(RedissonBaseLock.java:312)
      at org.redisson.misc.RedissonPromise.lambda$onComplete$0(RedissonPromise.java:187)
@@ -85,7 +82,7 @@ keywords: [分布式锁，事务，Redisson]
 
 首先， 判断jacoffee-lock这个可以是否存在， 如果不存在则尝试添加key-value对(UUID:threadId -- 1),   成功则获取锁； 如果jacoffee-lock这个key存在，则`尝试更新获取锁的次数(可重入实现)`，成功则获取锁，反之则失败, 返回当前hash key的ttl。
 
-```
+```java
  -- 核心的lua脚本
  -- KEYS[1] jacoffee-lock
  -- ARGV[1] 30s
