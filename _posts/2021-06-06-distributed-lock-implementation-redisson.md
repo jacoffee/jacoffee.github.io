@@ -10,8 +10,6 @@ description: 本文主要剖析Redisson分布式锁实现的原理
 keywords: [分布式锁，事务，Redisson]
 ---
 
-[TOC]
-
 # 1. 基本使用
 
 我们知道`java.util.concurrent.locks.Lock` 定义了Java中实现显示锁的规范，而Redisson中的Lock实现了它，因此我们可以通过lock和unlock来加锁和释放，非常简洁和方便。
@@ -227,7 +225,7 @@ return 0;
 
 与获取锁相对应的，就是锁的释放，也是分布式锁设计中很重要的环节，主要分为**主动释放**和**被动释放**
 
-+ 主动释放
+## 6.1 主动释放
 
 调用unlock方法，移除对应的hash key,  `特别要注意身份检查`，只有当前锁的持有者才有资格删除;  `可重入锁的释放`,  每调用一次unlock,  将相应的field值减1，只到为0才算彻底释放
 
@@ -251,15 +249,15 @@ end;
 return nil;
 ```
 
-+ 被动释放
+## 6.2 被动释放
 
 设置过期时间的情况下，Redis key自动到期然后释放锁;  没有设置过期时间的情况下，客户端down掉，续期的任务自动终止，最终key因为续期设置过期时间(internalLockLeaseTime)到了之后同样过期；
 
 # 7. 参考
 
-> [Redisson官网](https://redisson.org/)
+\> [Redisson官网](https://redisson.org/)
 
-> [Redisson实战 分布式对象](https://github.com/redisson/redisson/wiki/7.-Distributed-collections)
+\> [Redisson实战 分布式对象](https://github.com/redisson/redisson/wiki/7.-Distributed-collections)
 
 
 
