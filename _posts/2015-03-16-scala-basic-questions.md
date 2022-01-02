@@ -10,9 +10,9 @@ description: "本文收集一些Scala基本问题的解答"
 keywords: [修饰符]
 ---
 
-### 类和对象
+## 1.类和对象
 
-(1) **作为属性修饰符，private[this]和private的区别**
+### 1.1 作为属性修饰符，private[this]和private的区别
 
 ```scala
 class Foo {
@@ -44,7 +44,7 @@ public int iThing() { return i() * i(); }
 public int jThing() { return this.j * this.j; }
 ```
 
-(2) **case object与object的区别**
+### 1.2 case object与object的区别
 
 ```scala
 case object Message
@@ -67,7 +67,15 @@ public final class Message$ implements Product, Serializable {
 }
 ```
 
-### 命令行技巧
+### 1.3 this与this.type的区别
+
+```scala
+def -= (s: String): this.type  = { remove(s); this }
+```
+
+this -- 当前对象的引用
+
+## 2.命令行技巧
 
 (1) `:paste`, `:kind`, `:type`, `:settings`, `:javap`等命令使用
 
