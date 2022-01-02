@@ -2,7 +2,7 @@
 layout: post
 category: distribution
 date: 2018-03-17 15:29:03 UTC
-title: 基于Zookeeper的分布式锁实现研究
+title: 【分布式锁实战】Zookeeper分布式锁实现剖析
 tags: [分布式锁，事务，critical section，监视器锁]
 permalink: /zookeeper/distributed-locks-implementation
 key:
@@ -132,6 +132,6 @@ private static void registerShutdownHook(ZooKeeper zk) {
 
 ## 参考
 
-\> [分布式锁实现](https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html)
+> [分布式锁实现](https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html)
 
-\> [twitter commons 通过Zookeeper实现分布式锁](https://github.com/twitter/commons/blob/master/src/java/com/twitter/common/zookeeper/DistributedLockImpl.java)
+> [twitter commons 通过Zookeeper实现分布式锁](https://github.com/twitter/commons/blob/master/src/java/com/twitter/common/zookeeper/DistributedLockImpl.java)
