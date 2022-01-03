@@ -68,7 +68,6 @@ article.lotus-post table {
     border-collapse: collapse;
     border-spacing: 0;
     width: 100%;
-    margin-left: 20px;
 }
 
 article.lotus-post table td p {
@@ -846,7 +845,7 @@ h1, h2, h3, h4, h5, h6 {
 
 @media only screen and (min-width: 1440px) {
     .lotus {
-        width: 1024px;
+        width: 1200px;
     }
     .lotus-post {
 /*        -moz-column-count: 2;
@@ -859,7 +858,6 @@ h1, h2, h3, h4, h5, h6 {
         column-gap: 3em;
         column-rule: #c8c8c8 1px dotted;
 */    
-        width: 1200px;    
     }
 }
 /*************************
