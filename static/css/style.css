@@ -192,24 +192,22 @@ p img {
 }
 
 div.highlight,div.highlighter-rouge {
-    padding: 0.5em 0.1em 0.1em 0.1em;
-    margin: 0 0 10px 25px;
-    border-radius: 0px 2px 2px 0;
+    padding: 0.2em;
+    border-radius: 2px;
 }
 h2.highlight, b.highlight {
     color: #0077bb; /* 将标题改为蓝色 */
 }
 
-pre, code {
-    overflow-wrap: break-word;
-    word-wrap: break-word;
+pre {
+    white-space: pre-wrap;
 }
 
 code {
-    color: #4d4d4d;
+    color: rgb(0, 160, 160);
     /* background: rgba(215, 215, 215, 0.9); */
     border: 0px solid #bdbdbd;
-    font-weight: bold;
+    /*font-weight: bold;*/
 }
 small {
     font-size: 12px;
@@ -337,8 +335,8 @@ li[class^="icon-"].icon-large:before, li[class*=" icon-"].icon-large:before {
 *************************/
 
 .lotus p, .lotus ul, .lotus ol, .lotus dl, .lotus form, .lotus hr, .lotus table, .lotus-p, .lotus-pre, .lotus-ul, .lotus-ol, .lotus-dl, .lotus-form, .lotus-hr, .lotus-table {
-    margin-bottom: 5px;
-    margin-top: 5px;
+    margin-bottom: 2px;
+    margin-top: 2px;
     vertical-align: middle;
 }
 
@@ -860,7 +858,9 @@ h1, h2, h3, h4, h5, h6 {
         column-count: 2;
         column-gap: 3em;
         column-rule: #c8c8c8 1px dotted;
-*/    }
+*/    
+        width: 1200px;    
+    }
 }
 /*************************
  * iPad
@@ -953,11 +953,6 @@ h1, h2, h3, h4, h5, h6 {
 /**
  * for post img
  */
-
-pre code {
-    background: none;
-    border: none;
-}
 pre.prettyprint {
     font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
     background: rgba(255, 255, 255, 0.5);
