@@ -39,8 +39,8 @@ Author: original Style by 展新(pizner@gmail.com) and modified by Allen(3615416
 *************************/
 
 html {
-    color: #424242;
-    background: #f3f2ee;
+    color: #333;
+    background: #fcfcfc;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
 }
@@ -52,9 +52,11 @@ textarea, p, blockquote, th, td, hr, button, article, aside, details, figcaption
 article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
     display: block;
 }
+/*
 article.lotus-post p {
     text-indent: 20px;
 }
+*/
 audio, canvas, video {
     display: inline-block;
 }
@@ -186,7 +188,7 @@ mark {
     background: #FFFB99;
 }
 p img {
-  max-width: 90%;
+  max-width: 100%;
 }
 
 div.highlight,div.highlighter-rouge {
@@ -199,12 +201,13 @@ h2.highlight, b.highlight {
 }
 
 pre, code {
-    overflow-x: auto;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
 code {
     color: #4d4d4d;
-    background: rgba(215, 215, 215, 0.9);
+    /* background: rgba(215, 215, 215, 0.9); */
     border: 0px solid #bdbdbd;
     font-weight: bold;
 }
@@ -334,7 +337,8 @@ li[class^="icon-"].icon-large:before, li[class*=" icon-"].icon-large:before {
 *************************/
 
 .lotus p, .lotus ul, .lotus ol, .lotus dl, .lotus form, .lotus hr, .lotus table, .lotus-p, .lotus-pre, .lotus-ul, .lotus-ol, .lotus-dl, .lotus-form, .lotus-hr, .lotus-table {
-    margin-bottom: 1em;
+    margin-bottom: 5px;
+    margin-top: 5px;
     vertical-align: middle;
 }
 
@@ -374,8 +378,8 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 1.8em;
 }
 .lotus h2, .lotus-h2 {
-    font-size: 1.6em;
-    margin-left: 20px;
+    font-size: 1.4em;
+    /*margin-left: 20px;*/
 }
 .lotus h3, .lotus-h3 {
     font-size: 1.4em;
