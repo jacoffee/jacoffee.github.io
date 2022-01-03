@@ -369,7 +369,7 @@ h1, h2, h3, h4, h5, h6 {
     color: #333;
 }
 .lotus h1, .lotus h2, .lotus h3, .lotus h4, .lotus h5, .lotus h6, .lotus-h1, .lotus-h2, .lotus-h3, .lotus-h4, .lotus-h5, .lotus-h6 {
-    margin-bottom: 0.4em;
+    margin-bottom: 0.2em 0em 0.2em 0em;
     line-height: 1.5;
 }
 .lotus h1, .lotus-h1 {
