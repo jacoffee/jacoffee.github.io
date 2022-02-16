@@ -24,16 +24,16 @@ keywords: [消息队列，Kafka，生产者，内存池]
 
 + **nonPooledAvailableMemory**: 非池化内存
 
-+ **free: Deque<ByteBuffer>**: 可用的内存队列，由一个个分配好大小的Bytebuffer组成。 
++ `free: Deque<ByteBuffer>`: 可用的内存队列，由一个个分配好大小的Bytebuffer组成
 
-+ **waiters: Deque<Condition>**: 等待可用内存空间的条件队列
++ `waiters: Deque<Condition>`: 等待可用内存空间的条件队列
 
 + **lock: ReentrantLock**:  用来控制多线程同时进行资源申请时候的内存分配
 
 
 关于池化和非池化内存的概念，下面会进一步解释。
 
-# 3.  实现剖析
+# 3. 实现剖析
 
 对于内存池而言，核心功能就两个: **处理内存申请请求和内存释放请求**
 
