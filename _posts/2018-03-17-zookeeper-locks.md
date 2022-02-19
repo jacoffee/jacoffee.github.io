@@ -132,6 +132,6 @@ private static void registerShutdownHook(ZooKeeper zk) {
 
 ## 参考
 
-> [分布式锁实现](https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html)
+\> [分布式锁实现](https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html)
 
-> [twitter commons 通过Zookeeper实现分布式锁](https://github.com/twitter/commons/blob/master/src/java/com/twitter/common/zookeeper/DistributedLockImpl.java)
+\> [twitter commons 通过Zookeeper实现分布式锁](https://github.com/twitter/commons/blob/master/src/java/com/twitter/common/zookeeper/DistributedLockImpl.java)

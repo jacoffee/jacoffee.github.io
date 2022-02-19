@@ -91,7 +91,6 @@ iframe {
 }
 blockquote {
     padding: 0.5em 1em 0.1em 1em;
-    margin: 0 0 10px 20px;
     background: rgba(214, 214, 214, 0.5);
     border-width: 1px 1px 1px 0.4em;
     border-color: #d8d8d8 #d8d8d8 #d8d8d8 #d0d0d0;
@@ -340,9 +339,10 @@ li[class^="icon-"].icon-large:before, li[class*=" icon-"].icon-large:before {
 }
 
 .lotus blockquote p {
-    margin-bottom: 0.4em;
+    /* margin-bottom: 0.4em; */
     text-indent: -1em;
 }
+/*
 .lotus blockquote p:before {
     content: "“";
     font-size: 30px;
@@ -362,6 +362,7 @@ li[class^="icon-"].icon-large:before, li[class*=" icon-"].icon-large:before {
     overflow: hidden;
     top: 5px;
 }
+*/
 h1, h2, h3, h4, h5, h6 {
     font-weight: 500;
     font-weight: 700\9;
