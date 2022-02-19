@@ -1,7 +1,7 @@
 ---
 layout: post
 category: java
-date: 2021-06-06 15:29:03 UTC
+date: 2017-12-06 15:29:03 UTC
 title: 【Java基础】Comparator vs Comparable
 tags: [排序，比较函数，Comparator，Comparable]
 permalink: /java/oop/comparator-comparable
