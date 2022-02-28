@@ -98,5 +98,3 @@ byteBuffer.put(fileInfo.getContent());
 # 4. 参考
 
 \> [mp TCP拆包与粘包](https://mp.weixin.qq.com/s/cdJ7LbH-_uVWz9BZgOuMtg)
-
-\> [blog Sticky packets water pipe metaphor](
