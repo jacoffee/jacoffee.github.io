@@ -12,14 +12,9 @@ keywords: [TCP协议，粘包拆包]
 
 # 1. 粘包与拆包(sticky packet)
 
-首先外文文档中是没有拆包这个概念，只有粘包的概念。 本质上是由于TCP是**流式协议(stream protocol)**，可以将TCP协议类比成一根水管。A向B分两次分别运输了2升水, TCP协议保障：
+首先外文文档中是没有拆包这个概念，只有粘包的概念。 本质上是由于TCP是**流式协议(stream protocol)**，可以将TCP协议类比成一根水管。A向B分两次分别运输了2升水, TCP协议保证： 水一定是按照顺序抵达B、 到达B的水的容量一定是等于A发送出去的。
 
-+ 水一定是按照顺序抵达B
-+ 到达B的水的容量一定是等于A发送出去的
-
-但发送过程中可能有延迟， 运输的可能会将水管的中的水进行合并(The pipe may **merge multiple segments of water streams** because of the nature of water pipe)。
-
-正是由于对TCP Segment的合并，所以导致发送出去的数据被合并，这就是所谓的**粘包**。 显著的影响就是小文件系统中多个客户端同时向一个server发送 上传图片的请求，不同图片的字节可能被合并后发送过去了，所以解析时需要做额外处理。相较于UDP是基于packet的协议，数据总是packet为单位，统一发送。
+运输过程中可能会将水管的中的水进行合并(The pipe may **merge multiple segments of water streams** because of the nature of water pipe)。正是由于对TCP Segment的合并，所以导致发送出去的数据被合并，这就是所谓的**粘包**。 显著的影响就是小文件系统中多个客户端同时向一个server发送 上传图片的请求，不同图片的字节可能被合并后发送过去了，所以解析时需要做额外处理。相较于UDP是基于packet的协议，数据总是packet为单位，统一发送。
 
 # 2. 如何解决
 
