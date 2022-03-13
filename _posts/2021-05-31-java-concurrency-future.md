@@ -14,10 +14,10 @@ keywords: [异步执行、Future、FutureTask]
 
 Future的出现与异步计算是密不可分的，它代表着异步计算的结果。同时提供了**检测计算是否完成**、**阻塞等待完成**以及**取回计算完成的结果**等方法。它的核心实现可以概括为如下几点:
 
-1. 提交任务的线程和获取状态的线程可能不同
-2. 内部维护state，记录任务指定的不同状态，运行中、执行完以及取消等，以对外提供状态检查的功能 `isDonde`、`isCancelled`
-3. 内部维护当前执行任务线程runner，通过CAS设置，避免多个线程同时执行同一个任务同时也可以作为任务取消打断的线程
-4. 内部维护链表记录等待线程，以实现在指定时间内等待任务完成的操作 `get(long timeout, TimeUnit unit)`
++ 提交任务的线程和获取状态的线程可能不同
++ 内部维护state，记录任务指定的不同状态，运行中、执行完以及取消等，以对外提供状态检查的功能 `isDonde`、`isCancelled`
++ 内部维护当前执行任务线程runner，通过CAS设置，避免多个线程同时执行同一个任务同时也可以作为任务取消打断的线程
++ 内部维护链表记录等待线程，以实现在指定时间内等待任务完成的操作 `get(long timeout, TimeUnit unit)`
 
 ![future-task-struture](/static/images/charts/2021-05-13/future-task-struture.png)
 
@@ -168,13 +168,10 @@ public void run() {
 ```
 
 
-1. 通过线程池提交的Runnable会被转换成Callable, 只不过返回值为null。`new FutureTask<T>(runnable, null)`
-
-2. 线程执行的任务的时候，触发FutureTask的run()方法
-
-3. 首先**尝试CAS设置自己为当前执行任务的线程**，成功则开始执行真正的逻辑
-
-4. 任务执行完成之后，CAS设置**state=NORMAL**，异常则设置**state=EXCEPTIONAL**
++ 通过线程池提交的Runnable会被转换成Callable, 只不过返回值为null。`new FutureTask<T>(runnable, null)`
++ 线程执行的任务的时候，触发FutureTask的run()方法
++ 首先**尝试CAS设置自己为当前执行任务的线程**，成功则开始执行真正的逻辑
++ 任务执行完成之后，CAS设置**state=NORMAL**，异常则设置**state=EXCEPTIONAL**
 
 
 ## 3.2 get(timeout, Timeunit) -- 等待执行结果处理，最多多长时间

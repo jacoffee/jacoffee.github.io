@@ -416,10 +416,9 @@ h1, h2, h3, h4, h5, h6 {
 .lotus .lotus-tagline .lotus-tagline-catg {
     margin-left: 1em;
 }
-/*.lotus ul, .lotus-ul {
-    margin-left: 1.3em;
+.lotus ul, .lotus-ul {
     list-style: disc;
-}*/
+}
 .lotus-ol {
    list-style: decimal;
    margin-left: 1.9em;
