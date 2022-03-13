@@ -986,6 +986,7 @@ pre.prettyprint {
 }
 #archives .post-list ul li {
     margin: 0 0 5px 0;
+    list-style-type: none;
 }
 #archives .post-list ul li a {
     display: inline-block;
