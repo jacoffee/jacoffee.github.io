@@ -168,7 +168,7 @@ public void run() {
 ```
 
 
-+ 通过线程池提交的Runnable会被转换成Callable, 只不过返回值为null。`new FutureTask<T>(runnable, null)`
++ 通过线程池提交的Runnable会被转换成Callable，只不过返回值为null，`new FutureTask<T>(runnable, null)`
 + 线程执行的任务的时候，触发FutureTask的run()方法
 + 首先**尝试CAS设置自己为当前执行任务的线程**，成功则开始执行真正的逻辑
 + 任务执行完成之后，CAS设置**state=NORMAL**，异常则设置**state=EXCEPTIONAL**

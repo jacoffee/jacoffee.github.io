@@ -119,9 +119,11 @@ address, caption, cite, code, den, em, th, var {
     font-style: normal;
     font-weight: 500;
 }
+
 ul ol,
 ul li {
-    list-style: none;
+    list-style: disc;
+    margin-left: 1em;
 }
 
 ul.item li {
@@ -665,6 +667,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 .lotus-post h3 {
   /* margin-left: 20px; */
+}
+
+.lotus-post ul li {
+    list-style-type: disc;
 }
 .lotus-post .lotus-post-end {
     height: 21px;
