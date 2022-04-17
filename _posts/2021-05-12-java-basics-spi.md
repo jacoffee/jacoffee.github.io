@@ -220,7 +220,7 @@ registerDrivers:
 
 严格来说Spring boot中是**思想类似**并不是真正意义上的SPI机制。它体现在进行自动装配阶段，SpringFactoriesLoader会负责扫描 `META-INF/spring.factories`中配置的EnableAutoConfiguration的实现类。
 
-# 4.  SPI破坏了双亲委派机制嘛？
+# 4. SPI破坏了双亲委派机制嘛？
 
 关于这个问题，随便网上搜帖子可以看到很多人回答是的。但知乎这个帖子[为什么说java spi破坏双亲委派模型？](https://www.zhihu.com/question/49667892)也有人给出了不同的解释。
 
