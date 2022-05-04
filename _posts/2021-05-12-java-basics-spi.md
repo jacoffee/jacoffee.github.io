@@ -10,11 +10,17 @@ description: 本文主要剖析SPI的实现
 keywords: [类加载，SPI]
 ---
 
-SPI(service provider interface) -- 服务提供接口，一种扩展机制，在相应的位置**resources/META-INF/services/**配置接口的实现类，Java通过ServiceLoader去加载这些接口的实现类,  从而实现动态扩展。是一种典型的解耦思想也体现了OOP中的开闭原则(对于扩展开放，对于修改是封闭的)。实际上也是对类加载器"限制"的一种扩展，比如说定义通用规范的DriverManager,  它们在JDK核心包中，但是实现类肯定不能放里面，所以SPI也为加载提供商实现类提供了便利。
+# 1. 是什么
 
-# 1. 使用流程
+SPI(service provider interface) -- 服务提供接口，一种扩展机制。在相应的位置**resources/META-INF/services/**配置接口的实现类，Java通过ServiceLoader去加载这些接口
 
-## 1.1 定义服务接口
+的实现类,  从而实现动态扩展，是一种典型的解耦思想也体现了OOP中的开闭原则(对于扩展开放，对于修改是封闭的)。
+
+另外也是对类加载器"限制"的一种扩展，比如说定义通用规范的DriverManager,  它们在JDK核心包中，但是实现类肯定不能放里面，所以SPI也为加载提供商实现类提供了便利。
+
+# 2. 基本使用
+
+## 2.1 定义服务接口
 
 ```java
 package org.apache.ibatis.jacoffee.spi;
@@ -24,9 +30,9 @@ public interface SQLParserProvider {
 }
 ```
 
-## 1.2 定义服务接口实现类
+## 2.2 定义服务接口实现类
 
-需要无参构造方法
+注意DruidSQLParser和JacoffeeSQLParser都需要无参构造方法
 
 ```java
 public class DruidSQLParser implements SQLParserProvider {
@@ -48,7 +54,7 @@ public class JacoffeeSQLParser implements SQLParserProvider {
 }
 ```
 
-## 1.3 配置实现类
+## 2.3 配置实现类
 
 一般是在**resources**文件下面，新建`META-INF/services/`目录，然后新建服务配置文件, **文件名为服务接口的全限定名**(带package名的) - `org.apache.ibatis.jacoffee.spi.SQLParserProvider`
 
@@ -57,7 +63,7 @@ org.apache.ibatis.jacoffee.spi.impl.JacoffeeSQLParser
 org.apache.ibatis.jacoffee.spi.impl.DruidSQLParser
 ```
 
-## 1.4 测试
+## 2.4 测试
 
 ```java
 ServiceLoader<SQLParserProvider> provider = ServiceLoader.load(SQLParserProvider.class);
@@ -67,9 +73,16 @@ while (iterator.hasNext()) {
 }
 ```
 
-# 2. 源码剖析
+# 3. 底层实现
 
-### 2.1.1 ServiceLoader初始化，将Service类和线程上下文类加载器封装在LazyIterator中
+也就是搞清楚这些实现类是如何被加载的，总结起来:
+
++ 基于迭代器封装加载实现类的逻辑
++ 遍历迭代器，基于实现类无参构造方法进行初始化 -- 所以整个过程是懒加载的
+
+下面的代码部分，只是为了对于上面的流程有进一步认识(不要死抠、不要过度陷到源码中)
+
+## 3.1 ServiceLoader初始化，将Service类和线程上下文类加载器封装在LazyIterator中
 
 ServiceLoader初始化，定义加载Service Provider的类加载器，然后将查找加载逻辑封装在LazyIterator中。初始化的核心方法就是`reload()`。
 
@@ -80,7 +93,7 @@ public void reload() {
 }
 ```
 
-### 2.1.2  ServiceLoader的LazyIterator借助迭代器模式完成类加载
+## 3.2 ServiceLoader的LazyIterator借助迭代器模式完成类加载
 
 如果在自身项目和依赖包同时配置了Service Provider，`优先执行注册本项目中的`，但是依赖包中加载的顺序则不确定。
 
@@ -89,12 +102,13 @@ public void reload() {
 public Iterator<SQLParserProvider> iterator() {
 
     new Iterator<S> {
-            public S next() {
-                if (knownProviders.hasNext())
-                    return knownProviders.next().getValue();
-                // 也就是上面的LazyIterator
-                return lookupIterator.next();
+        public S next() {
+            if (knownProviders.hasNext()) {
+                return knownProviders.next().getValue();
             }
+            // 也就是上面的LazyIterator
+            return lookupIterator.next();
+        }
     }
 
 }
@@ -121,17 +135,19 @@ private class LazyIterator implements Iterator<S> {
 }
 ```
 
-### 2.1.3 用户迭代Iterator的时候，真正触发Service类实例构造
+## 3.3 用户迭代Iterator的时候，真正触发Service类实例构造
 
 当用户的iterator被调用，导致底层的LazyIterator的`nextService()`被调用，这个过程中会生成**类的实例(反射 + 无参构造方法)**，同时缓存下来。从这里反射初始化实例，我们可以看到ServiceLoader机制的一个限制，那就是`实现类必须定义无参数的构造函数`。
 
 > The only requirement enforced by this facility is that **provider classes must have a zero-argument constructor** so that they can be instantiated during loading
 
-# 3. 典型场景
+# 4. 案例分析
 
-## 3.1 JDBC Driver加载
+这部分主要我们主要看看SPI在开源软件或者框架中的使用，以进一步加深理解，这样下一次我们也可以在自己的项目中使用。
 
-JDBC操作数据库时候，有一个必要步骤就是先注册并且加载对应数据库的Driver实现。Java层面提供了统一的操作接口`java.sql.Driver`, 各个厂商各自实现，以操作MySQL为例:
+## 4.1 JDBC Driver加载
+
+JDBC操作数据库时候，有一个必要步骤就是先注册并且加载对应数据库的Driver实现。Java层面提供了统一的操作接口`java.sql.Driver·，各个厂商各自实现，以操作MySQL为例:
 
 ```java
 String url = "jdbc:mysql://localhost:3306/content_center?useSSL=false&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false&useSSL=false";
@@ -216,15 +232,15 @@ registerDrivers:
 3 = {DriverInfo@970} "driver[className=com.mysql.fabric.jdbc.FabricMySQLDriver@598067a5]"
 ```
 
-## 3.2 Spring Boot的SPI机制
+## 4.2 Spring Boot的SPI机制
 
 严格来说Spring boot中是**思想类似**并不是真正意义上的SPI机制。它体现在进行自动装配阶段，SpringFactoriesLoader会负责扫描 `META-INF/spring.factories`中配置的EnableAutoConfiguration的实现类。
 
-# 4. SPI破坏了双亲委派机制嘛？
+# 5. SPI破坏了双亲委派机制嘛？
 
 关于这个问题，随便网上搜帖子可以看到很多人回答是的。但知乎这个帖子[为什么说java spi破坏双亲委派模型？](https://www.zhihu.com/question/49667892)也有人给出了不同的解释。
 
-## 4.1 正方观点
+## 5.1 正方观点
 
 ServiceLoader暴露的加载方法:
 
@@ -237,12 +253,14 @@ public static <S> ServiceLoader<S> load(Class<S> service, ClassLoader loader) {}
 ```
 
 + 一个使用的是当前线程的**上下类加载器(并没有像正常加载那样向上寻找)**，一个使用的参数中的传递的ClassLoader(有可能加载逻辑已经完全改变)
-+ 基于类加载的可见性原则， 也就是**系统类加载器加载的类对于启动类加载器是不见的**。 **SPI的调用方和接口定义方很可能都在Java的核心类库之中**，而实现类交由开发者实现，然而实现类并不会被启动类加载器所加载，**基于双亲委派的可见性原则，SPI调用方无法拿到实现类**。SPI Serviceloader通过线程上下文获取能够加载实现类的Classloader(一般情况下是系统类加载器)，绕过了这层限制，逻辑上打破了双亲委派原则
++ SPI的调用方和接口定义方很可能都在Java的核心类库之中，而实现类交由开发者实现，然而实现类并不会被**启动类加载器所加载**，**基于双亲委派的可见性原则，SPI调用方无法拿到实现类**。SPI Serviceloader通过线程上下文获取能够加载实现类的Classloader(一般情况下是系统类加载器)，绕过了这层限制，逻辑上打破了双亲委派原则
 
-> Visibility principle allows child class loader to see all the classes loaded by parent ClassLoader, but parent class loader can not see classes loaded by child
+> Visibility principle allows child **class loader to see all the classes loaded by parent ClassLoader**, but parent class loader can not see classes loaded by child
+>
+> 类加载器可见性原则的核心内容是: 子类加载器能看到所有父类加载器加载的类，但是反过来却不成立
 
 
-## 4.2 反方观点
+## 5.2 反方观点
 
 在JDBC中加载Driver获取连接的时候:
 
@@ -257,11 +275,13 @@ System.out.println(conn.getClass().getClassLoader());
 
 可以看到Connection是由启动类加载器加载的，JDBC4Connection这个第三方的类是由系统类加载器记载的，这个从逻辑上来看也没有什么问题。启动类加载器肯定不能加载第三方的类。
 
+
+
 其实是与否都不重要，重要的是我们**需要掌握Java类加载机制中的双亲委派机制(parent delegation)以及SPI的用法**。
 
-# 5. 参考
+# 6. 参考
 
-\> [mp 从源码角度，看 Java 是如何实现自己的 SPI 机制的？](https://mp.weixin.qq.com/s/20t_UtNNwXfynbzxpi7p2Q)
+\> [mp 从源码角度，看Java是如何实现自己的SPI机制的？](https://mp.weixin.qq.com/s/20t_UtNNwXfynbzxpi7p2Q)
 
 
 \> [zhihu 为什么说java spi破坏双亲委派模型？](https://www.zhihu.com/question/49667892)
