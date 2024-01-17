@@ -2,7 +2,7 @@
 layout: post
 category: database
 date: 2022-09-27 15:29:03 UTC
-title: 【数据库综述系列】CMU15-445课程数据库bustub综述
+title: 【数据库综述系列】CMU15-445课程数据库Bustub综述
 tags: [OLAP数据库研究、bustub、RowStore]
 permalink: /database/summary/bustub
 key:
@@ -197,19 +197,22 @@ explain SELECT * FROM t1 INNER JOIN t2 ON v1 = v3 where t1.v1 = 100;
 ```bash
 						filter (FilterPlanNode)
                         ||
-						join (HashJoinPlanNode)
+						join (NestedLoopJoinPlanNode)
 
 					/			\
 t1 (SeqScanPlanNode)          t2 (SeqScanPlanNode)
 ```
 
-本优化需要做的就是，在可以进行下推的情况下。 将filter中的具体筛选条件基于是左表的还是右表的，进行拆分，然后合并到t1或者t2的部分，当然有的实现是将filter下移**作为t1或t2的parent**。从树形结构上来看，从顶部向下移动，这也是**该优化被称为下推的原因**。
+本优化需要做的就是，在可以进行下推的情况下。 将filter中的具体筛选条件基于是左表的还是右表的，进行拆分，将filter下移**作为t1或t2的parent**, 当然还可以进一步优化然后合并到作为t1或者t2的一部分。从树形结构上来看，从顶部向下移动，这也是**该优化被称为下推的原因**。
 
 ```bash
     					join (HashJoinPlanNode)
 
 					/				       \
-t1 (SeqScanPlanNode)          t2 (SeqScanPlanNode -- with filter)
+				   /	
+t1 (SeqScanPlanNode)    				filter (FilterPlanNode)      
+												\
+											t2 (SeqScanPlanNode)
 ```
 
 这样在SeqScanExecutor进行执行的时候，就需要检查是否满足相应的条件，满足才会返回一个tuple。 最后通过Explain查看执行计划，也可以很明显的看出，filter条件出现在了左边的SeqScan中。
