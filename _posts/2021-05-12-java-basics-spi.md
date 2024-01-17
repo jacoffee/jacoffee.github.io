@@ -12,9 +12,7 @@ keywords: [类加载，SPI]
 
 # 1. 是什么
 
-SPI(service provider interface) -- 服务提供接口，一种扩展机制。在相应的位置**resources/META-INF/services/**配置接口的实现类，Java通过ServiceLoader去加载这些接口
-
-的实现类,  从而实现动态扩展，是一种典型的解耦思想也体现了OOP中的开闭原则(对于扩展开放，对于修改是封闭的)。
+SPI(service provider interface) -- 服务提供接口，一种扩展机制。在相应的位置**resources/META-INF/services/**配置接口的实现类，Java通过ServiceLoader去加载这些接口的实现类,  从而实现动态扩展，是一种典型的解耦思想也体现了OOP中的开闭原则(对于扩展开放，对于修改是封闭的)。
 
 另外也是对类加载器"限制"的一种扩展，比如说定义通用规范的DriverManager,  它们在JDK核心包中，但是实现类肯定不能放里面，所以SPI也为加载提供商实现类提供了便利。
 
