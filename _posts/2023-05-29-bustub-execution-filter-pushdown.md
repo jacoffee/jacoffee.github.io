@@ -2,15 +2,15 @@
 layout: post
 category: database
 date: 2023-05-29 09:29:03 UTC
-title: 【Bustub】执行层优化之Filter Pushdown In Join
+title: 【BusTub】执行层优化之Filter Pushdown In Join
 tags: [数据库执行层、Filter Pushdown]
 permalink: /bustub/execution/filter-pushdown
 key:
-description: 本文介绍了在Bustub中实现filter-pushdown
+description: 本文介绍了在BusTub中实现filter-pushdown
 keywords: [数据库执行层、Filter Pushdown]
 ---
 
-在《【数据库综述系列】CMU15-445课程数据库Bustub综述》中我们对于Bustub进行了概述，本文我们将针对查询优化中的Filter Pushdown In Join进行展开讲解。
+在《【数据库综述系列】CMU15-445课程数据库BusTub综述》中我们对于BusTub进行了概述，本文我们将针对查询优化中的Filter Pushdown In Join进行展开讲解。
 
 假设我们在基础的Join(就是INNER JOIN，以及LEFT & RIGHT JOIN)实现这个优化的话，需要考虑如下问题:
 
@@ -20,7 +20,7 @@ keywords: [数据库执行层、Filter Pushdown]
 + 满足什么样条件的比较表达式才可以下推，比如说`left.columnA > right.columnB` 这种可以下推嘛？
 + 下推的时候，如何确定查询列下推的表， 比如说`left.columnA > 1 and right.columnB`中，如何确定columnA是left表的呢？
 + 下推对于JOIN类型有没有要求， INNER JOIN、LEFT JOIN、RIGHT JOIN等？
-+ 针对具体的实现而言，Bustub中是如何针对某个Plan进行动态调整的?
++ 针对具体的实现而言，BusTub中是如何针对某个Plan进行动态调整的?
 
 # 2. 具体实现
 
@@ -28,7 +28,7 @@ keywords: [数据库执行层、Filter Pushdown]
 
 逻辑计划的优化本质上就是TreeNode的转换、移动，比如说Spark SQL中就基于Scala的模式匹配、偏函数结合树遍历(pre-order、post-order)的方式来巧妙的完成了这一过程。
 
-而Bustub采用是也是类似的方式，只不过采用的至下向上(post-order 左-右-Root)的遍历方式，如果当前节点有Children先优化Children，最后再到自己。基本代码就类似于：
+而BusTub采用是也是类似的方式，只不过采用的至下向上(post-order 左-右-Root)的遍历方式，如果当前节点有Children先优化Children，最后再到自己。基本代码就类似于：
 
 + Spark中类似的方法
 
@@ -43,7 +43,7 @@ def transformUpWithPruning(cond: TreePatternBits => Boolean, ruleId: RuleId = Un
 }
 ```
 
-+ Bustub中的实现
++ BusTub中的实现
 
 ```c++
 auto Optimizer::OptimizeNLJAsHashJoinWithFilterPushDown(const AbstractPlanNodeRef &plan) -> AbstractPlanNodeRef {
@@ -90,7 +90,7 @@ t1 (SeqScanPlanNode)    				filter (FilterPlanNode)
 
 所以当我们检测到 **当前节点类型为Filter 且 它的唯一Child为 NestedLoopJoin**，就可以开始着手两个方向的优化:
 
-+ NestedLoopJoinPlan的效率偏低，将其转化成HashJoin，但Bustub中本人实现的还是比较原始的，就是简单遍历左边，Build HashTable，然后去右表Probe
++ NestedLoopJoinPlan的效率偏低，将其转化成HashJoin，但BusTub中本人实现的还是比较原始的，就是简单遍历左边，Build HashTable，然后去右表Probe
 
 ```c++
 HashJoinPlanNode(
@@ -179,8 +179,6 @@ auto SplitConjunctivePredicates(const AbstractExpressionRef &expr, std::vector<A
     }
 }
 ```
-
-
 
 + 遍历拆分的逻辑表达式集合`subExpressions`，针对每一个`subExpression`也就是如果
   1. 类型是`ComparisonExpression`,  则收集它的Children中(**也就是ColumnValueExpression**)的col_index。如果所有的col_index都属于一个表，则视为单表条件；反之则视为涉及到两表的条件;  
@@ -325,9 +323,17 @@ HashJoin { type=Inner, left_key=#0.0, right_key=#1.0 } | (t1.t1.v1:INTEGER, t1.t
 
 可以看到除了下推，还进行了筛选条件合并，`filter=((#0.0=1000)and((#0.1=10)and(#0.0>5)))`。
 
+
+
+
+
+
+
+
+
 # 3. 总结
 
-至此基于Bustub，扩展优化规则之Join情况下的筛选条件下推，就基本梳理清楚了。当然还是偏学习型的，生产级别的数据库这块肯定比这里复杂更大，但对于理解基本原理足以。
+至此基于BusTub，扩展优化规则之Join情况下的筛选条件下推，就基本梳理清楚了。当然还是偏学习型的，生产级别的数据库这块肯定比这里复杂更大，但对于理解基本原理足以。
 
 
 # 参考
