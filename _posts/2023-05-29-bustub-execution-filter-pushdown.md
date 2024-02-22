@@ -148,7 +148,7 @@ t1.v1 = 3 and t1.v2 > t2.v4
 
 这样的子表达式也有一个专门的术语: **conjunction**
 
-> 我们把过滤条件按照最外层的AND拆分之后的单元叫做conjunction，比如 ((A & B) | C) & D & E 就是由 ((A & B) | C)， D，E 三个conjunction组成的。只所以这么定义是，conjunction是是否下推到存储的最小单元。一个conjunction里面的条件要么都下推，要么都不下推
+\> 我们把过滤条件按照最外层的AND拆分之后的单元叫做conjunction，比如 ((A & B) | C) & D & E 就是由 ((A & B) | C)， D，E 三个conjunction组成的。只所以这么定义是，conjunction是是否下推到存储的最小单元。一个conjunction里面的条件要么都下推，要么都不下推
 
 + 逻辑操作符为OR且所有的子比较表达式 都属于一个表
 
@@ -181,11 +181,10 @@ auto SplitConjunctivePredicates(const AbstractExpressionRef &expr, std::vector<A
 ```
 
 + 遍历拆分的逻辑表达式集合`subExpressions`，针对每一个`subExpression`也就是如果
-  1. 类型是`ComparisonExpression`,  则收集它的Children中(**也就是ColumnValueExpression**)的col_index。如果所有的col_index都属于一个表，则视为单表条件；反之则视为涉及到两表的条件;  
-
-     当然也要注意Right Children是否也为ColumnValueExpression，如果是的话，那么不能下推到Join内部， 需要联表之后再次筛选
+1. 类型是`ComparisonExpression`,  则收集它的Children中(**也就是ColumnValueExpression**)的col_index。如果所有的col_index都属于一个表，则视为单表条件；反之则视为涉及到两表的条件;  
+当然也要注意Right Children是否也为ColumnValueExpression，如果是的话，那么不能下推到Join内部， 需要联表之后再次筛选
   
-  2. 类型是`LogicExpression`， 则说明是OR逻辑表达式，因为没有被拆分，则递归遍历收集Children中(**也就是ColumnValueExpression**)中的col_index，如果都满足一边表的，则可分配到一边表的筛选条件，反之则说明无法下推
+2. 类型是`LogicExpression`， 则说明是OR逻辑表达式，因为没有被拆分，则递归遍历收集Children中(**也就是ColumnValueExpression**)中的col_index，如果都满足一边表的，则可分配到一边表的筛选条件，反之则说明无法下推
 
 上面逻辑大致实现
 
@@ -338,6 +337,6 @@ HashJoin { type=Inner, left_key=#0.0, right_key=#1.0 } | (t1.t1.v1:INTEGER, t1.t
 
 # 参考
 
-> Spark SQL 
+\> Spark SQL 
 
-> [aliyun 一文读懂AnalyticDB MySQL过滤条件智能下推原理](https://developer.aliyun.com/article/1183032)
+\> [aliyun 一文读懂AnalyticDB MySQL过滤条件智能下推原理](https://developer.aliyun.com/article/1183032)

@@ -215,9 +215,9 @@ t1 (SeqScanPlanNode)          t2 (SeqScanPlanNode)
 ```bash
     					join (HashJoinPlanNode)
 
-					/				       \
-				   /	
-t1 (SeqScanPlanNode)    				filter (FilterPlanNode)      
+					/					\
+					/	
+t1 (SeqScanPlanNode)					filter (FilterPlanNode)      
 												\
 											t2 (SeqScanPlanNode)
 ```
@@ -338,8 +338,8 @@ AdaptiveSparkPlan isFinalPlan=false
 
 # 参考
 
-> [CMU15-445 BusTub](https://github.com/cmu-db/bustub)
+\> [CMU15-445 BusTub](https://github.com/cmu-db/bustub)
 
-> [CMU 15-721 Database System Report](https://15721.courses.cs.cmu.edu/spring2023/project2.html)
+\> [CMU 15-721 Database System Report](https://15721.courses.cs.cmu.edu/spring2023/project2.html)
 
-> [blog Query Processing in BusTub](https://www.skyzh.dev/blog/2023-03-02-bustub-query-processing/)
+\> [blog Query Processing in BusTub](https://www.skyzh.dev/blog/2023-03-02-bustub-query-processing/)
