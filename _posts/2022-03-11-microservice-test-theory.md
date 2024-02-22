@@ -84,11 +84,11 @@ Jacoco官网有[相关示例](https://www.jacoco.org/jacoco/trunk/coverage/)
 
 ### 3.3.1 代码覆盖率统计报告实例
 
-![jacoco-coverage](/Users/allen/Library/Application Support/typora-user-images/data-platform/jacoco-coverage.png)
+![jacoco-coverage](/static/images/charts/2022-03-11/jacoco-coverage.png)
 
 ### 3.3.2 详细代码覆盖率实例
 
-![jacoco-package-coverage](/Users/allen/Library/Application Support/typora-user-images/data-platform/jacoco-package-coverage.png)
+![jacoco-package-coverage](/static/images/charts/2022-03-11/jacoco-package-coverage.png)
 
 + 红色表示没有被覆盖
 + 黄色表示部分被覆盖
@@ -214,10 +214,10 @@ MockMvc的局限性:  **底层使用TestDispatcherServlet，不能使用整个�
 
 # 6. 参考
 
-> [Spring Boot 2.4.2 官网测试](https://docs.spring.io/spring-boot/docs/2.4.2/reference/html/spring-boot-features.html#boot-features-testing)
+\> [Spring Boot 2.4.2 官网测试](https://docs.spring.io/spring-boot/docs/2.4.2/reference/html/spring-boot-features.html#boot-features-testing)
 
->[zhihu 各位都是怎么进行单元测试的？](https://www.zhihu.com/question/27313846)
+\> [zhihu 各位都是怎么进行单元测试的？](https://www.zhihu.com/question/27313846)
 
-> [Integration Testing in Spring](https://www.baeldung.com/integration-testing-in-spring)
+\> [Integration Testing in Spring](https://www.baeldung.com/integration-testing-in-spring)
 
-> [第6章 微服务测试设计和实践](https://github.com/spring2go/staffjoy-ppt/blob/master/doc/ppts/Chapter_06.pdf)
+\> [第6章 微服务测试设计和实践](https://github.com/spring2go/staffjoy-ppt/blob/master/doc/ppts/Chapter_06.pdf)
