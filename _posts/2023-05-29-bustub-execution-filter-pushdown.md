@@ -148,7 +148,7 @@ t1.v1 = 3 and t1.v2 > t2.v4
 
 这样的子表达式也有一个专门的术语: **conjunction**
 
-\> 我们把过滤条件按照最外层的AND拆分之后的单元叫做conjunction，比如 `((A & B) | C) & D & E` 就是由 `((A & B) | C)， D，E` 三个conjunction组成的。只所以这么定义是，conjunction是是否下推到存储的最小单元。
+我们把过滤条件按照最外层的AND拆分之后的单元叫做conjunction，比如 `((A & B) | C) & D & E` 就是由 `((A & B) | C)， D，E` 三个conjunction组成的。只所以这么定义是，conjunction是是否下推到存储的最小单元。
 一个conjunction里面的条件要么都下推，要么都不下推
 
 + 逻辑操作符为OR且所有的子比较表达式 都属于一个表
