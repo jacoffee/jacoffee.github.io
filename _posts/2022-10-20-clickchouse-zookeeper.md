@@ -20,7 +20,7 @@ keywords: [OLAP数据库研究、ClickHouse、Vectorization Processing]
 
 ```sql
 create table test_local (
-    ....
+....
 ) ENGINE = ReplicatedMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}')
 ```
 
@@ -38,10 +38,10 @@ create table test_local (
 | /metadata        | 表元数据信息，索引列粒度、主键、分区键等                     |
 | /columns         | 记录对应本地表的列信息，列名、字段类型                       |
 | /replicas        | 保存副本名称，对应设置参数中的replica_name                   |
-| /leader_election | 用于主副本的选举工作，主副本会主导<br/>MERGE和MUTATION操作（ALTER DELETE和ALTER UPDATE）。这些任务在<br/>主副本完成之后再借助ZooKeeper将消息事件分发至其他副本 |
+| /leader_election | 用于主副本的选举工作，主副本会主导MERGE和MUTATION操作（ALTER DELETE和ALTER UPDATE）。这些任务在主副本完成之后再借助ZooKeeper将消息事件分发至其他副本 |
 | /blocks          | 记录Block数据块的Hash信息摘要，以及对应的partition_id。通过Hash摘要能够判断Block数据块是否重复; partition_id，则能够找到需要同步的数据分区 |
 | /quorum          | 记录quorum的数量，当至少有quorum数量的副本写入成功后，整个写操作才算成功。quorum的数量由insert_quorum参数控制，默认值为0 |
-| /log             | 常规操作日志节点（INSERT、MERGE和DROP、PARTITION），它是整个工作机制中最为重要的一环，保存了副本需要执行的任务指令。log使用了ZooKeeper的持久顺序型节点，每条指令<br/>的名称以log-为前缀递增，例如log-0000000000、log-0000000001等。 |
+| /log             | 常规操作日志节点(INSERT、MERGE和DROP、PARTITION)，它是整个工作机制中最为重要的一环，保存了副本需要执行的任务指令。log使用了ZooKeeper的持久顺序型节点，每条指令的名称以log-为前缀递增，例如log-0000000000、log-0000000001等。 |
 
 # 1.2 分布式DDL协调
 
@@ -107,7 +107,7 @@ part_type: Compact
 ```
 
 然后对应的副本监听了对应的目录，便会拉取相应的操作日志LogEntry，然后存放到自己的任务队列中`/clickhouse/tables/{uuid}/01/replicas/{cluster}-{shard}-{replica}/queue`，
-很典型的异步解耦的操作，用于应对同时段大量的LogEntry处理
+很典型的异步解耦的操作，用于应对同时段大量的LogEntry处理。
 
 # 2. 关于ClickHouse Keeper
 
@@ -123,8 +123,7 @@ part_type: Compact
 
 \>  ClickHouse原理解析与应用实践
 
-\>  [blog 源码注释 层面针对 Zookeeper 再CK中的作用再次进行了阐述]( https://clickhouse.com/codebrowser/ClickHouse/src/Storages/StorageReplicatedMergeTree.h.html )
+\>  [blog StorageReplicatedMergeTree源码注释 层面针对Zookeeper在CK中的作用进行了详细的描述]( https://clickhouse.com/codebrowser/ClickHouse/src/Storages/StorageReplicatedMergeTree.h.html )
 
 \>  [Clickhouse Keeper官方文档](https://clickhouse.com/docs/en/operations/clickhouse-keeper/)
-
 
