@@ -10,8 +10,6 @@ description: 本文介绍从宏观层面ClickHouse
 keywords: [OLAP数据库研究、ClickHouse、Vectorization Processing, MergeTree, Sparse Index]
 ---
 
-[TOC]
-
 数据库综述系列主要是参考CMU15-721课程中提到的[Database System Report](https://15721.courses.cs.cmu.edu/spring2023/project2.html)，针对个人研究过的数据库(主要是OLAP方向)的核心架构进行梳理。ClickHouse目前已经是一个相当复杂OLAP数据库，所以主要会选择比较贴近实际开发的一些维度进行展开。另外由于笔者数据库水平有限，难免存在谬误，所以请带着**审慎和批判的眼光阅读本文**。
 
 + 基础架构

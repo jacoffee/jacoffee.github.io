@@ -10,8 +10,6 @@ description: 本文主要分享了个人在工作中的一些ClickHouse查询优
 keywords: [OLAP数据库研究、ClickHouse、Vectorization Processing、Query Optimization]
 ---
 
-[TOC]
-
 关于查询性能的优化，其实大致的方向就是: **干的少，做的快** -- 减少扫描的数量、网络IO，然后并行的处理数据。[知乎上的  关于如何进行sql优化？这个问题的回答](https://www.zhihu.com/question/637554270/answer/3346518807)我想很全面的总结了SQL优化大体思路, 而且感觉是非常OLAP方向，当然那个答主本身就是StarRocks工程师。
 
 本文主要是分享和总结本人在运营分析平台构建业务模型SQL(事件、漏斗等)中的一些ClickHouse查询优化实践，ClickHouse版本21.3.15.4，基本都是分布式表(**3 Shard 2 Replica**)。**一些优化成果(可能与特定版本和环境有关**，所以谨慎参考，但是思路是通用的，说明这个方向至少是可行的。
