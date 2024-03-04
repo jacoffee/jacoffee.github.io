@@ -6,7 +6,7 @@ title: 【ClickHouse基础】Zookeeper in ClickHouse
 tags: [OLAP数据库研究、ClickHouse、Zookeper、Linearizable Write]
 permalink: /database/clickhouse/zookeeper
 key:
-description: 本文主要Zookeeper在ClickHouse中起到的作用
+description: 本文主要总结了Zookeeper在ClickHouse中起到的作用
 keywords: [OLAP数据库研究、ClickHouse、Vectorization Processing]
 ---
 
