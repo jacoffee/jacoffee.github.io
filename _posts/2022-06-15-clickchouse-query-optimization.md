@@ -12,7 +12,7 @@ keywords: [OLAP数据库研究、ClickHouse、Vectorization Processing、Query O
 
 关于查询性能的优化，其实大致的方向就是: **干的少，做的快** -- 减少扫描的数量、网络IO，然后并行的处理数据。[知乎上的  关于如何进行sql优化？这个问题的回答](https://www.zhihu.com/question/637554270/answer/3346518807)我想很全面的总结了SQL优化大体思路, 而且感觉是非常OLAP方向，当然那个答主本身就是StarRocks工程师。
 
-本文主要是分享和总结本人在运营分析平台构建业务模型SQL(事件、漏斗等)中的一些ClickHouse查询优化实践，ClickHouse版本21.3.15.4，基本都是分布式表(**3 Shard 2 Replica**)。**一些优化成果(可能与特定版本和环境有关**，所以谨慎参考，但是思路是通用的，说明这个方向至少是可行的。
+本文主要是分享和总结本人在运营分析平台构建业务模型SQL(事件、漏斗等)中的一些ClickHouse查询优化实践，ClickHouse版本21.3.15.4，基本都是分布式表(**3 Shard 2 Replica**)。**一些优化成果(可能与特定版本和环境有关**，所以请谨慎参考，但是思路是通用的，说明这个方向至少是可行的。
 
 
 # 1. 调优实践
@@ -177,8 +177,8 @@ xxx [ 34 ] {26b313c1-b7db-4c94-ae3b-a093381a61b6} <Debug> xxx (f1fe6faa-145f-417
 
 经过这个优化实践之后:
 
-+ **查询效果受url基数和页面传递格式影响**， 当查询的url基数越大，也就是越离散，比如说那种带id的页面，效果提升会更明显，因为可以进一步提高过滤的数据量
-+ 页面查询指定的越通用的，比如如说直接写域名 'http://www.xxxx.com' ，效果越差，这个和离散程度实际上一一对应的
++ **查询效果受url基数和页面传递格式影响**， 当查询的url基数越大(High cardinality)，也就是越离散，比如说那种带id的页面，效果提升会更明显，因为可以进一步提高过滤的数据量
++ 页面查询指定的越通用的，比如如说直接写二级域名 'http://www.xxxx.com' ，效果越差，这个和离散程度实际上一一对应的
 
 ## 1.3 Join优化之事件表联表用户表时，双重过滤
 
@@ -200,7 +200,7 @@ from
 	event_date = 'yyyy-MM-dd' and
 	(event_name = 'login' or event_name = 'order')
 ) t1
-global join
+left global join
 (
 	select 
 	channel 
@@ -210,13 +210,17 @@ global join
 ) t2 on t1.oneid = t2.oneid
 ```
 
+关于ClickHouse分布式表查询原理，可以参考[【数据库综述系列】ClickHouse综述(下)]()  的 关于Distributed Subqueries 部分。
+
+
+
 ### 1.3.2 问题描述
 
-由于用户维表较大，有的站点可能达到上10亿，但是如果查询时用户维表上没有很有**筛选力度的条件的**，右表就会非常大。关于ClickHouse join相关的执行流程，读者可以自行参考社区的相关文章。 在上例中，即使使用了global join，在我们的正常模型查询也是非常慢的。原因也很简单，两个比较大的表join，磁盘、网络IO都是很夸张的。
+由于用户维表较大，有的站点可能达到上10亿，但是如果查询时用户维表上没有很有**筛选力度的条件的**，右表就会非常大。 在上例中，即使使用了global join，在我们的正常模型查询也是非常慢的，假设事件表选了一个周的范围。原因也很简单，当前版本的Join支持还是比较局限的再加上两个比较大的表join，磁盘、网络IO都是很夸张的。
 
 ### 1.3.3 优化方向
 
-考虑到用户维表的主键是oneid + 关联关系是内联 + 只有在事件表有行为的用户，才需要去联表，基于这点考虑，**在联表之前基于事件表的条件先捞出oneid，作为用户维表查询的一部分条件**，SQL大致类似于这种:
+考虑到用户维表的主键是oneid  + 只有在事件表有行为的用户，才需要去联表，基于这点考虑，**在联表之前基于事件表的条件先捞出oneid，作为用户维表查询的一部分条件**，SQL大致类似于这种:
 
 ```sql
 select 
@@ -232,7 +236,7 @@ from
 	event_date = 'yyyy-MM-dd' and
 	(event_name = 'login' or event_name = 'order')
 ) t1
-global join
+left global join
 (
 	select 
 	channel 
@@ -252,7 +256,7 @@ global join
 ) t2 on t1.oneid = t2.oneid
 ```
 
-经过这个优化实践之后，可以大大提高join的性能，目前**几乎所有的分析模型在用户关联的时候采用类似的方式**。
+经过这个优化实践之后，可以大大提高join的性能，目前**几乎所有的分析模型在用户关联的时候采用类似的方式**。核心原因就是 通过oneid的筛选条件降低 右边的数量，这样可以加快global join基于右表生成临时表的过程。
 
 
 ## 1.4 基于特定站点的大小表查询优化
@@ -263,22 +267,20 @@ global join
 
 ### 1.4.2 问题描述
 
-Altinity(一家ClickHouse专业提供商)，关于ClickHouse Wide Table 还是 Not Wide，有一篇[非常详细的博文](https://altinity.com/blog/too-wide-or-not-too-wide-that-is-the-clickhouse-question)介绍，里面有各种实验论证，甚至提供了建表时候如何选择数据结。列太宽对于ClickHouse查询和写入都是有巨大影响。 如果从原理层面来解释就是: 
+Altinity(一家ClickHouse专业提供商)，关于ClickHouse Wide Table 还是 Not Wide，有一篇[非常详细的博文](https://altinity.com/blog/too-wide-or-not-too-wide-that-is-the-clickhouse-question)介绍，里面有各种实验论证，甚至提供了建表时候如何选择数据结构。列太宽对于ClickHouse查询和写入都有巨大影响。 如果从原理层面来解释就是: 
 
 ClickHouse在写入和读取的时候会按照列申请Compress Buffer，默认的是每列1MB，在[github issue 6943](https://github.com/ClickHouse/ClickHouse/issues/6943), ClickHouse CTO有专门回复过这个问题。
 
 > It's related to compress buffer size and write buffer size. Both are 1MB by default.
 > **It looks like buffers for all columns are allocated at once**, and 20 000 columns lead to about 40 GB of buffers.
 
-当初发现这个问题就是，在监测ClickHouse写入的时候，发现某个表即使当次写入的有数据列的非常少，但是每次分配的内存很大，后来结合Compress Buffer发现了这个问题。
+当初发现这个问题就是，在监测ClickHouse写入的时候，发现某个表即使当次写入的有数据列的非常少，但是每次分配的内存也很大，后来结合Compress Buffer发现了这个问题。
 
-
-
-关于Compress Buffer扩展解释下:
+关于Compress Buffer的扩展解释:
 
 + 为什么需要Compress Buffer
 
-ClickHouse写入底层列数据的时候一般都会进行压缩，将内存数据从一个地方压缩到另外一个内存，这个过程可能需要一块临时内存存储中间数据， 也就是下面代码中提到的**compressed_buffer**。基于临时内存中的数据计算checksum，最后将checksum + 临时内存数据写到output buffer中。
+ClickHouse写入底层列数据的时候一般都会进行压缩，将内存数据从一个地方压缩到另外一个内存，这个过程可能需要一块临时内存存储中间数据进行一些额外处理，比如说计算checksum之类的， 也就是下面代码中提到的**compressed_buffer**。基于临时内存中的数据计算checksum，最后将checksum + 临时内存数据写到output buffer中。
 
 ```c++
 // https://clickhouse.com/codebrowser/ClickHouse/src/Compression/CompressedWriteBuffer.cpp.html
@@ -289,11 +291,14 @@ void CompressedWriteBuffer::nextImpl() {
     * If output buffer does not have necessary capacity. Compress data into a temporary buffer.
       * Then we can write checksum and copy the temporary buffer into the output buffer.
     */
+    // 分配 compressed_buffer 用于额外的数据处理
     compressed_buffer.resize(compressed_reserve_size);
+    
     UInt32 compressed_size = codec->compress(working_buffer.begin(), decompressed_size, compressed_buffer.data());
 
     
     CityHash_v1_0_2::uint128 checksum = CityHash_v1_0_2::CityHash128(compressed_buffer.data(), compressed_size);
+    
     writeBinaryLittleEndian(checksum.low64, out);
     writeBinaryLittleEndian(checksum.high64, out);
     out.write(compressed_buffer.data(), compressed_size);
@@ -302,7 +307,7 @@ void CompressedWriteBuffer::nextImpl() {
 
 ```
 
-+ 由于ClickHouse中的数据是分列写入的，所以每一个Column写入的时候需要分配Compress buffer
++ 由于ClickHouse中的数据是分列写入的，所以每一个Column写入的时候都需要分配(If needed)
 
 ### 1.4.3 优化方向
 
@@ -318,7 +323,7 @@ void CompressedWriteBuffer::nextImpl() {
 
 ### 1.5.2 问题描述
 
-当时在构建一个分析模型的时候，需要对于数组进行拆分，ClickHouse提供了arraySplit函数，关于相关语法可以参考官网，第二个参数是切分点，一般是包含1,0的数组，通常会想到使用arrayEnumerate来获取数组的索引，一般会配合arrayMap使用。
+当时在构建一个分析模型的时候，需要对于数组进行拆分，ClickHouse提供了arraySplit函数，关于相关语法可以参考官网，第二个参数是切分点，一般是包含1,0的数组。通常会想到使用arrayEnumerate来获取数组的索引，一般会配合arrayMap使用。
 
 ```sql
 SELECT
@@ -371,7 +376,7 @@ Ok.
 
 官网关于ClickHouse配置部分，针对的[max_block_size](https://clickhouse.com/docs/en/operations/settings/settings)的解释，能非常清晰的解释为什么调小这个参数之后，能顺利跑过，简而言之就是：
 
-ClickHouse中数据读取的单位是Block，Block包含的读取的数据行，减少每个Block的数据量从而减少了内存消耗，属于时间换空间的操作。显然这个参数不能调的太小，上面的测试案例只是为了演示而设置成了1。
+ClickHouse中数据读取的单位是Block，**Block包含的读取的数据行**，减少每个Block的数据量从而减少了内存消耗，**属于时间换空间的操作**。显然这个参数不能调的太小，上面的测试案例只是为了演示而设置成了1。
 
 经过这个优化实践之后，差不多有两倍的速度提升。
 
