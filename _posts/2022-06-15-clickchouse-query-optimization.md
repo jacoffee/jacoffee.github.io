@@ -2,7 +2,7 @@
 layout: post
 category: database
 date: 2022-06-16 22:53:03 UTC
-title: 【ClickHouse基础】查询性能优化
+title: 【ClickHouse实战】查询性能优化
 tags: [OLAP数据库研究、ClickHouse、Vectorization Processing、Query Optimization]
 permalink: /database/clickhouse/query-optimization
 key:
