@@ -33,15 +33,37 @@ create table test_local (
 
 同时该路径下，比如说/clickhouse/tables/table_uuid/01，下面会包括如下路径:
 
-| 路径             | 说明                                                         |
-| ---------------- | ------------------------------------------------------------ |
-| /metadata        | 表元数据信息，索引列粒度、主键、分区键等                     |
-| /columns         | 记录对应本地表的列信息，列名、字段类型                       |
-| /replicas        | 保存副本名称，对应设置参数中的replica_name                   |
-| /leader_election | 用于主副本的选举工作，主副本会主导MERGE和MUTATION操作（ALTER DELETE和ALTER UPDATE）。这些任务在主副本完成之后再借助ZooKeeper将消息事件分发至其他副本 |
-| /blocks          | 记录Block数据块的Hash信息摘要，以及对应的partition_id。通过Hash摘要能够判断Block数据块是否重复; partition_id，则能够找到需要同步的数据分区 |
-| /quorum          | 记录quorum的数量，当至少有quorum数量的副本写入成功后，整个写操作才算成功。quorum的数量由insert_quorum参数控制，默认值为0 |
-| /log             | 常规操作日志节点(INSERT、MERGE和DROP、PARTITION)，它是整个工作机制中最为重要的一环，保存了副本需要执行的任务指令。log使用了ZooKeeper的持久顺序型节点，每条指令的名称以log-为前缀递增，例如log-0000000000、log-0000000001等。 |
+| 路径                 | 说明                                                         |
+| -------------------- | ------------------------------------------------------------ |
+| /metadata            | 表元数据信息，索引列粒度、主键、分区键等                     |
+| /columns             | 记录对应本地表的列信息，列名、字段类型                       |
+| /replicas            | 保存副本名称，对应设置参数中的replica_name                   |
+| ~~/leader_election~~ | ~~用于主副本的选举工作，主副本会主导MERGE和MUTATION操作（ALTER DELETE和ALTER UPDATE）。这些任务在主副本完成之后再借助ZooKeeper将消息事件分发至其他副本~~ |
+| /blocks              | 记录Block数据块的Hash信息摘要以及对应的partition_id。通过Hash摘要能够判断Block数据块是否重复; partition_id，则能够找到需要同步的数据分区 |
+| /quorum              | 记录quorum的数量，当至少有quorum数量的副本写入成功后，整个写操作才算成功。quorum的数量由insert_quorum参数控制，默认值为0 |
+| /log                 | Shard中分片操作日志节点(INSERT、MERGE和DROP、PARTITION)，它是整个工作机制中最为重要的一环，保存了副本需要执行的任务指令。log使用了Z持久顺序型节点，每条指令的名称以log-为前缀递增，例如log-0000000000、log-0000000001等。 |
+
+关于Shard中的leader replica, 这点从20.6已经发生了改变，或者21.12以后的版本实际上都是双主了，也就是多个Replica都可以接收写入，没有所谓的Leader Election。
+
+```c++
+// LeaderElection.h
+
+/** Initially was used to implement leader election algorithm described here:
+  * http://zookeeper.apache.org/doc/r3.4.5/recipes.html#sc_leaderElection
+  *
+  * But then we decided to get rid of leader election, so every replica can become leader.
+  * For now, every replica can become leader if there is no leader among replicas with old version.
+  */
+void checkNoOldLeaders(Poco::Logger * log, ZooKeeper & zookeeper, const String path)
+{
+    /// Previous versions (before 21.12) used to create ephemeral sequential node path/leader_election-
+    /// Replica with the lexicographically smallest node name becomes leader (before 20.6) or enables multi-leader mode (since 20.6)
+    constexpr auto persistent_multiple_leaders = "leader_election-0";   /// Less than any sequential node
+    constexpr auto suffix = " (multiple leaders Ok)";
+    constexpr auto persistent_identifier = "all (multiple leaders Ok)";
+    ....
+}
+```
 
 # 1.2 分布式DDL协调
 
@@ -93,10 +115,12 @@ alter table test_all add column A on cluster xx_cluster
 INSERT INTO TABLE test_all VALUES('A001')
 ```
 
-首先会在执行节点插入相关的数据，写入临时文件夹中，然后往Replica的Zookeeper路径下的`/log`推送本次命令的日志，大致格式为
+首先会在执行节点插入相关的数据，写入临时文件夹中，然后往Replica对应Shard的log目录下的`/log`推送本次命令的日志，可以想象同一个Shard下面的两个Replica都会监听该目录，大致格式如下:
 
 ```bash
+# Zookeeper路径
 /clickhouse/tables/{uuid}/01/log/log-0000029825
+
 format version: 4
 create_time: xxxxx
 source replica: xxxx

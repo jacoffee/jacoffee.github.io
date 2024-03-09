@@ -223,6 +223,8 @@ Column.mrk中维护了两个offset:
 
 # 3. 参考
 
+\> ClickHouse原理解析与应用
+
 \> [ClickHouse architecture](https://clickhouse.com/docs/en/development/architecture#merge-tree)
 
 \> [ClickHouse What Makes ClickHouse so Fast?](https://clickhouse.com/docs/en/faq/general/why-clickhouse-is-so-fast)
