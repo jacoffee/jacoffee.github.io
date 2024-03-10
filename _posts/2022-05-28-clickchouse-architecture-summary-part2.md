@@ -10,8 +10,6 @@ description: 本文介绍从宏观层面ClickHouse
 keywords: [OLAP数据库研究、ClickHouse、Vectorization Processing, Distributed Read&Write]
 ---
 
-[TOC]
-
 在[【数据库综述系列】ClickHouse综述(上)](http://roadtopro.top/database/summary/clickhouse/part1)中，我们针对ClickHouse的基础架构、MergeTree存储结构进行了展开，本篇我们将针对ClickHouse中分布式表的写入和查询流程进行剖析，由于是综述性质所以会更偏向于流程性的东西。
 
 # 1. 关于分布式表
