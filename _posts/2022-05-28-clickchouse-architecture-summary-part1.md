@@ -237,5 +237,5 @@ Column.mrk中维护了两个offset:
 
 \> [ClickHouse和他的朋友们（6）MergeTree存储结构](https://bohutang.me/2020/06/26/clickhouse-and-friends-merge-tree-disk-layout/)
 
-\>  [github 解析Mark file](https://github.com/ClickHouse/ClickHouse/issues/6830)
+\> [github 解析Mark file](https://github.com/ClickHouse/ClickHouse/issues/6830)
 
