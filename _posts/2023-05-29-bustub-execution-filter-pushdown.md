@@ -16,9 +16,9 @@ keywords: [数据库执行层、Filter Pushdown]
 
 # 1. 实现思考
 
-+ 满足什么样条件的**逻辑操作符(AND、OR)**才可以下推，比如说`left.columnA > 1 or right.columnB` 这种可以下推嘛？
++ 满足什么样条件的**逻辑操作符(AND、OR)**才可以下推，比如说`left.columnA > 1 or right.columnB > 1` 这种可以下推嘛？
 + 满足什么样条件的比较表达式才可以下推，比如说`left.columnA > right.columnB` 这种可以下推嘛？
-+ 下推的时候，如何确定查询列下推的表， 比如说`left.columnA > 1 and right.columnB`中，如何确定columnA是left表的呢？
++ 下推的时候，如何确定查询列下推的表， 比如说`left.columnA > 1 and right.columnB > 1`中，如何确定columnA是left表, 而columnB是right表的呢？
 + 下推对于JOIN类型有没有要求， INNER JOIN、LEFT JOIN、RIGHT JOIN等？
 + 针对具体的实现而言，BusTub中是如何针对某个Plan进行动态调整的?
 
