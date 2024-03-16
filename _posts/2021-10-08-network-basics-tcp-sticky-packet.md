@@ -2,7 +2,7 @@
 layout: post
 category: network
 date: 2021-10-08 20:51:22 UTC
-title: 【网络】TCP基础之粘包和拆包
+title: 【网络基础】TCP基础之粘包和拆包
 tags: [TCP协议，粘包拆包]
 permalink: /network/tcp/sticky-packet
 key: 
