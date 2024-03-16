@@ -10,8 +10,6 @@ description: 本文介绍了应用层协议Https的基础知识以及实际应�
 keywords: [网络基础, 4层网络协议，SSL/TLS, 数据链路层，、网络层、传输层、应用层]
 ---
 
-[TOC]
-
 #  1. 基础概念
 
 ## 1.1 对称加密(**Symmetric Cryptography**) vs 非对称加密(Asymmetric Cryptography)
@@ -234,5 +232,3 @@ ssh user@host 'mkdir -p .ssh && cat >> ~/.ssh/authorized_keys < ~/.ssh/id_rsa.pu
 \> [百度Https接入安全](http://www.infoq.com/cn/presentations/baidu-https-access-security?utm_campaign=infoq_content&utm_source=infoq&utm_medium=feed&utm_term=presentations)
 
 \> [blog https process 英文版](https://www.cloudflare.com/en-gb/learning/ssl/keyless-ssl/)
-
-\> 极客时间 第15讲 | HTTPS协议：点外卖的过程原来这么复杂
