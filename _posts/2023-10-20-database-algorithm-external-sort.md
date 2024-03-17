@@ -33,13 +33,13 @@ keywords: [数据库算法、外部排序、Vocalno Model、Physical Plan、Aggr
 针对下面的示例数据，如果按照group key排好序了，那么我们通过读取行，发现group key发生变化了，就说明切换到了新的组。这样之前为group key=A累计的中间状态就可以进行计算。HashBasedAggregation之所以会导致内存溢出，一方面是group key太多，另外一方面是因为要同时存在的大量的中间存储，比如说A和B都要存在，而SortBasedAggregation可以边读边进行计算。
 
 ```bash
-group key    value
-A				1
-A				2
-A 				3
-B				4
-B				3
-B				5
+group key			value
+A					1
+A					2
+A 					3
+B					4
+B					3
+B					5
 ```
 
 但是默认情况下，就个人所知，几乎所有的数据库默认都采用的是HashBasedAggregation，只不过各有各的优化。这个原因也很简单，因为对于大数据量的排序也是一个很重的操作。
@@ -180,7 +180,7 @@ E			E
 
 联想到取一组数据里面最小的元素，自然而然的会想到最小堆，C++中当然有相应的实现[std::priority_queue](https://en.cppreference.com/w/cpp/container/priority_queue)。
 
-另外由于需要不断的比较首元素并且改变，所以需要借助系统`string.h`提供的getLine同时维护一个变量存储最近读出来的行，参见下面的`IOStringStack.h` &&  `IOStringStack.cpp`。
+另外由于需要不断的比较首元素并且改变，所以需要借助系统`string.h`提供的getLine同时维护一个变量存储最近读出来的行，参见下面的`IOStringStack.h` &&  `IOStringStack.cpp`。
 
 # 3. 核心代码梳理
 
