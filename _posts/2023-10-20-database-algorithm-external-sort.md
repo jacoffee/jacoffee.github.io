@@ -10,8 +10,6 @@ description: 本文基于C++简化实现了数据库聚合的时候的外部排�
 keywords: [数据库算法、外部排序、Vocalno Model、Physical Plan、AggregationExecutorr、Spark SQL]
 ---
 
-[TOC]
-
 # 1. 背景概述
 
 ## 1.1 数据库聚合操作的实现
