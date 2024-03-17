@@ -171,7 +171,7 @@ auto initializeStudents() -> std::vector<Student> {
 B			A			A		
 C			B			C
 D			C			E
-E           E
+E			E
 ```
 
 假设上面三组排好序的数据，需要按照升序从小到大排列，实现从逻辑上就讲就是: 
