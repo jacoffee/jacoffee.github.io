@@ -278,13 +278,9 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.jacoffee.thre
 
 `DispatcherServletAutoConfiguration`执行流程，负责Spring WebMVC相关的功能
 
-
-
 # 3. 实战演练
 
 我们在基于Spring boot实际开发的过程中，会引入各种starter， 比如说`spring-boot-starter-web`, `druid-spring-boot-starter`， 它通过集成的方式引入了一揽子的依赖，比如说前面的如果我们需要引入druid相关的功能。不用说背后肯定会使用到AutoConfiguration, 下面的我们通过引入的一个定制化的threadpool，来看看如何基于AutoConfiguration开发一个简单的starter，`spring-boot-starter-threadpool`。
-
-
 
 ## 3.1 定义核心功能类 -- JacoffeeThreadPoolExecutor
 
