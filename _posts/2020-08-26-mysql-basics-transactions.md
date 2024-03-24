@@ -600,8 +600,6 @@ struct trx_t {
 
 \> [SO 回滚更新操作](http://stackoverflow.com/questions/12880994/how-to-rollback-an-update-in-postgres)
 
-\> 极客时间  08 | 事务到底是隔离的还是不隔离的
-
 \> [MySQL多版本并发控制（mvcc）](https://blog.csdn.net/chenjianhuideyueding/article/details/112122692)
 
 \> [正确的理解MySQL的MVCC及实现原理](https://blog.csdn.net/SnailMann/article/details/94724197)
