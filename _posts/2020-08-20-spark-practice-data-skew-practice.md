@@ -2,7 +2,7 @@
 layout: post
 category: spark
 date: 2020-08-15 15:29:03 UTC
-title: 【Spark实战】 数据倾斜处理
+title: 【Spark实战】数据倾斜处理
 tags: [Data Skew, Adpative Optimization]
 permalink: /spark/practice/data-skew
 key:
