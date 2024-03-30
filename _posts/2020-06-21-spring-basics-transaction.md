@@ -567,42 +567,14 @@ public void insert(User user) {
 
 # 5. 参考
 
-> [官网 事务管理](https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#transaction-programmatic)
+\> [官网 事务管理](https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#transaction-programmatic)
 
-> [IBM 透彻的掌握 Spring 中@transactional 的使用](https://www.ibm.com/developerworks/cn/java/j-master-spring-transactional-use/index.html)
+\> [IBM 透彻的掌握 Spring 中@transactional 的使用](https://www.ibm.com/developerworks/cn/java/j-master-spring-transactional-use/index.html)
 
-> [@Transactional的工作原理](http://www.codingpedia.org/jhadesdev/how-does-spring-transactional-really-work/)
-> 两个上下文: the persistence context && the database transaction
-> The transactional annotation itself defines the scope of a single database transaction. The database transaction happens inside the scope of a persistence context.
->
-> Transactional注解定义了单个数据库事务的作用域，也就是持久化的上下文
-> The Transactional Aspect has two main responsibilities:
->
-> @Transactional切面有上下文有两个职责:
-> At the 'before' moment, the aspect provides a hook point for determining if the business method about to be called should run in the scope of an ongoing database transaction, or if a new separate transaction should be started.
-> At the 'after' moment, the aspect needs to decide if the transaction should be committed, rolled back or left running.
+\> [@Transactional的工作原理](http://www.codingpedia.org/jhadesdev/how-does-spring-transactional-really-work/)
 
-> [知乎【技术干货】Spring事务原理一探](https://zhuanlan.zhihu.com/p/54067384)
->
-> 作为上面研究流程的补充
+\> [知乎【技术干货】Spring事务原理一探](https://zhuanlan.zhihu.com/p/54067384)
 
-```java
+\> [SO 隔离与传播性解释](https://stackoverflow.com/questions/8490852/spring-transactional-isolation-propagation)
 
-o.s.j.d.DataSourceTransactionManager@[restartedMain] - Creating new transaction with name [com.jacoffee.springboot.service.impl.GameDataServiceImpl.insertOrUpdate]:
-
-o.s.t.s.TransactionSynchronizationManager@[restartedMain] - Initializing transaction synchronization
-
-o.s.t.i.TransactionInterceptor@[restartedMain] - Getting transaction for [com.jacoffee.springboot.service.impl.GameDataServiceImpl.insertOrUpdate]
-
-gameDataMapperFromSession org.apache.ibatis.binding.MapperProxy@29afde29
-
-```
-
-> [SO 隔离与传播性解释](https://stackoverflow.com/questions/8490852/spring-transactional-isolation-propagation)
-
-> [Spring官方都推荐使用的@Transactional事务，为啥我不建议使用！](https://mp.weixin.qq.com/s/owtAvBkjj44BVG7cFIZumw)
->
-> 主要是两点:
-> 方法被@Transactional注解，然后内部塞了太多的逻辑导致 long-lived transaction
-> 一致性问题，在事件发布与监听机制中，我们提到过@Transactional修饰的方法需要整个执行完成之后才会走到事务提交的流程
-> 但内部可能包含了RPC、发送消息到消息队列。这几个无法通过统一回滚的来保证一致性的
+\> [Spring官方都推荐使用的@Transactional事务，为啥我不建议使用！](https://mp.weixin.qq.com/s/owtAvBkjj44BVG7cFIZumw)
