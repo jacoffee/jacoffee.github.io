@@ -4,7 +4,7 @@ category: spring
 date: 2020-06-28 17:26:03 UTC
 title: 【Spring基础】AOP
 tags: [SpingAOP, Aspect Oriented Programming]
-permalink: /spring/basics/transaction
+permalink: /spring/basics/aop
 key:
 description: 本文整理Spring AOP的基础知识
 keywords: [SpingAOP, Aspect Oriented Programming]
@@ -587,8 +587,6 @@ NodeScheduler的testScheduled被定时调度执行的时候，由于此处容器
 `DynamicAdvisedInterceptor`中的intercept方法。
 
 ![nodescheduler_callback](/static/images/charts/2020-06-29/nodescheduler_callback.png)
-
-![nodescheduler_callback](/Users/allen/Library/Application Support/typora-user-images/nodescheduler_callback.png)
 
 + 构建CglibMethodInvocation并且执行proceed()
 + 从代理配置的**拦截器中根据指定条件去执行具体拦截**，比如说本例中的 AspectJAroundAdvice的invoke方法, 最终会通过反射调用 Advice method也就是上面的`testScheduled`
